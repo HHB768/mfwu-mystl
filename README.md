@@ -1,7 +1,12 @@
-[ongoing] [incomplete]
-#My stl implementation
+[Ongoing] [Incomplete]
+# My STL implementation
 
-src: 240511-sgi-stl
-wko: mfwu-stl-vector
+info:
+* src: 240511-sgi-stl
+* wko: mfwu-stl-vector
 
-X-mfwu / 24.06.16
+env:
+* ubuntu 22.04
+* g++11.4.0
+
+X-mfwu / 24.06.16<br>
