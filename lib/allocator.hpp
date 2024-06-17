@@ -72,7 +72,7 @@ typedef default_alloc alloc;
 #if 0
 #   define __THROW_BAD_ALLOC throw ::std::bad_alloc
 #elif !defined __THROW_BAD_ALLOC
-#   define __THROW_BAD_ALLOC ::std::cerr << "out of memory" << ::std::endl; exit(1)
+#   define __THROW_BAD_ALLOC ::std::cerr << "out of memory" << ::std::endl/*; exit(1)*/
 #endif
 
 // stl alloc interface
@@ -128,7 +128,7 @@ private:
         void* res;
         for (;;) {
             my_malloc_handler = __malloc_alloc_oom_handler;
-            if (0 == my_malloc_handler) { __THROW_BAD_ALLOC; }
+            if (0 == my_malloc_handler) { __THROW_BAD_ALLOC; return nullptr; }
             (*my_malloc_handler)();
             res = malloc(n);
             if (res) return res;
@@ -146,7 +146,7 @@ void (*malloc_alloc::__malloc_alloc_oom_handler)() = 0;
 enum { __ALIGN = 8 };
 enum { __MAX_BYTES = 128 };
 enum { __NFREELISTS = __MAX_BYTES / __ALIGN };
-
+enum { __DEFAULT_REFILLING_SIZE = 20 };
 class default_alloc {
 public:
     friend class unit_test_allocator;
@@ -180,7 +180,12 @@ public:
     static void* reallocate(void* p, size_t old_size, size_t new_size) { return nullptr; }  // TODO
 
 private:
-    static std::string identify();  // test interface
+// #ifdef __UNIT_TEST_ALLOCATOR__  // test interface
+    static std::string identify();  
+    static std::string print_status();
+    static void* print_status_alloc(size_t n);
+    static void print_status_dealloc(void* p, size_t n);
+// #endif // __UNIT_TEST_ALLOCATOR__
 
     static size_t ROUND_UP(size_t bytes) {
         return (bytes + __ALIGN - 1) & ~(__ALIGN - 1);
@@ -197,7 +202,7 @@ private:
     }
 
     static void* refill(size_t n) {  // we assume n has been ROUNDUPed
-        int nobjs = 20;  // default refilling size
+        int nobjs = __DEFAULT_REFILLING_SIZE;  // default refilling size
         char* chunk = chunk_alloc(n, nobjs);  // get mem from pool
 
         if (1 == nobjs) {
@@ -213,8 +218,7 @@ private:
             if (nobjs - 1 == i) {
                 current_obj->free_list_link = 0;
                 break;
-            }
-            else {
+            } else {
                 current_obj->free_list_link = next_obj;
             }
         }
@@ -241,7 +245,7 @@ private:
             size_t bytes_to_get = 2 * total_bytes + ROUND_UP(heap_size / 16);  // why?
             if (bytes_left > 0) {
                 obj* volatile* my_free_list = free_lists + FREELIST_INDEX(bytes_left);  // why can we do that?
-                ((obj*)start_free)->free_list_link = *my_free_list;  // bcz bytes_left % 8 === 0
+                ((obj*)start_free)->free_list_link = *my_free_list;  // bcz bytes_left % 8 === 0 !
                 *my_free_list = (obj*)start_free;
             }
             start_free = (char*)malloc(bytes_to_get);

@@ -2,9 +2,12 @@
 
 int main() {
     int score = 0;
-    const int total = 1;
-    mfwu::unit_test_allocator ut_malloc_alloc;
-    score += !ut_malloc_alloc.use_malloc_allocator();
-    std::cout << score << "/" << total << "\n";
+    const int total = 2;
+    mfwu::unit_test_allocator ut_alloc;
+    score += !ut_alloc.use_malloc_allocator();
+    score += !ut_alloc.use_default_allocator();
+
+    std::cout << "----------- result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n";
     return 0;
 }

@@ -3,14 +3,16 @@
         {
             "name": "Linux",
             "includePath": [
-                // "${workspaceFolder}/**"
                 "${workspaceFolder}/lib/**",
                 "${workspaceFolder}/test/**"
             ],
-            "defines": [],
+            "defines": [
+                "__UNIT_TEST_ALLOCATOR__=1"
+            ],
             "cStandard": "c17",
             "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": []
         }
     ],
     "version": 4

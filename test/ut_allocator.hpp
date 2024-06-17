@@ -1,4 +1,5 @@
 #include "allocator.hpp"
+#define __UNIT_TEST_ALLOCATOR__
 
 namespace mfwu {
 
@@ -21,7 +22,39 @@ std::string default_alloc::identify() {
     return "default_alloc";
 }
 
+std::string default_alloc::print_status() {
+    std::stringstream ss;
+    ss << "memory pool: \n";
+    ss << "heap size: " << heap_size << " start-end: " 
+       << (void*)start_free << " - " << (void*)end_free << "\n";
+    ss << "free lists: \n[ ";
+    for (int i=0; i<__NFREELISTS; i++) {
+        int num = 0;
+        default_alloc::obj* node = free_lists[i];
+        while(node) {
+            node = node->free_list_link;
+            num++;
+        }
+        ss << num << " ";
+    }
+    ss << "]\n\n";
+    return ss.str();
+}
+
+void* default_alloc::print_status_alloc(size_t n) {
+    void* res = default_alloc::allocate(n);
+    std::cout << default_alloc::print_status();
+    return res;
+}
+
+void default_alloc::print_status_dealloc(void* p, size_t n) {
+    default_alloc::deallocate(p, n);
+    std::cout << default_alloc::print_status();
+}
+
+
 bool unit_test_allocator::use_malloc_allocator() {
+    std::cout << "------- Test: use_malloc_allocator -------\n";
     std::cout << "In " << malloc_alloc::identify() << "\n";
 
     std::cout << "allocating 0\n";
@@ -36,11 +69,11 @@ bool unit_test_allocator::use_malloc_allocator() {
     std::cout << "allocating 1024^3\n";
     start = malloc_alloc::allocate(1024*1024*1024);  // GB?
     std::cout << "ptr: " << start << "\n";
-    sleep(5);
+    sleep(0.5);
     std::cout << "reallocating 1.5*1024^3\n";
     start = malloc_alloc::reallocate(start, 42, 1024*1024*1536);
     std::cout << "ptr: " << start << "\n";
-    sleep(5);
+    sleep(0.5);
     std::cout << "deallocating 1.5*1024^3\n";
     malloc_alloc::deallocate(start, 0);
 
@@ -50,19 +83,54 @@ bool unit_test_allocator::use_malloc_allocator() {
         std::cout << "ptr: " << p << "\n";
         malloc_alloc::deallocate(p, 424242);
     }
-    sleep(2);
+    sleep(0.2);
     std::cout << "allocating 1000 times\n";
     for (int i = 0; i < 1000; ++i) {
         malloc_alloc::allocate(10 * sizeof(int));  // leaky mem
     }
-    sleep(5);
+    sleep(0.5);
     std::cout << "setting invalid oom_handler\n";
     malloc_alloc::set_malloc_handler(nullptr);
-    std::cout << "oom malloc failure testing\n";
+    std::cout << "oom malloc failure testing: \n";
     malloc_alloc::oom_malloc(25);
+    std::cout << "\n";
     
     return 0;
 }
+
+bool unit_test_allocator::use_default_allocator() {
+    std::cout << "------- Test: use_default_allocator -------\n";
+
+    std::cout << "malloc_allocating large block\n";
+    void* start = default_alloc::print_status_alloc(1024*1024*1024);
+    std::cout << "malloc_deallocating large block\n";
+    default_alloc::print_status_dealloc(start, 42);
+
+    std::cout << "allocating and deallocating random units\n";
+    void* p1 = default_alloc::print_status_alloc(1);
+    void* p2 = default_alloc::print_status_alloc(4);
+    void* p3 = default_alloc::print_status_alloc(13);
+    void* p4 = default_alloc::print_status_alloc(62);
+    void* p5 = default_alloc::print_status_alloc(24);
+    void* p6 = default_alloc::print_status_alloc(25);
+    default_alloc::print_status_dealloc(p3, 13);
+    void* p7 = default_alloc::print_status_alloc(39);
+    default_alloc::print_status_dealloc(p4, 63);  // same blocksize
+    void* p8 = default_alloc::print_status_alloc(42);
+    void* p9 = default_alloc::print_status_alloc(68);
+    default_alloc::print_status_dealloc(p1, 1);
+    default_alloc::print_status_dealloc(p9, 68);
+    default_alloc::print_status_dealloc(p8, 42);
+    default_alloc::print_status_dealloc(p5, 24);
+    void* p10 = default_alloc::print_status_alloc(80);
+    default_alloc::print_status_dealloc(p6, 25);
+    default_alloc::print_status_dealloc(p2, 4);
+    default_alloc::print_status_dealloc(p7, 39);
+    default_alloc::print_status_dealloc(p10, 80);
+    std::cout << "end of random tests\n";
+    return 0;
+}
+
 
 }  // endof namespace mfwu
 
