@@ -147,6 +147,7 @@ enum { __ALIGN = 8 };
 enum { __MAX_BYTES = 128 };
 enum { __NFREELISTS = __MAX_BYTES / __ALIGN };
 enum { __DEFAULT_REFILLING_SIZE = 20 };
+
 class default_alloc {
 public:
     friend class unit_test_allocator;
@@ -224,6 +225,7 @@ private:
         }
         return res;
     }
+    // get mem from pool
     static char* chunk_alloc(size_t size, int& nobjs) {
         char* res;
         size_t total_bytes = size * nobjs;
@@ -233,16 +235,14 @@ private:
             res = start_free;
             start_free += total_bytes;
             return res;
-        }
-        else if (bytes_left >= size) {
+        } else if (bytes_left >= size) {
             nobjs = bytes_left / size;
             total_bytes = size * nobjs;
             res = start_free;
             start_free += total_bytes;
             return res;
-        }
-        else {
-            size_t bytes_to_get = 2 * total_bytes + ROUND_UP(heap_size / 16);  // why?
+        } else {
+            size_t bytes_to_get = 2 * total_bytes + ROUND_UP(heap_size / 16);  // 2 * needed + round(poolsize / 16)
             if (bytes_left > 0) {
                 obj* volatile* my_free_list = free_lists + FREELIST_INDEX(bytes_left);  // why can we do that?
                 ((obj*)start_free)->free_list_link = *my_free_list;  // bcz bytes_left % 8 === 0 !

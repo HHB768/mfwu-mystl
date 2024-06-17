@@ -1,5 +1,6 @@
 #include "allocator.hpp"
 #define __UNIT_TEST_ALLOCATOR__
+#define __UNIT_TEST_ALLOCATOR_BRIEF__
 
 namespace mfwu {
 
@@ -43,23 +44,29 @@ std::string default_alloc::print_status() {
 
 void* default_alloc::print_status_alloc(size_t n) {
     void* res = default_alloc::allocate(n);
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << default_alloc::print_status();
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
     return res;
 }
 
 void default_alloc::print_status_dealloc(void* p, size_t n) {
     default_alloc::deallocate(p, n);
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << default_alloc::print_status();
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
 }
-
 
 bool unit_test_allocator::use_malloc_allocator() {
     std::cout << "------- Test: use_malloc_allocator -------\n";
     std::cout << "In " << malloc_alloc::identify() << "\n";
 
     std::cout << "allocating 0\n";
+
     void* start = malloc_alloc::allocate(0);
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "ptr: " << start << "\n";
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "deallocating 0\n";
     malloc_alloc::deallocate(start, 0);
     
@@ -68,27 +75,37 @@ bool unit_test_allocator::use_malloc_allocator() {
 
     std::cout << "allocating 1024^3\n";
     start = malloc_alloc::allocate(1024*1024*1024);  // GB?
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "ptr: " << start << "\n";
-    sleep(0.5);
+    sleep(1);
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "reallocating 1.5*1024^3\n";
     start = malloc_alloc::reallocate(start, 42, 1024*1024*1536);
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "ptr: " << start << "\n";
-    sleep(0.5);
+    sleep(1);
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "deallocating 1.5*1024^3\n";
     malloc_alloc::deallocate(start, 0);
 
     std::cout << "allocating and deallocating 10 times\n";
     for (int i = 0; i < 10; ++i) {
         int* p = (int*)malloc_alloc::allocate(i * sizeof(long double));
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
         std::cout << "ptr: " << p << "\n";
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
         malloc_alloc::deallocate(p, 424242);
     }
-    sleep(0.2);
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
+    sleep(1);
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "allocating 1000 times\n";
     for (int i = 0; i < 1000; ++i) {
         malloc_alloc::allocate(10 * sizeof(int));  // leaky mem
     }
-    sleep(0.5);
+#ifndef __UNIT_TEST_ALLOCATOR_BRIEF__
+    sleep(1);
+#endif  // __UNIT_TEST_ALLOCATOR_BRIEF__
     std::cout << "setting invalid oom_handler\n";
     malloc_alloc::set_malloc_handler(nullptr);
     std::cout << "oom malloc failure testing: \n";
@@ -102,9 +119,9 @@ bool unit_test_allocator::use_default_allocator() {
     std::cout << "------- Test: use_default_allocator -------\n";
 
     std::cout << "malloc_allocating large block\n";
-    void* start = default_alloc::print_status_alloc(1024*1024*1024);
+    void* start = default_alloc::print_status_alloc(129);
     std::cout << "malloc_deallocating large block\n";
-    default_alloc::print_status_dealloc(start, 42);
+    default_alloc::print_status_dealloc(start, 129);
 
     std::cout << "allocating and deallocating random units\n";
     void* p1 = default_alloc::print_status_alloc(1);
@@ -116,11 +133,11 @@ bool unit_test_allocator::use_default_allocator() {
     default_alloc::print_status_dealloc(p3, 13);
     void* p7 = default_alloc::print_status_alloc(39);
     default_alloc::print_status_dealloc(p4, 63);  // same blocksize
-    void* p8 = default_alloc::print_status_alloc(42);
+    void* p8 = default_alloc::print_status_alloc(128);
     void* p9 = default_alloc::print_status_alloc(68);
     default_alloc::print_status_dealloc(p1, 1);
     default_alloc::print_status_dealloc(p9, 68);
-    default_alloc::print_status_dealloc(p8, 42);
+    default_alloc::print_status_dealloc(p8, 128);
     default_alloc::print_status_dealloc(p5, 24);
     void* p10 = default_alloc::print_status_alloc(80);
     default_alloc::print_status_dealloc(p6, 25);
