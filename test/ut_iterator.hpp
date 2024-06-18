@@ -10,6 +10,8 @@ public:
     template <typename T>
     class list {
     public:
+        template <typename U>
+        friend void print_list(const list<U>&);
         struct node {
             T value;  // = T();  // can i?
             node* next;
@@ -66,6 +68,7 @@ public:
             for ( ; p->next != tail_; p = p->next) {}
             p->next = newnode;
             newnode->next = tail_;
+            // std::cout << "push back\n";
         }
         void push_front(const T& value) {
             node* newnode = new node(value, nullptr);
@@ -85,20 +88,13 @@ public:
             head_->next = p->next;
             delete p;
         }
-        void print_list() {
-            std::cout << "list: ";
-            for (node* p = head_->next; p != tail_; p = p->next) {
-                std::cout << *p << " -> ";
-            }
-            std::cout << "nullptr\n";
-        }
         void insert(const int& idx, const T& value) {
             node* p = head_;
             for (int i=0; i<idx; i++) {
                 p = p->next;
                 if (!p) return ;
             }
-            node* newnode = new node(value, p->next->next);
+            node* newnode = new node(value, p->next);
             p->next = newnode;
         }
         void insert(const list_iterator& it, const T& value) {
@@ -137,7 +133,7 @@ public:
             }
             return iterator(p);
         }
-        list_iterator begin() { return list_iterator(head_); }
+        list_iterator begin() { return list_iterator(head_->next); }
         list_iterator end() { return list_iterator(tail_); }
     private:
         node* head_;
@@ -162,33 +158,66 @@ private:
 };  // endof class unit_test_iterator
 
 // operator<< must outside the class
-template <typename T>
+
+// interesting! you must place this operator<<(...) forward
+// otherwise the operator<<(...) for node will not know this overload
+// and its os << nd.value will try to be os << node(nd.value)
+// my comment is : 我趣，逆天 (2024.06.18)
+std::ostream& operator<<(std::ostream& os, const
+    typename unit_test_iterator::data& dt) {
+    os << dt.value;
+    return os;
+}
+
+// why can not i use this?
+// template <typename T>
+// std::ostream& operator<<(std::ostream& os, const 
+//     typename unit_test_iterator::list<T>::node& nd) {    
+//     os << nd.value;
+//     return os;
+// }
+
 std::ostream& operator<<(std::ostream& os, const 
-    typename unit_test_iterator::list<T>::node& nd) {    
+    typename unit_test_iterator::list<unit_test_iterator::data>::node& nd) {
     os << nd.value;
     return os;
 }
-std::ostream& operator<<(std::iostream& os, const
-    typename unit_test_iterator::data& data) {
-    os << data.value;
-    return os;
-}
 
+template <typename T>
+void print_list(const unit_test_iterator::list<T>& list_) {
+    std::cout << "printing list nodes with node*\n";
+    for (typename unit_test_iterator::list<T>::node* p = list_.head_->next; p != list_.tail_; p = p->next) {
+#ifndef __UNIT_TEST_ITERATOR_BRIEF__
+        std::cout << *p << " -> ";
+#endif  // __UNIT_TEST_ITERATOR_BRIEF__
+    }
+#ifndef __UNIT_TEST_ITERATOR_BRIEF__
+    std::cout << "nullptr\n";
+#endif  // __UNIT_TEST_ITERATOR_BRIEF__
+}
 bool unit_test_iterator::use_list_iterator() {
+    std::cout << "------- Test: use_list_iterator -------\n";
     for (int i=0; i<10; i++) {
         list_.push_back(data{i});
     }
-    list_.print_list();
+    print_list(list_);
+    std::cout << "doing some list operations\n";
     list_.push_front(data{-1});
     list_.pop_front();
     list_.pop_back();
+    list_.erase(3);
+    list_.insert(5, data{9});
+    std::cout << "modifying and printing list nodes with iterator\n";
     for (list<data>::list_iterator it = list_.begin();
          it != list_.end(); it++) {
         (*it).value++;
+#ifndef __UNIT_TEST_ITERATOR_BRIEF__
         std::cout << --it->value << " -> ";  // change nothing
+#endif  // __UNIT_TEST_ITERATOR_BRIEF__
     }
+#ifndef __UNIT_TEST_ITERATOR_BRIEF__
     std::cout << "nullptr\n";
-
+#endif  // __UNIT_TEST_ITERATOR_BRIEF__
 
     return 0;
 }
