@@ -13,26 +13,27 @@ struct random_access_iterator_tag : bidirectional_iterator_tag {};
 
 
 template <typename T, typename Category, typename Pointer=T*,
-    typename Reference=T&, typename Difference=mfwu::ptrdiff_t>
+          typename Reference=T&, typename Difference=mfwu::ptrdiff_t>
 class iterator {
 public:
     using value_type = T;
     using iterator_category = Category;
     using pointer = Pointer;
     using reference = Reference;
-    using difference_type = Distance;
+    using difference_type = Difference;
 };  // endof class iterator
 
 // TODO: operator= copy constructor
 template <typename T,
-    typename Pointer = T*,
-    typename Reference = T&,
-    typename Difference = mfwu::ptrdiff_t>
+          typename Pointer=T*,
+          typename Reference=T&,
+          typename Difference=mfwu::ptrdiff_t>
 class input_iterator
     : public iterator<T, mfwu::input_iterator_tag,
-                        Pointer, Reference, Difference> {
+                      Pointer, Reference, Difference> {
 public:
-    input_iterator() : ptr_(nullptr) {}
+    input_iterator() : iterator<T, mfwu::input_iterator_tag,   // u must add template args
+                                Pointer, Reference, Difference>(), ptr_(nullptr) {}
     explicit input_iterator(T* t) : ptr_(t) {}
     input_iterator(const input_iterator& it) : ptr_(it.ptr_) {}
     input_iterator& operator=(const input_iterator& it) {
@@ -58,7 +59,7 @@ public:
         ++ptr_;
         return *this;
     }
-    input_iterator operatpr++(int) {
+    input_iterator operator++(int) {
         input_iterator tmp = *this;
         ++ptr_;
         return std::move(tmp);
@@ -69,12 +70,12 @@ private:
 
 
 template <typename T,
-    typename Pointer = T*,
-    typename Reference = T&,
-    typename Difference = mfwu::ptrdiff_t>
+          typename Pointer=T*,
+          typename Reference=T&,
+          typename Difference=mfwu::ptrdiff_t>
 class output_iterator :
     public mfwu::iterator<T, mfwu::output_iterator_tag,
-                            Pointer, Reference, Difference> {
+                          Pointer, Reference, Difference> {
 public:
     output_iterator() : ptr_(nullptr) {}
     explicit output_iterator(T* t) : ptr_(t) {}
@@ -118,12 +119,12 @@ private:
 
 
 template <typename T,
-    typename Pointer = T*,
-    typename Reference = T&,
-    typename Difference = mfwu::ptrdiff_t>
+          typename Pointer=T*,
+          typename Reference=T&,
+          typename Difference=mfwu::ptrdiff_t>
 class forward_iterator :
     public mfwu::iterator<T, mfwu::forward_iterator_tag,
-                            Pointer, Reference, Difference> {
+                          Pointer, Reference, Difference> {
 public:
     forward_iterator() : ptr_(nullptr) {}
     explicit forward_iterator(T* t) : ptr_(t) {}
@@ -161,11 +162,11 @@ private:
 };  // endof class forward_iterator
 
 
-template <typename T, typename Pointer = T*,
-    typename Reference = T&, typename Difference = mfwu::ptrdiff_t>
+template <typename T, typename Pointer=T*,
+          typename Reference=T&, typename Difference=mfwu::ptrdiff_t>
 class bidirectional_iterator :
     public mfwu::iterator<T, mfwu::bidirectional_iterator_tag,
-                            Pointer, Reference, Difference> {
+                          Pointer, Reference, Difference> {
 public:
     bidirectional_iterator() : ptr_(nullptr) {}
     explicit bidirectional_iterator(T* t) : ptr_(t) {}
@@ -189,20 +190,20 @@ public:
         return & this->operator*();
     }
 
-    iterator& operator++() {
+    bidirectional_iterator& operator++() {
         ++ptr_;
         return *this;
     }
-    iterator operator++(int) {
+    bidirectional_iterator operator++(int) {
         bidirectional_iterator tmp = *this;
         ++ptr_;
         return std::move(tmp);
     }
-    iterator& operator--() {
+    bidirectional_iterator& operator--() {
         --ptr_;
         return *this;
     }
-    iterator operator--(int) {
+    bidirectional_iterator operator--(int) {
         bidirectional_iterator tmp = *this;
         --ptr_;
         return std::move(tmp);
@@ -212,14 +213,14 @@ private:
 };  // endof class bidirectional iterator
 
 
-template <typename T, typename Pointer = T*,
-    typename Reference = T&, typename Difference = mfwu::ptrdiff_t>
+template <typename T, typename Pointer=T*,
+          typename Reference=T&, typename Difference=mfwu::ptrdiff_t>
 class random_access_iterator :
     public mfwu::iterator<T, mfwu::random_access_iterator_tag,
-                            Pointer, Reference, Difference> {
+                          Pointer, Reference, Difference> {
 public:
-    random_access_iterator() : iterator(), (nullptr) {}
-    explicit random_access_iterator(T* t) : iterator(), ptr_(t) {}
+    random_access_iterator() : ptr_(nullptr) {}
+    explicit random_access_iterator(T* t) : ptr_(t) {}
     random_access_iterator(const random_access_iterator& it) : ptr_(it.ptr_) {}
     random_access_iterator& operator=(const random_access_iterator& it) {
         ptr_ = it.ptr_;
@@ -278,7 +279,7 @@ public:
     bool operator==(const random_access_iterator& it) const {
         return ptr_ == it.ptr_;
     }
-    bool operator==(const random_access_iterator& it) const {
+    bool operator!=(const random_access_iterator& it) const {
         return !(*this == it);
     }
 private:

@@ -117,7 +117,7 @@ bool unit_test_allocator::use_malloc_allocator() {
 
 bool unit_test_allocator::use_default_allocator() {
     std::cout << "------- Test: use_default_allocator -------\n";
-
+    std::cout << "In " << default_alloc::identify() << "\n";
     std::cout << "malloc_allocating large block\n";
     void* start = default_alloc::print_status_alloc(129);
     std::cout << "malloc_deallocating large block\n";

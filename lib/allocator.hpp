@@ -121,8 +121,9 @@ public:
         return old;
     }
 private:
+// #ifdef __UNIT_TEST_ALLOCATOR__
     static std::string identify();  // test interface
-
+// #endif  // __UNIT_TEST_ALLOCATOR__
     static void* oom_malloc(size_t n) {
         void (*my_malloc_handler)();
         void* res;
