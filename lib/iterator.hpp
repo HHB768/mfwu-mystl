@@ -228,8 +228,8 @@ public:
     }
     ~random_access_iterator() = default;
 
-    T& operator[](int idx) {
-        return ptr_[index];
+    T& operator[](Difference idx) const {
+        return ptr_[idx];
     }
     T& operator*() const {
         return *ptr_;
@@ -282,6 +282,8 @@ public:
     bool operator!=(const random_access_iterator& it) const {
         return !(*this == it);
     }
+    // other comparasions
+    // operator-(other_iterator)
 private:
     T* ptr_;
 };  // endof class random_access_iterator

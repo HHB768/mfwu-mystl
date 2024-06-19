@@ -243,12 +243,15 @@ bool unit_test_iterator::use_input_iterator() {
     set_mem_value(1);
     mfwu::input_iterator<char> it((char*)linear_mem);
     mfwu::input_iterator<char> end = mfwu::input_iterator<char>((char*)linear_mem + 8);
+    std::cout << "testing input_iterator reading\n";
 #ifndef __UNIT_TEST_ITERATOR_BRIEF__
     for ( ; it != end; it++) {
         // *it = 3;  // failed
         std::cout << (int)*it << " "; 
     }
     std::cout << "\n";
+#else //  __UNIT_TEST_ITERATOR_BRIEF__
+    if (*it && std::cout << "reading complete\n") {}
 #endif  // __UNIT_TEST_ITERATOR_BRIEF__
     set_mem_value(0);
     return 0;
@@ -259,6 +262,7 @@ bool unit_test_iterator::use_output_iterator() {
     set_mem_value(0);
     mfwu::output_iterator<int> it((int*)linear_mem);
     mfwu::output_iterator<int> end = mfwu::output_iterator<int>((int*)linear_mem + 2);
+    std::cout << "testing output_iterator writing\n";
     for ( ; it != end; it++) {
         *it = 2;
         ++*it;  // == ++it
@@ -275,6 +279,7 @@ bool unit_test_iterator::use_forward_iterator() {
     mfwu::forward_iterator<char> it((char*)linear_mem);
     mfwu::forward_iterator<char> end = 
         mfwu::forward_iterator<char>((char*)linear_mem + 8);
+    std::cout << "testing forward_iterator writing\n";
     for ( ; it != end; it++) {
         *it = 3;
     }
@@ -289,6 +294,7 @@ bool unit_test_iterator::use_bidirectional_iterator() {
     mfwu::bidirectional_iterator<char> it((char*)linear_mem);
     mfwu::bidirectional_iterator<char> end = 
         mfwu::bidirectional_iterator<char>((char*)linear_mem + 8);
+    std::cout << "testing bidirectional_iterator moving and writing\n";
     for ( ; it != end; it++) {
         *it = 4;
         it--; ++it;
@@ -304,10 +310,12 @@ bool unit_test_iterator::use_random_access_iterator() {
     mfwu::random_access_iterator<char> it((char*)linear_mem);
     mfwu::random_access_iterator<char> end = 
         mfwu::random_access_iterator<char>((char*)linear_mem + 8);
+    std::cout << "testing random_access_iterator moving and writing\n";
     for ( ; it != end; it+=2) {
         *it = 5;
         it--; ++it;
     }
+    it[-1] = 6;
     print_mem_value();
     set_mem_value(0);
     return 0;
