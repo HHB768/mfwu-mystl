@@ -3,7 +3,7 @@
 #ifdef __ALL_BRIEF__
 #   define __UNIT_TEST_ALLOCATOR_BRIEF__
 #   define __UNIT_TEST_ITERATOR_BRIEF__
-#   define __UNIT_TEST_UTILS_BRIEF__
+// #   define __UNIT_TEST_UTILS_BRIEF__
 #endif  // __ALL_BRIEF__
 
 #include "ut_allocator.hpp"
@@ -37,9 +37,10 @@ int main() {
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     score = 0;
-    total = 1;
+    total = 2;
     ttotal += total;
     score += !ut_utils.use_construct_destroy();
+    score += !ut_utils.use_uninitialized_op();
     std::cout << "\n---------- Utils test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 

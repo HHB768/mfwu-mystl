@@ -1,7 +1,7 @@
+#define __UNIT_TEST_UTILS__
+
 #include "iterator.hpp"
 #include "utils.hpp"
-
-#define __UNIT_TEST_UTILS__
 
 namespace mfwu {
 
@@ -19,10 +19,15 @@ private:
         int a;
         npod_data() : a(0) {}
         npod_data(int a_) : a(a_) {}
-        ~npod_data() { a = 0x2E; }
+        ~npod_data() { a = 0x2E; }  // '.'  <- 可爱捏
     };
     char mem[17] = {};
     void print_mem();
+    void set_mem_zero() {
+        for (char c : mem) {
+            c = 0;
+        }
+    }
 };  // endof class unit_test_utils
 
 void unit_test_utils::print_mem() {
@@ -40,6 +45,7 @@ void unit_test_utils::print_mem() {
 
 bool unit_test_utils::use_construct_destroy() {
     std::cout << "\n------- Test: use construct destroy -------\n";
+    set_mem_zero();
     
     std::cout << "constructing pod data\n";
     mfwu::construct((pod_data*)mem, 0x31, 'b', 'c', 'd', 'e');
@@ -71,6 +77,21 @@ bool unit_test_utils::use_construct_destroy() {
     mfwu::destroy(nfirst, nlast);
     print_mem();
     
+    return 0;
+}
+
+bool unit_test_utils::use_uninitialized_op() {
+    std::cout << "\n------- Test: use uninitialized operations -------\n";
+    set_mem_zero();
+    mfwu::random_access_iterator<pod_data> first((pod_data*)mem), last((pod_data*)mem+2);
+    std::cout << "filling pod data with iterator\n";
+    mfwu::uninitialized_fill(first, last, pod_data{0x33, 'b', 'c', 'd', 'e'});
+    print_mem();
+    std::cout << "filling non-pod data with iterator\n";
+    mfwu::random_access_iterator<npod_data> nfirst((npod_data*)mem), nlast((npod_data*)mem+4);
+    mfwu::uninitialized_fill(nfirst, nlast, npod_data{0x34});
+    print_mem();
+
     return 0;
 }
 

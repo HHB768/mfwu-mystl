@@ -118,13 +118,14 @@ inline void destroy(ForwardIterator first, ForwardIterator last) {
 // 3 uninitialized_copy
 template <typename InputIteraor, typename ForwardIterator>
 inline ForwardIterator uninitialized_copy_aux(
-    InputIteraor first, InputIteraor last, ForwardIterator res, mfwu::true_type) {
-    return std::copy(first, last, res);
+    InputIteraor first, InputIteraor last, ForwardIterator res, std::true_type) {
+    return std::copy(first, last, res);  
+    // cmp to non-pod, it can use *res = *first, instead of construct(res, *first)
 }
 
 template <typename InputIterator, typename ForwardIterator>
 inline ForwardIterator uninitialized_copy_aux(
-    InputIterator first, InputIterator last, ForwardIterator res, mfwu::false_type) {
+    InputIterator first, InputIterator last, ForwardIterator res, std::false_type) {
     for (; first != last; ++first, ++res) {
         mfwu::construct(&*res, *first);
     }
@@ -149,12 +150,22 @@ inline wchar_t* uninitialized_copy(const wchar_t* first, const wchar_t* last, wc
 
 // 4 uninitialized_fill
 template <typename ForwardIterator, typename T>
-inline void uninitialized_fill_aux(ForwardIterator first, ForwardIterator last, const T& x, mfwu::true_type) {
+inline void uninitialized_fill_aux(ForwardIterator first, ForwardIterator last, const T& x, std::true_type) {
+#ifdef __UNIT_TEST_UTILS__
+#ifndef __UNIT_TEST_UTILS_BRIEF__
+    std::cout << "calling std::fill\n";
+#endif  // __UNIT_TEST_UTILS_BRIEF__
+#endif  // __UNIT_TEST_UTILS__
     std::fill(first, last, x);
 }
 
 template <typename ForwardIterator, typename T>
-inline void uninitialized_fill_aux(ForwardIterator first, ForwardIterator last, const T& x, mfwu::false_type) {
+inline void uninitialized_fill_aux(ForwardIterator first, ForwardIterator last, const T& x, std::false_type) {
+#ifdef __UNIT_TEST_UTILS__
+#ifndef __UNIT_TEST_UTILS_BRIEF__
+    std::cout << "calling construct in loop\n";
+#endif  // __UNIT_TEST_UTILS_BRIEF__
+#endif  // __UNIT_TEST_UTILS__
     for (ForwardIterator cur = first; cur != last; ++cur) {
         mfwu::construct(&*cur, x);
     }
@@ -168,12 +179,12 @@ inline void uninitialized_fill(ForwardIterator first, ForwardIterator last, cons
 
 // 5 fill_n
 template <typename ForwardIterator, typename Size, typename T>
-inline ForwardIterator uninitialized_fill_aux(ForwardIterator first, Size n, const T& x, mfwu::true_type) {
+inline ForwardIterator uninitialized_fill_aux(ForwardIterator first, Size n, const T& x, std::true_type) {
     return std::fill_n(first, n, x);
 }
 
 template <typename ForwardIterator, typename Size, typename T>
-inline ForwardIterator uninitialized_fill_aux(ForwardIterator first, Size n, const T& x, mfwu::false_type) {
+inline ForwardIterator uninitialized_fill_aux(ForwardIterator first, Size n, const T& x, std::false_type) {
     for (; n > 0; n--, ++first) {
         mfwu::construct(&*first, x);
     }
