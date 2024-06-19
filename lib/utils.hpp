@@ -15,11 +15,11 @@ struct random_access_iterator_tag;
 template <typename It>
 class iterator_traits {
 public:
-    using value_type = It::value_type;
-    using iterator_category = It::iterator_category;
-    using pointer = It::pointer;
-    using reference = It::reference;
-    using difference_type = It::difference_type;
+    using value_type = typename It::value_type;
+    using iterator_category = typename It::iterator_category;
+    using pointer = typename It::pointer;
+    using reference = typename It::reference;
+    using difference_type = typename It::difference_type;
 };  // endof class iterator_traits
 
 template <typename T>
@@ -53,7 +53,7 @@ public:
 // 1 construct
 template <typename T1, typename... Args>
 inline void construct(T1* p, Args&&... args) {
-    new(p) T1(mfwu::forward<Args>(args)...);  // TODO: std::forward
+    new (p) T1{mfwu::forward<Args>(args)...};  // TODO: std::forward
 }
 
 /*
@@ -84,10 +84,10 @@ inline void construct(ForwardIterator first, ForwardIterator last, const T& valu
 
 // 1 construct from-to
 template <typename ForwardIterator, typename... Args>
-inline void construct(ForwardIterator first, ForwardIterator last, const Args&... args) {
+inline void construct(ForwardIterator first, ForwardIterator last, Args&&... args) {
     using Ty = typename mfwu::iterator_traits<ForwardIterator>::value_type;
     for (; first != last; first++) {
-        new(&*first) Ty(mfwu::forward<Args>(args)...);
+        new(&*first) Ty{mfwu::forward<Args>(args)...};
     }
 }
 
@@ -98,11 +98,11 @@ inline void destroy(T* pointer) {
 }
 
 template <typename ForwardIterator>
-inline void destroy_aux(ForwardIterator, ForwardIterator, mfwu::true_type) {}
+inline void destroy_aux(ForwardIterator, ForwardIterator, std::true_type) {}
 
 template <typename ForwardIterator>
-inline void destroy_aux(ForwardIterator first, ForwardIterator last, mfwu::false_type) {
-    for (; first < last; ++first) {
+inline void destroy_aux(ForwardIterator first, ForwardIterator last, std::false_type) {
+    for (; first != last; ++first) {
         mfwu::destroy(&*first);
     }
 }
@@ -125,16 +125,16 @@ inline ForwardIterator uninitialized_copy_aux(
 template <typename InputIterator, typename ForwardIterator>
 inline ForwardIterator uninitialized_copy_aux(
     InputIterator first, InputIterator last, ForwardIterator res, mfwu::false_type) {
-    for (; first != last; ++first, ++cur) {
-        mfwu::construct(&*cur, *first);
+    for (; first != last; ++first, ++res) {
+        mfwu::construct(&*res, *first);
     }
-    return cur;
+    return res;
 }
 
 template <typename InputIterator, typename ForwardIterator>
 inline ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator res) {
     return uninitialized_copy_aux(first, last, res,
-        std::is_pod<typename mfwu::iterator_traits<ForwardIterator>::value_type>);
+        std::is_pod<typename mfwu::iterator_traits<ForwardIterator>::value_type>{});
 }
 
 inline char* uninitialized_copy(const char* first, const char* last, char* res) {
@@ -174,10 +174,10 @@ inline ForwardIterator uninitialized_fill_aux(ForwardIterator first, Size n, con
 
 template <typename ForwardIterator, typename Size, typename T>
 inline ForwardIterator uninitialized_fill_aux(ForwardIterator first, Size n, const T& x, mfwu::false_type) {
-    for (ForwardIterator cur = first; n > 0; n--, ++cur) {
-        mfwu::construct(&*cur, x);
+    for (; n > 0; n--, ++first) {
+        mfwu::construct(&*first, x);
     }
-    return cur;
+    return first;
 }
 
 template <typename ForwardIterator, typename Size, typename T>
@@ -201,46 +201,21 @@ void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
 template <typename It>
 void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
     mfwu::bidirectional_iterator_tag) {
-        {
-            while (n > 0) {
-                ++it;
-                --n;
-            }
-            while (n < 0) {
-                --it;
-                ++n;
-            }
+        while (n > 0) {
+            ++it;
+            --n;
         }
+        while (n < 0) {
+            --it;
+            ++n;
+        }
+    }
 
-        template <typename It>
-        void advance_aux(It & it, typename mfwu::iterator_traits<It>::difference_type n,
-            mfwu::random_access_iterator_tag) {
-            it += n;
-        }
-
-        template <typename It>
-        typename mfwu::iterator_traits<It>::difference_type
-            distance(It first, It last) {
-            distance_aux(first, last, typename mfwu::iterator_triats<It>::iterator_category());
-        }
-
-        template <typename It>
-        typename mfwu::iterator_traits<It>::difference_type
-            distance_aux(It first, It last, mfwu::input_iterator_tag) {
-            typename mfwu::iterator_traits<It>::difference_type res = 0;
-            while (first != last) {
-                res++;
-                first++;
-            }
-            return res;
-        }
-
-        template <typename It>
-        typename mfwu::iterator_traits<It>::difference_type
-            distance_aux(It first, It last, mfwu::random_access_iterator_tag) {
-            return last - first;
-        }
-};
+template <typename It>
+void advance_aux(It & it, typename mfwu::iterator_traits<It>::difference_type n,
+    mfwu::random_access_iterator_tag) {
+    it += n;
+}
 
 template <typename It, typename Distance>
 void advance(It& it, Distance n) {

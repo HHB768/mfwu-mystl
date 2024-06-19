@@ -1,6 +1,5 @@
-#include "iterator.hpp"
-
 #define __UNIT_TEST_ITERATOR__
+#include "iterator.hpp"
 
 namespace mfwu {
 

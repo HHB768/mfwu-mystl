@@ -1,5 +1,6 @@
-#include "allocator.hpp"
 #define __UNIT_TEST_ALLOCATOR__
+#include "allocator.hpp"
+
 
 namespace mfwu {
 

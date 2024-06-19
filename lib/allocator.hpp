@@ -121,9 +121,9 @@ public:
         return old;
     }
 private:
-// #ifdef __UNIT_TEST_ALLOCATOR__
+#ifdef __UNIT_TEST_ALLOCATOR__
     static std::string identify();  // test interface
-// #endif  // __UNIT_TEST_ALLOCATOR__
+#endif  // __UNIT_TEST_ALLOCATOR__
     static void* oom_malloc(size_t n) {
         void (*my_malloc_handler)();
         void* res;
@@ -182,12 +182,12 @@ public:
     static void* reallocate(void* p, size_t old_size, size_t new_size) { return nullptr; }  // TODO
 
 private:
-// #ifdef __UNIT_TEST_ALLOCATOR__  // test interface
+#ifdef __UNIT_TEST_ALLOCATOR__  // test interface
     static std::string identify();  
     static std::string print_status();
     static void* print_status_alloc(size_t n);
     static void print_status_dealloc(void* p, size_t n);
-// #endif // __UNIT_TEST_ALLOCATOR__
+#endif // __UNIT_TEST_ALLOCATOR__
 
     static size_t ROUND_UP(size_t bytes) {
         return (bytes + __ALIGN - 1) & ~(__ALIGN - 1);
