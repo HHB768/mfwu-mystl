@@ -151,9 +151,10 @@ public:
     bool use_bidirectional_iterator();
     bool use_random_access_iterator();
 private:
-    void set_mem_zero();
+    void set_mem_value(char c=0);
+    void print_mem_value();
     list<data> list_;
-    list<data>::list_iterator it_;
+    // list<data>::list_iterator it_;
     char linear_mem[8];
 };  // endof class unit_test_iterator
 
@@ -196,7 +197,7 @@ void print_list(const unit_test_iterator::list<T>& list_) {
 #endif  // __UNIT_TEST_ITERATOR_BRIEF__
 }
 bool unit_test_iterator::use_list_iterator() {
-    std::cout << "------- Test: use_list_iterator -------\n";
+    std::cout << "\n------- Test: use_list_iterator -------\n";
     for (int i=0; i<10; i++) {
         list_.push_back(data{i});
     }
@@ -219,6 +220,96 @@ bool unit_test_iterator::use_list_iterator() {
     std::cout << "nullptr\n";
 #endif  // __UNIT_TEST_ITERATOR_BRIEF__
 
+    return 0;
+}
+
+void unit_test_iterator::set_mem_value(char c) {
+    for (auto&& el : linear_mem) {
+        el = c;
+    }
+}
+
+void unit_test_iterator::print_mem_value() {
+#ifndef __UNIT_TEST_ITERATOR_BRIEF__
+    for (char& el : linear_mem) {
+        std::cout << (int)el << " ";
+    }
+    std::cout << "\n";
+#endif  // __UNIT_TEST_ITERATOR_BRIEF__
+}
+
+bool unit_test_iterator::use_input_iterator() {
+    std::cout << "\n------- Test: use_input_iterator -------\n";
+    set_mem_value(1);
+    mfwu::input_iterator<char> it((char*)linear_mem);
+    mfwu::input_iterator<char> end = mfwu::input_iterator<char>((char*)linear_mem + 8);
+#ifndef __UNIT_TEST_ITERATOR_BRIEF__
+    for ( ; it != end; it++) {
+        // *it = 3;  // failed
+        std::cout << (int)*it << " "; 
+    }
+    std::cout << "\n";
+#endif  // __UNIT_TEST_ITERATOR_BRIEF__
+    set_mem_value(0);
+    return 0;
+}
+
+bool unit_test_iterator::use_output_iterator() {
+    std::cout << "\n------- Test: use_output_iterator -------\n";
+    set_mem_value(0);
+    mfwu::output_iterator<int> it((int*)linear_mem);
+    mfwu::output_iterator<int> end = mfwu::output_iterator<int>((int*)linear_mem + 2);
+    for ( ; it != end; it++) {
+        *it = 2;
+        ++*it;  // == ++it
+        // std::cout << *it;  // failed
+    }
+    print_mem_value();
+    set_mem_value(0);
+    return 0;
+}
+
+bool unit_test_iterator::use_forward_iterator() {
+    std::cout << "\n------- Test: use_forward_iterator -------\n";
+    set_mem_value(0);
+    mfwu::forward_iterator<char> it((char*)linear_mem);
+    mfwu::forward_iterator<char> end = 
+        mfwu::forward_iterator<char>((char*)linear_mem + 8);
+    for ( ; it != end; it++) {
+        *it = 3;
+    }
+    print_mem_value();
+    set_mem_value(0);
+    return 0;
+}
+
+bool unit_test_iterator::use_bidirectional_iterator() {
+    std::cout << "\n------- Test: use_bidirectional_iterator -------\n";
+    set_mem_value(0);
+    mfwu::bidirectional_iterator<char> it((char*)linear_mem);
+    mfwu::bidirectional_iterator<char> end = 
+        mfwu::bidirectional_iterator<char>((char*)linear_mem + 8);
+    for ( ; it != end; it++) {
+        *it = 4;
+        it--; ++it;
+    }
+    print_mem_value();
+    set_mem_value(0);
+    return 0;
+}
+
+bool unit_test_iterator::use_random_access_iterator() {
+    std::cout << "\n------- Test: use_random_access_iterator -------\n";
+    set_mem_value(0);
+    mfwu::random_access_iterator<char> it((char*)linear_mem);
+    mfwu::random_access_iterator<char> end = 
+        mfwu::random_access_iterator<char>((char*)linear_mem + 8);
+    for ( ; it != end; it+=2) {
+        *it = 5;
+        it--; ++it;
+    }
+    print_mem_value();
+    set_mem_value(0);
     return 0;
 }
 

@@ -97,7 +97,7 @@ public:
         return !(*this == it);
     }
 
-    output_iterator& operator*() const {
+    output_iterator& operator*() /* const */ {  // why?
         return *this;
     }
     output_iterator* operator->() const {

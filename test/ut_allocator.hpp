@@ -57,7 +57,7 @@ void default_alloc::print_status_dealloc(void* p, size_t n) {
 }
 
 bool unit_test_allocator::use_malloc_allocator() {
-    std::cout << "------- Test: use_malloc_allocator -------\n";
+    std::cout << "\n------- Test: use_malloc_allocator -------\n";
     std::cout << "In " << malloc_alloc::identify() << "\n";
 
     std::cout << "allocating 0\n";
@@ -109,13 +109,12 @@ bool unit_test_allocator::use_malloc_allocator() {
     malloc_alloc::set_malloc_handler(nullptr);
     std::cout << "oom malloc failure testing: \n";
     malloc_alloc::oom_malloc(25);
-    std::cout << "\n";
     
     return 0;
 }
 
 bool unit_test_allocator::use_default_allocator() {
-    std::cout << "------- Test: use_default_allocator -------\n";
+    std::cout << "\n------- Test: use_default_allocator -------\n";
     std::cout << "In " << default_alloc::identify() << "\n";
     std::cout << "malloc_allocating large block\n";
     void* start = default_alloc::print_status_alloc(129);

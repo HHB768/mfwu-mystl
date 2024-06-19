@@ -23,9 +23,14 @@ int main() {
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     score = 0;
-    total = 1;
+    total = 6;
     ttotal += total;
     score += !ut_iter.use_list_iterator();
+    score += !ut_iter.use_input_iterator();
+    score += !ut_iter.use_output_iterator();
+    score += !ut_iter.use_forward_iterator();
+    score += !ut_iter.use_bidirectional_iterator();
+    score += !ut_iter.use_random_access_iterator();
     std::cout << "\n---------- Iterator test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
     return 0;
