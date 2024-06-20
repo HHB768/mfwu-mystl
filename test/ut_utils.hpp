@@ -95,8 +95,17 @@ bool unit_test_utils::use_uninitialized_op() {
     std::cout << "filling pod data n times\n";
     mfwu:uninitialized_fill_n(first, 2, pod_data{0x35, 'e', 'd', 'c', 'b'});
     print_mem();
-    std::cout << "filling non_pod data n times\n";
+    std::cout << "filling non-pod data n times\n";
     mfwu::uninitialized_fill_n(nfirst, 4, npod_data{0x36});
+    print_mem();
+
+    std::cout << "copying pod data with iterator\n";
+    std::vector<pod_data>  vec(2, pod_data{0X37, 'Q', 'E', 'W', 'R'});
+    mfwu::uninitialized_copy(vec.begin(), vec.end(), first);
+    print_mem();
+    std::cout << "copying non-pod data with iterator\n";
+    std::vector<npod_data>  nvec(4, npod_data{0X38});
+    mfwu::uninitialized_copy(nvec.begin(), nvec.end(), nfirst);
     print_mem();
     
     return 0;
