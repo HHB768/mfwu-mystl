@@ -92,6 +92,13 @@ bool unit_test_utils::use_uninitialized_op() {
     mfwu::uninitialized_fill(nfirst, nlast, npod_data{0x34});
     print_mem();
 
+    std::cout << "filling pod data n times\n";
+    mfwu:uninitialized_fill_n(first, 2, pod_data{0x35, 'e', 'd', 'c', 'b'});
+    print_mem();
+    std::cout << "filling non_pod data n times\n";
+    mfwu::uninitialized_fill_n(nfirst, 4, npod_data{0x36});
+    print_mem();
+    
     return 0;
 }
 

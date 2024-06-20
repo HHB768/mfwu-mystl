@@ -60,6 +60,8 @@ inline void construct(T1* p, Args&&... args) {
 // 我是傻逼的珍贵记录，我就是为了在这片未初始化的空间上构造对象
 // 那 *first 是在做什么，它并没有指向对象，又谈何赋值呢？
 // 我真的太幽默了  X-Q3(psd) 240612/23:19
+// 但是后面 fill 或者 copy 的时候，是有可能不用 construct 的
+// *first 就意味着按照 standard layout 直接填充空间 6.20/24
 
 template <typename ForwardIterator, typename T, typename Ty>
 inline void construct_aux(ForwardIterator first, ForwardIterator last, const T& value, const Ty&) {
