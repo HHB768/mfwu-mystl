@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <initializer_list>
 #include <cstring>
+#include <vector>
 
 namespace mfwu {
 

@@ -281,13 +281,13 @@ void advance(It& it, Distance n) {
 
 template <typename It>
 typename mfwu::iterator_traits<It>::difference_type
-    distance(It first, It last, mfwu::random_access_iterator_tag) {
+    distance_aux(It first, It last, mfwu::random_access_iterator_tag) {
     return last - first;
 }
 
 template <typename It>
 typename mfwu::iterator_traits<It>::difference_type
-    distance(It first, It last, mfwu::input_iterator_tag) {
+    distance_aux(It first, It last, mfwu::input_iterator_tag) {
     typename mfwu::iterator_traits<It>::difference_type res{0};
     while (first != last) {
         res++;

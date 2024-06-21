@@ -283,7 +283,9 @@ public:
         return !(*this == it);
     }
     // other comparasions
-    // operator-(other_iterator)
+    Difference operator-(const random_access_iterator& it) const {
+        return ptr_ - it.ptr_;
+    }
 private:
     T* ptr_;
 };  // endof class random_access_iterator

@@ -32,7 +32,8 @@ namespace mfwu {
                 ptr_ = it.ptr_;
                 return *this;
             }
-            ~vector_iterator() = default;
+            /* iterators dont manage the memory, the ptrs do */ 
+            ~vector_iterator() = default; 
 
             reference operator[](int idx) = delete {  // delete
                 return ptr_[idx];
