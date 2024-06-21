@@ -66,38 +66,90 @@
 // }
 
 
+// #include <iostream>
+// #include <utility> // for std::forward
+
+// struct data {
+//     int a;
+//     char b, c, d, e;
+
+//     // data(int a, char b, char c, char d, char e) : a(a), b(b), c(c), d(d), e(e) {}
+// };
+
+// // Template function to forward arguments and construct the object in place
+// template <typename T1, typename... Args>
+// inline void construct(T1* p, Args&&... args) {
+//     new (p) T1(std::forward<Args>(args)...);
+// }
+
+// int main() {
+//     // Allocate memory for a data object
+//     void* p = operator new(sizeof(data));
+
+//     // Construct the data object in the allocated memory
+//     construct(static_cast<data*>(p), 1, 'a', 'b', 'c', 'd');
+
+//     // Access the constructed object
+//     data* dp = static_cast<data*>(p);
+//     std::cout << "data: " << dp->a << ", " << dp->b << ", " << dp->c << ", " << dp->d << ", " << dp->e << std::endl;
+
+//     // Destruct the object
+//     dp->~data();
+
+//     // Free the allocated memory
+//     operator delete(p);
+
+//     return 0;
+// }
+
 #include <iostream>
-#include <utility> // for std::forward
 
-struct data {
-    int a;
-    char b, c, d, e;
+template <typename T>
+class vector {
+public:
+    class vector_iterator {
+    public:
+        vector_iterator(T* ptr) : ptr_(ptr) {}
 
-    // data(int a, char b, char c, char d, char e) : a(a), b(b), c(c), d(d), e(e) {}
+        bool operator==(const vector_iterator& it) const {
+            return ptr_ == it.ptr_;
+        }
+
+        bool operator!=(const vector_iterator& it) const {
+            return !(*this == it);
+        }
+
+        // Other necessary iterator operators (like *, ++, etc.)
+    private:
+        T* ptr_;
+    };
+
+    using iterator = vector_iterator;
+
+    iterator begin() {
+        return iterator(data_);
+    }
+
+    iterator end() {
+        return iterator(data_ + size_);
+    }
+
+    // Other vector operations
+
+private:
+    T* data_;
+    size_t size_;
 };
 
-// Template function to forward arguments and construct the object in place
-template <typename T1, typename... Args>
-inline void construct(T1* p, Args&&... args) {
-    new (p) T1(std::forward<Args>(args)...);
-}
-
 int main() {
-    // Allocate memory for a data object
-    void* p = operator new(sizeof(data));
-
-    // Construct the data object in the allocated memory
-    construct(static_cast<data*>(p), 1, 'a', 'b', 'c', 'd');
-
-    // Access the constructed object
-    data* dp = static_cast<data*>(p);
-    std::cout << "data: " << dp->a << ", " << dp->b << ", " << dp->c << ", " << dp->d << ", " << dp->e << std::endl;
-
-    // Destruct the object
-    dp->~data();
-
-    // Free the allocated memory
-    operator delete(p);
-
+    vector<int> vec;
+    // Initialize vec with some data
+    vector<int>::iterator it = vec.begin();
+    if (it != vec.end()) {
+        std::cout << "Iterators are not equal" << std::endl;
+    } else {
+        std::cout << "Iterators are equal" << std::endl;
+    }
     return 0;
 }
+

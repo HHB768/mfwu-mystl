@@ -83,7 +83,7 @@ public:
     static T* allocate(size_t n=1) {
         return 0 == n ? 0 : (T*)Alloc::allocate(n * sizeof(T));
     }
-    static void deallocator(T* p, size_t n=1) {
+    static void deallocate(T* p, size_t n=1) {
         if (0 != n) {
             Alloc::deallocate(p, n * sizeof(T));
         }
@@ -98,6 +98,12 @@ public:
 class malloc_alloc {
 public:
     friend class unit_test_allocator;
+    // TODO: why we can declare friendship 
+    // without forward declaring the class
+    // ChatGPT answer: When all classes are in the same namespace and 
+    // the namespace block is processed by the compiler in its entirety,
+    // the compiler can resolve dependencies between classes without
+    // the need for forward declarations within that namespace.
     
     static void* allocate(size_t n) {
         void* res = malloc(n);

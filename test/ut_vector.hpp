@@ -5,7 +5,6 @@
 
 namespace mfwu {
 
-// friend and test of vector-related funcs
 class unit_test_vector {
 public:
     bool use_vector_iterator();
@@ -27,9 +26,13 @@ private:
 bool unit_test_vector::use_vector_iterator() {
     mfwu::vector<int> vec = {1, 2, 3, 4};
     for (mfwu::vector<int>::iterator it = vec.begin(); 
-         it != vec.end(); it++) {
-        //
+         it < vec.end(); it+=2, --it, it++, --it, ++it) {
+        std::cout << mfwu::distance(vec.begin(), it) 
+                  << " : " << (++(*it))-- << "  ";
     }
+    std::cout << "\n";
+
+    return 0;
 }
 
 bool unit_test_vector::use_mfwu_vector() {

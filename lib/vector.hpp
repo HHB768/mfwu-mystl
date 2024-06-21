@@ -7,7 +7,7 @@
 
 namespace mfwu {
 
-    class vector_unit_test;
+    class unit_test_vector;
 
     template <typename T, typename Alloc = mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
     class vector {
@@ -15,19 +15,24 @@ namespace mfwu {
         friend class mfwu::unit_test_vector;
 
         class vector_iterator
-            : mfwu::iterator<T, mfwu::random_access_iterator_tag> {
+            : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {
         public:
             using value_type = T;
             using iterator_category = mfwu::random_access_iterator_tag;
             using pointer = T*;
             using reference = T&;
-            using difference_type = mfwu::ptrdiff_t;
+            using difference_type = mfwu::ptrdiff_t;  // already in mfwu::iterator
+                                                      // how to use them ? TODO
             using size_type = size_t;
 
             // vector_iterators don't new and free the pointer
             vector_iterator() : ptr_(nullptr) {}
-            explicit vector_iterator(pointer p) : ptr_(p) {}
-            explicit vector_iterator(const vector_iterator& it) : ptr_(it.ptr_) {}
+            /*explicit*/ vector_iterator(pointer p) : ptr_(p) {}
+            /*explicit*/ vector_iterator(const vector_iterator& it) : ptr_(it.ptr_) {}
+            // you should not use explicit qualifier before copy constructor
+            // bcz it will force you to use static_cast<vector_iterator>(it) everywhere
+            // even it is already a instance of vector_iterator T^T
+            // explicit vector_iterator(const vector_iterator&& it) : ptr_(it.ptr_) { it.ptr_ = nullptr; }
             vector_iterator& operator=(const vector_iterator& it) {
                 ptr_ = it.ptr_;
                 return *this;
@@ -35,9 +40,16 @@ namespace mfwu {
             /* iterators dont manage the memory, the ptrs do */ 
             ~vector_iterator() = default; 
 
+            reference operator[](int idx) = delete;
+            /*
+            crazy! i have used this one:
             reference operator[](int idx) = delete {  // delete
                 return ptr_[idx];
             }
+            but it is illegal, even a redundant scope {} can make
+            the following declarations inaccessible, try:
+            */
+            // {}
             vector_iterator& operator++() {
                 ++ptr_;
                 return *this;
@@ -74,8 +86,7 @@ namespace mfwu {
                 tmp -= n;
                 return *this;
             }
-            typename mfwu::iterator_traits<vector_iterator>::difference_type
-            operator-(const vector_iterator& it) {
+            difference_type operator-(const vector_iterator& it) const {
                 return mfwu::distance(it, *this);
             }
             bool operator==(const vector_iterator& it) const {
@@ -110,7 +121,7 @@ namespace mfwu {
         using size_type = size_t;
         using iterator = vector_iterator;
 
-        vector() == default;
+        vector() = default;
         vector(size_type n) {
             value_type* start = allocator_.allocate(n);
             init_iterator(start, n);
@@ -212,7 +223,7 @@ namespace mfwu {
                 ++end_;
             } else {
                 request_mem();
-                emplace_back(value);
+                emplace_back(std::forward<Args>(args)...);
             }
         }
         void push_back(const value_type& value) {
@@ -242,7 +253,7 @@ namespace mfwu {
                 insert(it, value);
             }
         }
-        void insert(iterator it, const value_type& value&, size_type n) {
+        void insert(iterator it, const value_type& value, size_type n) {
             if (end_ + n <= last_) {
                 mfwu::construct(end_, end_ + n - 1, value_type());
                 end_ += n;
@@ -270,9 +281,10 @@ namespace mfwu {
             mfwu::destroy(&*end_);
         }
         void shrink(const size_type& ref_size) {
-            size_type size = max(ref_size, size());
+            // size_type sz = max(ref_size, size());
             allocator_.deallocate(&*end_, &*last_);
             last_ = end_;
+            // TODO
         }
 
         value_type& operator[](size_type idx) {
@@ -281,10 +293,10 @@ namespace mfwu {
             }
             return begin_[idx];
         }
-        operator=(const vector& vec) {
+        void operator=(const vector& vec) {
             copy(vec, *this);
         }
-        operator=(const vector&& vec) {
+        void operator=(const vector&& vec) {
             move(vec, *this);
         }
         bool operator!=(const vector& vec) const {
@@ -306,13 +318,13 @@ namespace mfwu {
             return !(this != vec);
         }
         bool operator<(const vector& vec) const {
-            aux_cmp(vec, false)
+            return aux_cmp(vec, false);
         }
         bool operator>=(const vector& vec) const {
             return !(this < vec);
         }
         bool operator>(const vector& vec) const {
-            aux_cmp(vec, true);
+            return aux_cmp(vec, true);
         }
         bool operator<=(const vector& vec) const {
             return !(this > vec);
@@ -324,11 +336,11 @@ namespace mfwu {
         iterator last_;
         Alloc allocator_;
 
-        void init_iterator(size_type* start, size_type n) {
+        void init_iterator(value_type* start, size_type n) {
             begin_ = start;  // explicit
             end_ = last_ = start + n;
         }
-        void init_iterator(size_type* start, size_type n, size_type c) {
+        void init_iterator(value_type* start, size_type n, size_type c) {
             begin_ = start;  //
             end_ = start + n;
             last_ = start + c;
@@ -362,7 +374,7 @@ namespace mfwu {
 
         void reinit() {
             mfwu::destroy(begin_, end_);
-            allocator_.deallocate(begin_, capacity());
+            allocator_.deallocate(&*begin_, capacity());
             begin_ = end_ = last_ = iterator();
         }
 
@@ -373,7 +385,7 @@ namespace mfwu {
             fill(*this, tmp);
         }
 
-        void aux_cmp(const vector& vec, bool is_larger = true) const {
+        bool aux_cmp(const vector& vec, bool is_larger = true) const {
             for (iterator it1 = begin_, it2 = vec.begin_;
                  it1 != end_ || it2 != vec.end_;
                  it1++, it2++) {
