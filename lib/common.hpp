@@ -12,6 +12,7 @@
 #include <initializer_list>
 #include <cstring>
 #include <vector>
+#include <memory>
 
 namespace mfwu {
 
@@ -38,6 +39,12 @@ struct remove_reference<T&&> { typedef T type; };
 template <typename T>
 constexpr T&& forward(typename mfwu::remove_reference<T>::type& t) noexcept {
     return static_cast<T&&>(t);
+}
+
+template <typename T>
+typename mfwu::remove_reference<T>::type&&
+move(T&& t) {
+    return static_cast<typename mfwu::remove_reference<T>::type&&>(t);
 }
 
 

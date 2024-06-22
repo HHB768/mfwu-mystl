@@ -3,7 +3,7 @@
 #ifdef __ALL_BRIEF__
 #   define __UNIT_TEST_ALLOCATOR_BRIEF__
 #   define __UNIT_TEST_ITERATOR_BRIEF__
-#   define __UNIT_TEST_UTILS_BRIEF__
+// #   define __UNIT_TEST_UTILS_BRIEF__
 // #   define __UNIT_TEST_VECTOR_BRIEF__
 #endif  // __ALL_BRIEF__
 
@@ -54,7 +54,7 @@ int main() {
     score += !ut_vector.use_vector_iterator();
     score += !ut_vector.use_mfwu_vector();
     score += !ut_vector.use_vector_algo();
-    std::cout << "\n---------- Utils test result -----------\n";
+    std::cout << "\n---------- Vector test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     return 0;

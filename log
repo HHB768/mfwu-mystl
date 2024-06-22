@@ -1,0 +1,111 @@
+
+------- Test: use_malloc_allocator -------
+In malloc_alloc
+allocating 0
+deallocating 0
+setting dummy oom_handler
+allocating 1024^3
+reallocating 1.5*1024^3
+deallocating 1.5*1024^3
+allocating and deallocating 10 times
+allocating 1000 times
+setting invalid oom_handler
+oom malloc failure testing: 
+
+------- Test: use_default_allocator -------
+In default_alloc
+malloc_allocating large block
+malloc_deallocating large block
+allocating and deallocating random units
+end of random tests
+
+----------- Alloc test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use_list_iterator -------
+printing list nodes with node*
+doing some list operations
+modifying and printing list nodes with iterator
+
+------- Test: use_input_iterator -------
+testing input_iterator reading
+reading complete
+
+------- Test: use_output_iterator -------
+testing output_iterator writing
+
+------- Test: use_forward_iterator -------
+testing forward_iterator writing
+
+------- Test: use_bidirectional_iterator -------
+testing bidirectional_iterator moving and writing
+
+------- Test: use_random_access_iterator -------
+testing random_access_iterator moving and writing
+
+---------- Iterator test result -----------
+Pass/Total: 6/6
+
+
+
+------- Test: use construct destroy -------
+constructing pod data
+1 _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
+destroying pod data
+1 _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
+constructing non-pod data
+2 _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
+destroying non-pod data
+. _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
+constructing pod data with iterator
+3 _ _ _ b c d e 3 _ _ _ b c d e _ 
+destroying pod data with iterator
+3 _ _ _ b c d e 3 _ _ _ b c d e _ 
+constructing non-pod data with iterator
+4 _ _ _ 4 _ _ _ 4 _ _ _ 4 _ _ _ _ 
+destroying non-pod data with iterator
+. _ _ _ . _ _ _ . _ _ _ . _ _ _ _ 
+
+------- Test: use uninitialized operations -------
+filling pod data with iterator
+calling std::fill (or mfwu::fill)
+3 _ _ _ b c d e 3 _ _ _ b c d e _ 
+filling non-pod data with iterator
+calling construct in loop
+4 _ _ _ 4 _ _ _ 4 _ _ _ 4 _ _ _ _ 
+filling pod data n times
+5 _ _ _ e d c b 5 _ _ _ e d c b _ 
+filling non-pod data n times
+6 _ _ _ 6 _ _ _ 6 _ _ _ 6 _ _ _ _ 
+copying pod data with iterator
+7 _ _ _ Q E W R 7 _ _ _ Q E W R _ 
+copying non-pod data with iterator
+8 _ _ _ 8 _ _ _ 8 _ _ _ 8 _ _ _ _ 
+
+------- Test: use uninitialized operations -------
+testing distance of iterator
+distance(first, last) = 2
+distance(rlast, rfirst) = -2
+distance(nfirst, nlast) = 4
+distance(nrlast, nrfirst) = -4
+testing advance of iterator
+after proper advance, we have: 
+first == last : true
+nfirst == nlast : true
+
+---------- Utils test result -----------
+Pass/Total: 3/3
+
+
+0x5b0c13a9aee0 0x5b0c13a9aee0
+0 :
+ 2  0x5b0c13a9aee0 0x5b0c13a9aee8
+2 :
+ 4  
+
+---------- Vector test result -----------
+Pass/Total: 3/3
+
+

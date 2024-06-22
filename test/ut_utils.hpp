@@ -114,25 +114,36 @@ bool unit_test_utils::use_uninitialized_op() {
 bool unit_test_utils::use_advance_distance() {
     std::cout << "\n------- Test: use uninitialized operations -------\n";
     set_mem_zero();
-    std::cout << "testing distance of iteratorn\n";
+    std::cout << "testing distance of iterator\n";
     mfwu::input_iterator<pod_data> first((pod_data*)mem), last((pod_data*)mem+2);
     mfwu::random_access_iterator<pod_data> rfirst((pod_data*)mem), rlast((pod_data*)mem+2);
+#ifdef __UNIT_TEST_UTILS_BRIEF__
+    mfwu::distance(first, last), mfwu::distance(rlast, rfirst);
+#else // !__UNIT_TEST_UTILS_BRIEF__
     std::cout << "distance(first, last) = " << mfwu::distance(first, last) << "\n";
     std::cout << "distance(rlast, rfirst) = " << mfwu::distance(rlast, rfirst) << "\n";
+#endif  // __UNIT_TEST_UTILS_BRIEF__
     mfwu::input_iterator<npod_data> nfirst((npod_data*)mem), nlast((npod_data*)mem+4);
     mfwu::random_access_iterator<npod_data> nrfirst((npod_data*)mem), nrlast((npod_data*)mem+4);
+#ifdef __UNIT_TEST_UTILS_BRIEF__
+    mfwu::distance(nfirst, nlast), mfwu::distance(nrlast, nrfirst);
+#else  // __UNIT_TEST_UTILS_BRIEF__
     std::cout << "distance(nfirst, nlast) = " << mfwu::distance(nfirst, nlast) << "\n";
     std::cout << "distance(nrlast, nrfirst) = " << mfwu::distance(nrlast, nrfirst) << "\n";
+#endif  // __UNIT_TEST_UTILS_BRIEF__
     
     std::cout << "testing advance of iterator\n";
-    std::cout << "after proper advance, we have: \n";
     mfwu::advance(first, 2);
+#ifndef __UNIT_TEST_UTILS_BRIEF__
+    std::cout << "after proper advance, we have: \n";
     std::cout << "first == last : " << (first == last ? "true" : "false") << "\n";
+#endif  // __UNIT_TEST_UTILS_BRIEF__
     mfwu::advance(nfirst, 4);
+#ifndef __UNIT_TEST_UTILS_BRIEF__
     std::cout << "nfirst == nlast : " << (nfirst == nlast ? "true" : "false") << "\n";
+#endif  // __UNIT_TEST_UTILS_BRIEF__
 
     return 0;
 }
-
 
 }  // endof namespace mfwu

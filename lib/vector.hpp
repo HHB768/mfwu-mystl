@@ -17,12 +17,13 @@ namespace mfwu {
         class vector_iterator
             : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {
         public:
-            using value_type = T;
-            using iterator_category = mfwu::random_access_iterator_tag;
-            using pointer = T*;
-            using reference = T&;
-            using difference_type = mfwu::ptrdiff_t;  // already in mfwu::iterator
-                                                      // how to use them ? TODO
+            using Iter = mfwu::iterator<T, mfwu::random_access_iterator_tag>;
+            using value_type = typename Iter::value_type;
+            using iterator_category = typename Iter::iterator_category;
+            using pointer = typename Iter::pointer;
+            using reference = typename Iter::reference;
+            using difference_type = typename Iter::difference_type;  
+            // really confusing lol, since C++17 the std::iterator is deprecated
             using size_type = size_t;
 
             // vector_iterators don't new and free the pointer
@@ -87,7 +88,7 @@ namespace mfwu {
                 return *this;
             }
             difference_type operator-(const vector_iterator& it) const {
-                return mfwu::distance(it, *this);
+                return ptr_ - it.ptr_;
             }
             bool operator==(const vector_iterator& it) const {
                 return ptr_ == it.ptr_;
@@ -120,6 +121,8 @@ namespace mfwu {
         using value_type = T;  // TODO: 2d support
         using size_type = size_t;
         using iterator = vector_iterator;
+        // TODO: you can cmp to using iterator = T*
+        // to check your vector_iterator definition
 
         vector() = default;
         vector(size_type n) {
@@ -145,14 +148,14 @@ namespace mfwu {
         vector(const vector& vec) {
             copy(vec, *this);  // TODO: check
         }
-        vector(const vector&& vec) {
-            init_iterator(&*vec.begin_, vec.capacity());
-            vec.reinit();
+        vector(vector&& vec) {
+            init_iterator(&*vec.begin_, vec.size(), vec.capacity());
+            vec.reset_iterator();
         }
         // TODO: 2d vector init
         ~vector() {
             reinit();
-            // TODO: ensure iterator(?) and allocator free their memory
+            // TODO: how to ensure iterator(?) and allocator free their memory
         }
 
         iterator begin() const {
@@ -183,7 +186,7 @@ namespace mfwu {
             // what if n < c
             tmp.init_iterator(start, n);
             fill(*this, tmp);  // TODO: keep capacity
-            *this = std::move(tmp);
+            *this = mfwu::move(tmp);
         }
         void reserve(size_type c) {
             // similar but just allocate
@@ -197,7 +200,7 @@ namespace mfwu {
                     mfwu::construct(start, *it);
                     ++start;
                 }
-                *this = std::move(tmp);
+                *this = mfwu::move(tmp);
             }
         }
         void clear() {
@@ -359,10 +362,8 @@ namespace mfwu {
             dst.init_iterator(dstart, n, c);
         }
         static void move(vector& src, vector& dst) {
-            size_type c = src.capacity();
-            dst.reinit();
-            dst.init_iterator(&*src.begin_, c);
-            src.reinit();
+            dst.init_iterator(&*src.begin_, src.size(), src.capacity());
+            src.reset_iterator();
         }
         static void fill(const vector& src, vector& dst) {
             for (iterator& its = src->begin_, itd = dst->begin_;
@@ -373,10 +374,14 @@ namespace mfwu {
         }
 
         void reinit() {
-            mfwu::destroy(begin_, end_);
-            allocator_.deallocate(&*begin_, capacity());
-            begin_ = end_ = last_ = iterator();
+            destroy();
+            deallocate();
+            reset_iterator();
         }
+
+        void destroy() { mfwu::destroy(begin_, end_); }
+        void deallocate() { allocator_.deallocate(&*begin_, capacity()); }
+        void reset_iterator() { begin_ = end_ = last_ = iterator(); }
 
         void request_mem() {
             vector tmp;
