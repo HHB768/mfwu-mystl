@@ -109,6 +109,23 @@ inline void construct(ForwardIterator first, ForwardIterator last, Args&&... arg
     }
 }
 
+// // 1 construct but try not to construct
+// deprecated bcz vector has its own reverse copy
+// template <typename T>
+// inline void construct_or_not_aux(T* p, const T& val, std::true_type) {
+//     *p = val;
+// }
+
+// template <typename T>
+// inline void construct_or_not_aux(T* p, const T& val, std::false_type) {
+//     construct(p, val);
+// }
+
+// template <typename T>
+// inline void construct_or_not(T* p, const T& val) {
+//     construct_or_not_aux(p, val, std::is_pod<T>{});
+// }
+
 // 2 destroy *p
 template <typename T>
 inline void destroy(T* pointer) {

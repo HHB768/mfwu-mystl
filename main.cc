@@ -1,10 +1,10 @@
-#define __ALL_BRIEF__
+// #define __ALL_BRIEF__
 
 #ifdef __ALL_BRIEF__
 #   define __UNIT_TEST_ALLOCATOR_BRIEF__
 #   define __UNIT_TEST_ITERATOR_BRIEF__
-// #   define __UNIT_TEST_UTILS_BRIEF__
-// #   define __UNIT_TEST_VECTOR_BRIEF__
+#   define __UNIT_TEST_UTILS_BRIEF__
+#   define __UNIT_TEST_VECTOR_BRIEF__
 #endif  // __ALL_BRIEF__
 
 #include "ut_allocator.hpp"

@@ -23,7 +23,7 @@ namespace mfwu {
             using pointer = typename Iter::pointer;
             using reference = typename Iter::reference;
             using difference_type = typename Iter::difference_type;  
-            // really confusing lol, since C++17 the std::iterator is deprecated
+            // really confusing lol, and the std::iterator is deprecated since C++17
             using size_type = size_t;
 
             // vector_iterators don't new and free the pointer
@@ -38,10 +38,18 @@ namespace mfwu {
                 ptr_ = it.ptr_;
                 return *this;
             }
+            // vector_iterator& operator=(value_type* const p) {
+            //     ptr_ = p;
+            //     return *this;
+            // }  // still cannot understand the implicit type conversion here
+
             /* iterators dont manage the memory, the ptrs do */ 
             ~vector_iterator() = default; 
 
             reference operator[](int idx) = delete;
+            // reference operator[](int idx) {  // delete
+            //     return ptr_[idx];
+            // }
             /*
             crazy! i have used this one:
             reference operator[](int idx) = delete {  // delete
@@ -124,33 +132,39 @@ namespace mfwu {
         // TODO: you can cmp to using iterator = T*
         // to check your vector_iterator definition
 
-        vector() = default;
+        // vector() = default;
+        vector() : begin_(), end_(), last_(), allocator_() {}
+        // For POD types, there’s no default initialization (members remain uninitialized).
+        // For non-POD types, members are either zero-initialized or default-constructed 
+        //     based on whether the class has a user-provided constructor12. 😊
         vector(size_type n) {
             value_type* start = allocator_.allocate(n);
             init_iterator(start, n);
-            mfwu::construct(begin_, end_, value_type());
+            mfwu::uninitialized_fill(begin_, end_, value_type());
+            // mfwu::construct(begin_, end_, value_type());
         }
         vector(size_type n, const value_type& value) {
             value_type* start = allocator_.allocate(n);
             init_iterator(start, n);
-            mfwu::construct(begin_, end_, value);
+            mfwu::uninitialized_fill(begin_, end_, value);
+            // mfwu::construct(begin_, end_, value);
         }
         vector(const std::initializer_list<value_type>& values) {
             size_type n = values.size();
             value_type* start = allocator_.allocate(n);
             init_iterator(start, n);
 
-            for (auto&& value : values) {
-                mfwu::construct(start, value);
-                start++;
-            }
+            mfwu::uninitialized_copy(values.begin(), values.end(), begin());
         }
         vector(const vector& vec) {
-            copy(vec, *this);  // TODO: check
+            reset_and_copy(vec, *this);  // TODO: check
         }
         vector(vector&& vec) {
-            init_iterator(&*vec.begin_, vec.size(), vec.capacity());
-            vec.reset_iterator();
+            move(vec, *this);
+        }
+        template <typename ForwardIterator>
+        vector(ForwardIterator first, ForwardIterator last) {
+            // TODO
         }
         // TODO: 2d vector init
         ~vector() {
@@ -158,50 +172,40 @@ namespace mfwu {
             // TODO: how to ensure iterator(?) and allocator free their memory
         }
 
-        iterator begin() const {
-            return begin_;
-        }
-        iterator end() const {
-            return end_;
-        }
-
-        value_type& back() {
-            return *end_;
-        }
-
-        size_type size() const {
-            return end_ - begin_; 
-        }
-        size_type capacity() const {
-            return last_ - begin_;  // type conversion? long -> unsigned long
-        }
-        bool empty() const {
-            return end_ == begin_;
-        }
+        iterator begin() const { return begin_; }
+        iterator end() const { return end_; }
+        value_type& back() { return *end_; }
+        size_type size() const { return end_ - begin_; }
+        size_type capacity() const { return last_ - begin_; }  // type conversion? long -> unsigned long
+        bool empty() const { return end_ == begin_; }
 
         void resize(size_type n, const value_type& value=value_type()) {
-            // what if n < size() ?
+            if (n < 0) { return ; }
+            if (n <= capacity()) {
+                if (n <= size()) {
+                    destroy(begin_ + n, end_);
+                    end_ = begin_ + n;
+                    return ;
+                }
+                // if size < n < capacity
+                mfwu::uninitialized_fill(end_, begin_ + n, value);
+                return ;
+            }
             vector tmp;
             value_type* start = tmp.allocator_.allocate(n);
-            // what if n < c
             tmp.init_iterator(start, n);
-            fill(*this, tmp);  // TODO: keep capacity
-            *this = mfwu::move(tmp);
+            iterator finish = uninitialized_copy(begin_, end_, start);
+            uninitialized_fill(finish, tmp.end_, value);
+            reset_and_move(tmp, *this);
         }
         void reserve(size_type c) {
             // similar but just allocate
-            if (c < size()) {
-                // error 
-            } else {
-                vector tmp = vector();
-                value_type* start = tmp.allocator_.allocate(c);
-                tmp.init_iterator(start, 0, c);
-                for (iterator& it = begin_; it != end_; ++it) {
-                    mfwu::construct(start, *it);
-                    ++start;
-                }
-                *this = mfwu::move(tmp);
-            }
+            if (c <= capacity()) { return ; }
+            vector tmp = vector();
+            value_type* start = tmp.allocator_.allocate(c);
+            tmp.init_iterator(start, 0, c);
+            mfwu::uninitialized_copy(begin_, end_, start);
+            reset_and_move(tmp, *this);  // TODO: CHECK
         }
         void clear() {
             // destroy the objects but not deallocate the memory
@@ -230,10 +234,15 @@ namespace mfwu {
             }
         }
         void push_back(const value_type& value) {
-            emplace_back(value);
+            emplace_back(value);  
+            // i write this myself and i am not quite sure
+            // but later i find stl_vector.h use same way
+        }
+        void push_back(value_type&& value) {
+            emplace_back(mfwu::move(value));
         }
         void pop_back() {
-            mfwu::destroy(&*end_);
+            mfwu::destroy(&*end_);  // even with trivial destructor
             --end_;
         }
 
@@ -245,32 +254,42 @@ namespace mfwu {
         }
         void insert(iterator it, const value_type& value) {
             if (end_ != last_) {
-                mfwu::construct(&*end_, back());
-                ++end_;
                 for (iterator pos = end_; pos != it; --pos) {
                     *pos = *(pos - 1);  // check TODO
                 }
-                *it = value;
+                ++end_;
+                // *it = value;   
+                construct(&*it, value);
             } else {
                 request_mem();
                 insert(it, value);
             }
         }
         void insert(iterator it, const value_type& value, size_type n) {
-            if (end_ + n <= last_) {
-                mfwu::construct(end_, end_ + n - 1, value_type());
-                end_ += n;
-                for (iterator pos = end_; pos >= it; --pos) {
-                    *(pos + n) = *pos;
-                }
-                mfwu::fill(it, it + n - 1, value);
-            } else {
-                request_mem();
-                insert(it, value, n);
-            }
+            // if (end_ + n <= last_) {
+            //     // mfwu::uninitialized_copy(it, end_, it + n); 
+            //     // unsafe, senario: it + n < end_
+            //     // TODO: check
+            //     reverse_uninitialized_copy(it, end_, it + n);
+            //     if (it + n > end_) {
+            //         mfwu::construct(end_, it + n, value_type());
+            //     }
+            //     end_ += n;
+            //     for (iterator pos = end_; pos >= it; --pos) {
+            //         *(pos + n) = *pos;
+            //     }
+            //     mfwu::fill(it, it + n - 1, value);
+            // } else {
+            //     request_mem();
+            //     insert(it, value, n);
+            // }
+            // TODO: refer to std impl _M_range_insert()
+            // TODO: tldr
         }
-
-        void insert(iterator first, iterator last, iterator it) {
+        void insert(iterator it, std::initializer_list<value_type>& values) {
+            // TODO
+        }
+        void insert(iterator it, iterator first, iterator last) {
             // TODO: insert(other.first ~ other.last) to position it
         }
         void erase(int idx) {
@@ -279,12 +298,14 @@ namespace mfwu {
         void erase(iterator it) {
             --end_;
             for (iterator pos = it; pos != end_; pos++) {
-                *pos = *(pos + 1);
+                *pos = *(pos + 1);  // TODO: check
             }
             mfwu::destroy(&*end_);
         }
+        // TODO: range erase
+
         void shrink(const size_type& ref_size) {
-            // size_type sz = max(ref_size, size());
+            if (ref_size < size()) return ;
             allocator_.deallocate(&*end_, &*last_);
             last_ = end_;
             // TODO
@@ -340,7 +361,7 @@ namespace mfwu {
         Alloc allocator_;
 
         void init_iterator(value_type* start, size_type n) {
-            begin_ = start;  // explicit
+            begin_ = start;  // explicit?
             end_ = last_ = start + n;
         }
         void init_iterator(value_type* start, size_type n, size_type c) {
@@ -349,28 +370,41 @@ namespace mfwu {
             last_ = start + c;
         }
 
-        static void copy(const vector& src, vector& dst) {
-            size_type n = src.size();
-            size_type c = src.capacity();
+        static void reset_and_copy(const vector& src, vector& dst) {
             dst.reinit();
-            value_type* dstart = dst.allocator_.allocate(c);  // just control your own memory
-            value_type* sstart = &*src.begin_;
-            for (int i = 0; i < n; i++) {
-                mfwu::construct(dstart, *sstart);  // TODO: check  // unless you complete "realloc"
-                sstart++; dstart++;
-            }
-            dst.init_iterator(dstart, n, c);
+            value_type* dstart = dst.allocator_.allocate(src.capacity());
+            mfwu::uninitialized_copy(src.begin(), src.end(), dstart);
+            dst.init_iterator(dstart, src.size(), src.capacity());
         }
-        static void move(vector& src, vector& dst) {
+        static void reset_and_move(vector& src, vector& dst) {
+            dst.reinit();
             dst.init_iterator(&*src.begin_, src.size(), src.capacity());
             src.reset_iterator();
         }
-        static void fill(const vector& src, vector& dst) {
-            for (iterator& its = src->begin_, itd = dst->begin_;
-                its != src->end_ && itd != dst.end_;
-                its++, itd++) {
-                *itd = *its;
+        // static void fill(const vector& src, vector& dst) {
+        //     for (iterator& its = src->begin_, itd = dst->begin_;
+        //         its != src->end_ && itd != dst.end_;
+        //         its++, itd++) {
+        //         *itd = *its;
+        //     }
+        // }
+        void reverse_uninitialized_copy(iterator first, iterator last, 
+                                        iterator res, std::true_type) {
+            for (iterator pos = res + (last - first) - 1;
+                 pos >= res; first--, pos--) {
+                *pos = *first;
             }
+        }
+        void reverse_uninitialized_copy(iterator first, iterator last, 
+                                        iterator res, std::false_type) {
+            for (iterator pos = res + (last - first) - 1;
+                 pos >= res; first--, pos--) {
+                construct(&*pos, *first);
+            }
+        }
+        void reverse_uninitialized_copy(iterator first, iterator last, iterator res) {
+            reverse_uninitialized_copy_aux(first, last, res,
+                std::is_pod<typename iterator_traits<iterator>::value_type{});
         }
 
         void reinit() {
@@ -379,8 +413,8 @@ namespace mfwu {
             reset_iterator();
         }
 
-        void destroy() { mfwu::destroy(begin_, end_); }
-        void deallocate() { allocator_.deallocate(&*begin_, capacity()); }
+        void destroy() { if(&*begin_) mfwu::destroy(begin_, end_); }
+        void deallocate() { if(&*begin_) allocator_.deallocate(&*begin_, capacity()); }
         void reset_iterator() { begin_ = end_ = last_ = iterator(); }
 
         void request_mem() {

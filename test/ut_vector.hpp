@@ -20,14 +20,29 @@ private:
         npod_data() : a(0) {}
         npod_data(int a_) : a(a_) {}
         ~npod_data() { a = 0x2E; }
-    };    
+        npod_data& operator++() {
+            ++a;
+            return *this;
+        }
+        npod_data operator--(int) {
+            --a;
+            return *this;
+        }
+    };
+    friend std::ostream& operator<<(std::ostream&, const npod_data&);
 };  // endof class unit_test_vector
+
+std::ostream& operator<<(std::ostream& os, 
+                         const unit_test_vector::npod_data& data) {
+    os << data.a;
+    return os;
+}
 
 bool unit_test_vector::use_vector_iterator() {
     std::cout << "\n------- Test: use vector_iterator -------\n";
-    mfwu::vector<int> vec = {1, 2, 3, 4, 5, 6};
-    for (mfwu::vector<int>::iterator it = vec.begin(); 
-         it < vec.end(); it+=2, --it, it++, --it, ++it) {
+    mfwu::vector<npod_data> vec = {1, 2, 3, 4, 5, 6};
+    for (mfwu::vector<npod_data>::iterator it = vec.begin(); 
+         it < vec.end(); it+=2, --it, it++, --it, ++it, it = &*it) {
         std::cout << mfwu::distance(vec.begin(), it) 
                   << " : " << (++(*it))-- << "  ";
     }
