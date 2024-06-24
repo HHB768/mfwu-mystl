@@ -170,6 +170,7 @@ namespace mfwu {
         ~vector() {
             reinit();
             // TODO: how to ensure iterator(?) and allocator free their memory
+            // is it necessary to reset_iterator? no?
         }
 
         iterator begin() const { return begin_; }
@@ -254,12 +255,11 @@ namespace mfwu {
         }
         void insert(iterator it, const value_type& value) {
             if (end_ != last_) {
-                for (iterator pos = end_; pos != it; --pos) {
-                    *pos = *(pos - 1);  // check TODO
-                }
+                mfwu::construct(&*end_, back());
+                reverse_uninitialized_copy(it, end_ - 1, it + 1);
                 ++end_;
-                // *it = value;   
-                construct(&*it, value);
+                mfwu::destroy(&*it);
+                mfwu::construct(&*it, value);
             } else {
                 request_mem();
                 insert(it, value);
@@ -296,17 +296,17 @@ namespace mfwu {
             erase(&begin_[idx]);
         }
         void erase(iterator it) {
-            --end_;
-            for (iterator pos = it; pos != end_; pos++) {
-                *pos = *(pos + 1);  // TODO: check
-            }
-            mfwu::destroy(&*end_);
+            // --end_;
+            // for (iterator pos = it; pos != end_; pos++) {
+            //     *pos = *(pos + 1);  // TODO: check
+            // }
+            // mfwu::destroy(&*end_);
         }
         // TODO: range erase
 
         void shrink(const size_type& ref_size) {
             if (ref_size < size()) return ;
-            allocator_.deallocate(&*end_, &*last_);
+            allocator_.deallocate(&*end_, last_ - end_);
             last_ = end_;
             // TODO
         }
@@ -318,10 +318,10 @@ namespace mfwu {
             return begin_[idx];
         }
         void operator=(const vector& vec) {
-            copy(vec, *this);
+            reset_and_copy(vec, *this);
         }
         void operator=(const vector&& vec) {
-            move(vec, *this);
+            reset_and_move(vec, *this);
         }
         bool operator!=(const vector& vec) const {
             // cmp value_type first
@@ -399,6 +399,7 @@ namespace mfwu {
                                         iterator res, std::false_type) {
             for (iterator pos = res + (last - first) - 1;
                  pos >= res; first--, pos--) {
+                destroy(&*pos);
                 construct(&*pos, *first);
             }
         }
