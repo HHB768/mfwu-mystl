@@ -160,7 +160,7 @@ namespace mfwu {
             reset_and_copy(vec, *this);  // TODO: check
         }
         vector(vector&& vec) {
-            move(vec, *this);
+            reset_and_move(vec, *this);
         }
         template <typename ForwardIterator>
         vector(ForwardIterator first, ForwardIterator last) {
@@ -251,58 +251,99 @@ namespace mfwu {
             insert(&begin_[idx], value);
         }
         void insert(int idx, const value_type& value, size_type n) {
-            insert(&begin_[idx], value, n);
+            insert(&begin_[idx], value, n);  // std 接口好像是 (it, n, val)
         }
-        void insert(iterator it, const value_type& value) {
+        void insert(const iterator it, const value_type& value) {
             if (end_ != last_) {
                 mfwu::construct(&*end_, back());
-                reverse_uninitialized_copy(it, end_ - 1, it + 1);
+                reverse_copy(it, end_ - 1, it + 1);
                 ++end_;
-                mfwu::destroy(&*it);
-                mfwu::construct(&*it, value);
+                *it = value;
             } else {
                 request_mem();
                 insert(it, value);
             }
         }
-        void insert(iterator it, const value_type& value, size_type n) {
-            // if (end_ + n <= last_) {
-            //     // mfwu::uninitialized_copy(it, end_, it + n); 
-            //     // unsafe, senario: it + n < end_
-            //     // TODO: check
-            //     reverse_uninitialized_copy(it, end_, it + n);
-            //     if (it + n > end_) {
-            //         mfwu::construct(end_, it + n, value_type());
-            //     }
-            //     end_ += n;
-            //     for (iterator pos = end_; pos >= it; --pos) {
-            //         *(pos + n) = *pos;
-            //     }
-            //     mfwu::fill(it, it + n - 1, value);
-            // } else {
-            //     request_mem();
-            //     insert(it, value, n);
-            // }
+        void insert(const iterator it, const value_type& value, size_type n) {
+            if (end_ + n <= last_) {
+                // mfwu::uninitialized_copy(it, end_, it + n); 
+                // unsafe, senario: it + n < end_
+                // TODO: check
+                if (it + n > end_) {
+                    mfwu::construct(end_, it + n, value);
+                    mfwu::uninitialized_copy(it, end_, it + n);
+                    mfwu::fill(it, end_, value);
+                } else {
+                    mfwu::uninitialized_copy(end - n, end, end);
+                    reverse_copy(it, end - n, it + n);
+                    mfwu::fill(it, it + n, value);
+                }
+                end_ += n;
+            } else {
+                request_mem();
+                insert(it, value, n);
+            }
             // TODO: refer to std impl _M_range_insert()
             // TODO: tldr
         }
         void insert(iterator it, std::initializer_list<value_type>& values) {
-            // TODO
+            int n = values.size();
+            if (end_ + n <= last_) {
+                if (it + n > end_) {
+                    mfwu::uninitialized_copy(it, end_, it + n);
+                    mfwu::copy(values.begin(), values.begin() + (end_ - it), it);
+                    mfwu::uninitialized_copy(values.begin() + (end_ - it), values.end(), end_);
+                } else {
+                    mfwu::uninitialized_copy(end_ - n, end_, end_);
+                    reverse_copy(it, end_ - n, it + n);
+                    mfwu::copy(values.begin(), values.end(), it);
+                }
+                end_ += n;
+            } else {
+                request_mem();
+                insert(it, values);
+            }
         }
         void insert(iterator it, iterator first, iterator last) {
             // TODO: insert(other.first ~ other.last) to position it
+            int n = last - first;
+            if (end_ + n <= last_) {
+                if (it + n > end_) {
+                    mfwu::uninitialized_copy(it, end_, it + n);
+                    mfwu::copy(first, first + (end_ - it), it);
+                    mfwu::uninitialized_copy(first + (end_ - it), last, end_);
+                } else {
+                    mfwu::uninitialized_copy(end_ - n, end_, end_);
+                    reverse_copy(it, end_ - n, it + n);
+                    mfwu::copy(first, last, it);
+                }
+                end_ += n;
+            } else {
+                request_mem();
+                insert(it, first, last);
+            }
+            
         }
         void erase(int idx) {
             erase(&begin_[idx]);
         }
         void erase(iterator it) {
-            // --end_;
-            // for (iterator pos = it; pos != end_; pos++) {
-            //     *pos = *(pos + 1);  // TODO: check
-            // }
-            // mfwu::destroy(&*end_);
+            --end_;
+            for (iterator pos = it; pos != end_; pos++) {
+                *pos = pos[1];  // TODO: check
+            }
+            mfwu::destroy(&*end_);
         }
-        // TODO: range erase
+        void erase(iterator first, iterator last) {
+            int n = last - first;
+            for (iterator pos = first; pos != last; pos++) {
+                *pos = pos[n];
+            }
+            for (iterator pos = last + n; pos != end_; pos++) {
+                mfwu::destroy(&*pos);
+            }
+            end_ -= n;
+        }
 
         void shrink(const size_type& ref_size) {
             if (ref_size < size()) return ;
@@ -388,14 +429,24 @@ namespace mfwu {
         //         *itd = *its;
         //     }
         // }
-        void reverse_uninitialized_copy(iterator first, iterator last, 
-                                        iterator res, std::true_type) {
+        void reverse_copy(iterator first, iterator last, iterator res) {
+            // 听说指针移动和判等没有整数快
+            // TODO: 以后试试把 first != last; first++
+            //       改成 i < n; i++
+            // 搜 insert 的实现时候看到的
+            --last;
             for (iterator pos = res + (last - first) - 1;
-                 pos >= res; first--, pos--) {
-                *pos = *first;
+                 pos >= res; --last, --pos) {
+                *pos = *last;
+                // as i found in the std::vector test
+                // value_type must have copy constructor and operator=
             }
         }
-        void reverse_uninitialized_copy(iterator first, iterator last, 
+        void reverse_uninitialized_copy_aux(iterator first, iterator last, 
+                                        iterator res, std::true_type) {
+            reverse_copy(first, last, res);
+        }
+        void reverse_uninitialized_copy_aux(iterator first, iterator last, 
                                         iterator res, std::false_type) {
             for (iterator pos = res + (last - first) - 1;
                  pos >= res; first--, pos--) {
@@ -405,7 +456,7 @@ namespace mfwu {
         }
         void reverse_uninitialized_copy(iterator first, iterator last, iterator res) {
             reverse_uninitialized_copy_aux(first, last, res,
-                std::is_pod<typename iterator_traits<iterator>::value_type{});
+                std::is_pod<typename iterator_traits<iterator>::value_type>{});
         }
 
         void reinit() {
