@@ -184,19 +184,18 @@ namespace mfwu {
             if (n < 0) { return ; }
             if (n <= capacity()) {
                 if (n <= size()) {
-                    destroy(begin_ + n, end_);
-                    end_ = begin_ + n;
-                    return ;
+                    mfwu::destroy(begin_ + n, end_);
+                } else {  // if size < n < capacity
+                    mfwu::uninitialized_fill(end_, begin_ + n, value);
                 }
-                // if size < n < capacity
-                mfwu::uninitialized_fill(end_, begin_ + n, value);
+                end_ = begin_ + n;
                 return ;
             }
             vector tmp;
             value_type* start = tmp.allocator_.allocate(n);
             tmp.init_iterator(start, n);
             iterator finish = uninitialized_copy(begin_, end_, start);
-            uninitialized_fill(finish, tmp.end_, value);
+            mfwu::uninitialized_fill(finish, tmp.end_, value);
             reset_and_move(tmp, *this);
         }
         void reserve(size_type c) {
@@ -204,7 +203,7 @@ namespace mfwu {
             if (c <= capacity()) { return ; }
             vector tmp = vector();
             value_type* start = tmp.allocator_.allocate(c);
-            tmp.init_iterator(start, 0, c);
+            tmp.init_iterator(start, size(), c);
             mfwu::uninitialized_copy(begin_, end_, start);
             reset_and_move(tmp, *this);  // TODO: CHECK
         }
@@ -243,6 +242,7 @@ namespace mfwu {
             emplace_back(mfwu::move(value));
         }
         void pop_back() {
+            if (begin_ == end_) { return ; }
             mfwu::destroy(&*end_);  // even with trivial destructor
             --end_;
         }
@@ -471,9 +471,11 @@ namespace mfwu {
 
         void request_mem() {
             vector tmp;
-            value_type* start = tmp.allocator_.allocate(2 * size());
-            tmp.init_iterator(start, size(), capacity());
-            fill(*this, tmp);
+            size_type capacity = (size() ? 2 * size() : 1);
+            value_type* start = tmp.allocator_.allocate(capacity);
+            tmp.init_iterator(start, size(), capacity);
+            mfwu::uninitialized_copy(begin_, end_, start);
+            reset_and_move(tmp, *this);
         }
 
         bool aux_cmp(const vector& vec, bool is_larger = true) const {
