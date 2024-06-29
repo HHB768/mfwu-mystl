@@ -88,6 +88,9 @@ public:
             Alloc::deallocate(p, n * sizeof(T));
         }
     }
+    static T* reallocate(T* p, size_t old_n, size_t n=1) {
+        return (T*)Alloc::reallocate(p, old_n * sizeof(T), n * sizeof(T));
+    }
 
 };  // endof class DefaultAllocator
 

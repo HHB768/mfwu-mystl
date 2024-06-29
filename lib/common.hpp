@@ -13,6 +13,7 @@
 #include <cstring>
 #include <vector>
 #include <memory>
+#include <cassert>
 
 namespace mfwu {
 

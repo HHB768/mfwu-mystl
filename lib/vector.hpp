@@ -72,7 +72,7 @@ namespace mfwu {
                 --ptr_;
                 return *this;
             }
-            vector_iterator operator--(int) {
+            vector_iterator operator--(int) const {
                 vector_iterator tmp = *this;
                 --ptr_;
                 return tmp;
@@ -81,7 +81,7 @@ namespace mfwu {
                 ptr_ += n;
                 return *this;
             }
-            vector_iterator operator+(int n) {
+            vector_iterator operator+(int n) const {
                 vector_iterator tmp = *this;
                 tmp += n;
                 return tmp;
@@ -90,7 +90,7 @@ namespace mfwu {
                 ptr_ -= n;
                 return *this;
             }
-            vector_iterator operator-(int n) {
+            vector_iterator operator-(int n) const {
                 vector_iterator tmp = *this;
                 tmp -= n;
                 return *this;
@@ -248,23 +248,27 @@ namespace mfwu {
         }
 
         void insert(int idx, const value_type& value) {
-            insert(&begin_[idx], value);
+            insert(begin_ + idx, value);
         }
         void insert(int idx, const value_type& value, size_type n) {
-            insert(&begin_[idx], value, n);  // std 接口好像是 (it, n, val)
+            insert(begin_ + idx, value, n);  // std 接口好像是 (it, n, val)
         }
         void insert(const iterator it, const value_type& value) {
+            assert(begin_ <= it && it <= end_);
             if (end_ != last_) {
                 mfwu::construct(&*end_, back());
                 reverse_copy(it, end_ - 1, it + 1);
                 ++end_;
                 *it = value;
             } else {
+                typename iterator::difference_type idx = it - begin_;
                 request_mem();
-                insert(it, value);
+                insert(begin_ + idx, value);
             }
         }
         void insert(const iterator it, const value_type& value, size_type n) {
+            assert(begin_ <= it && it <= end_);
+            if (0 == n) return ;
             if (end_ + n <= last_) {
                 // mfwu::uninitialized_copy(it, end_, it + n); 
                 // unsafe, senario: it + n < end_
@@ -274,19 +278,21 @@ namespace mfwu {
                     mfwu::uninitialized_copy(it, end_, it + n);
                     mfwu::fill(it, end_, value);
                 } else {
-                    mfwu::uninitialized_copy(end - n, end, end);
-                    reverse_copy(it, end - n, it + n);
+                    mfwu::uninitialized_copy(end_ - n, end_, end_);
+                    reverse_copy(it, end_ - n, it + n);
                     mfwu::fill(it, it + n, value);
                 }
                 end_ += n;
             } else {
+                typename iterator::difference_type idx = it - begin_;
                 request_mem();
-                insert(it, value, n);
+                insert(begin_ + idx, value, n);
             }
             // TODO: refer to std impl _M_range_insert()
             // TODO: tldr
         }
         void insert(iterator it, std::initializer_list<value_type>& values) {
+            assert(begin_ <= it && it <= end_);
             int n = values.size();
             if (end_ + n <= last_) {
                 if (it + n > end_) {
@@ -300,12 +306,14 @@ namespace mfwu {
                 }
                 end_ += n;
             } else {
+                typename iterator::difference_type idx = it - begin_;
                 request_mem();
-                insert(it, values);
+                insert(begin_ + idx, values);
             }
         }
         void insert(iterator it, iterator first, iterator last) {
             // TODO: insert(other.first ~ other.last) to position it
+            assert(begin_ <= it && it <= end_);
             int n = last - first;
             if (end_ + n <= last_) {
                 if (it + n > end_) {
@@ -319,37 +327,54 @@ namespace mfwu {
                 }
                 end_ += n;
             } else {
+                typename iterator::difference_type idx = it - begin_;
+                // it wont work, bcz the logic in the copy side
+                // if (begin_ <= first && first <= last_
+                //     && begin_ <= last && last <= last_) {
+                //     typename iterator::difference_type fcidx = first - begin_,
+                //                                        lcidx = last - begin_;
+                //     request_mem();
+                //     insert(begin_ + idx, begin_ + fcidx, end_ + lcidx);
+                //     return ;
+                // }
                 request_mem();
-                insert(it, first, last);
+                insert(begin_ + idx, first, last);
             }
             
         }
+        // TODO: what if these its are beyond the begin_ ~ end_ ?
         void erase(int idx) {
-            erase(&begin_[idx]);
+            erase(begin_ + idx);
         }
         void erase(iterator it) {
+            assert(begin_ <= it && it <= end_);
+            mfwu::copy(it + 1, end_, it);
             --end_;
-            for (iterator pos = it; pos != end_; pos++) {
-                *pos = pos[1];  // TODO: check
-            }
             mfwu::destroy(&*end_);
         }
         void erase(iterator first, iterator last) {
+            assert(begin_ <= first && first <= end_
+                && begin_ <= last  && last  <= end_);
             int n = last - first;
-            for (iterator pos = first; pos != last; pos++) {
-                *pos = pos[n];
-            }
-            for (iterator pos = last + n; pos != end_; pos++) {
-                mfwu::destroy(&*pos);
-            }
+            mfwu::copy(last, end_, first);
+            mfwu::destroy(first + (end_ - last), end_);  // TODO: check
             end_ -= n;
         }
 
         void shrink(const size_type& ref_size) {
-            if (ref_size < size()) return ;
-            allocator_.deallocate(&*end_, last_ - end_);
-            last_ = end_;
-            // TODO
+            if (ref_size < size() || ref_size >= capacity()) return ;
+            value_type* start = allocator_.reallocate(&*begin_, 
+                                                      capacity(), ref_size);
+            assert(start == &*begin_);  // bcz ref_size < capacity
+            last_ = begin_ + ref_size;  // while in default_alloc it is different
+            // TODO: check
+            // default_alloc 的 pool 中分配的内存我是打算在 realloc 中并不释放
+            // 因为本身就很小，释放空间还需要拷贝到小一点的 node 上，没啥意思
+            // 问题就是到时释放的时候可能会找不到对应的节点（因为 last_ 改了）
+            // 所以拟增加一个 real_last_，原来的 last_ 骗骗用户
+            // 但是这个更新想想就烦，最终应该要先实现下面两个替代：
+            // 1、default_alloc 小碎片遇到 shrink 直接重新分配并拷贝
+            // 2、只保证 malloc_alloc 的 shrink
         }
 
         value_type& operator[](size_type idx) {
@@ -471,9 +496,10 @@ namespace mfwu {
 
         void request_mem() {
             vector tmp;
-            size_type capacity = (size() ? 2 * size() : 1);
+            size_type capacity = (this->capacity() ? 2 * this->capacity() : 1);
             value_type* start = tmp.allocator_.allocate(capacity);
             tmp.init_iterator(start, size(), capacity);
+            // std::cout << "capacity: " << capacity << "\n";
             mfwu::uninitialized_copy(begin_, end_, start);
             reset_and_move(tmp, *this);
         }

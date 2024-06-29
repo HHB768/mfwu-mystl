@@ -118,6 +118,7 @@ bool unit_test_vector::use_mfwu_vector() {
     print_detailed_info(vec5);
     vec5.reserve(1);
     print_detailed_info(vec5);
+
     nvec5.reserve(1);
     nvec5.reserve(5);
     print_detailed_info(nvec5);
@@ -130,6 +131,7 @@ bool unit_test_vector::use_mfwu_vector() {
     print_detailed_info(vec5);
     vec5.resize(1);
     print_detailed_info(vec5);
+
     nvec5.resize(1);
     nvec5.resize(5);
     print_detailed_info(nvec5);
@@ -149,6 +151,7 @@ bool unit_test_vector::use_mfwu_vector() {
     print_detailed_info(vec6);
     vec6.push_back({3, 'h', 'a', 'c', 'e'});
     print_detailed_info(vec6);
+
     npod_data npdata = 4;
     nvec6.emplace_back(2);
     print_detailed_info(nvec6);
@@ -162,6 +165,7 @@ bool unit_test_vector::use_mfwu_vector() {
     print_detailed_info(vec6);
     vec6.pop_back();
     print_detailed_info(vec6);
+
     nvec6.pop_back();
     print_detailed_info(nvec6);
     nvec6.pop_back();
@@ -173,6 +177,61 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec6.pop_back();
     print_detailed_info(nvec6);
 
+    std::cout << "inserting\n";
+    vec5.insert(0, pod_data{1, 'q', 'w', 'e', 'r'});
+    print_detailed_info(vec5);
+    vec5.insert(1, {2, 't', 'y', 't', 'y'}, 5);
+    print_detailed_info(vec5);
+    vec5.insert(1, {}, 0);
+    print_detailed_info(vec5);
+    auto it1 = vec5.begin();
+    it1 += 2;
+    vec5.insert(it1, {}, 0);
+    print_detailed_info(vec5);
+    vec5.insert(it1, vec6.begin(), vec6.end());
+    print_detailed_info(vec5);
+    
+    nvec5.insert(0, npod_data{1});
+    print_detailed_info(nvec5);
+    nvec5.insert(1, {2}, 5);
+    print_detailed_info(nvec5);
+    nvec5.insert(1, {}, 0);
+    print_detailed_info(nvec5);
+    auto it2 = nvec5.begin();
+    it2 += 2;
+    nvec5.insert(it2, {}, 0);
+    print_detailed_info(nvec5);
+    mfwu::vector<npod_data> tmp = {3, 4, 4, 7};
+    nvec5.insert(it2, tmp.begin(), tmp.end());
+    print_detailed_info(nvec5);
+    
+    std::cout << "erasing\n";
+    vec5.erase(5);
+    print_detailed_info(vec5);
+    vec5.erase(it1);
+    print_detailed_info(vec5);
+    vec5.erase(vec5.begin(), it1);
+    print_detailed_info(vec5);
+    
+    nvec5.erase(5);
+    print_detailed_info(nvec5);
+    nvec5.erase(it2);
+    print_detailed_info(nvec5);
+    nvec5.erase(nvec5.begin(), it2);
+    print_detailed_info(nvec5);
+
+    std::cout << "shrinking\n";
+    vec5.shrink(8);
+    print_basic_info(vec5);
+    vec5.shrink(4);
+    print_basic_info(vec5);
+    nvec5.shrink(8);
+    print_basic_info(nvec5);
+    nvec5.shrink(4);
+    print_basic_info(nvec5);
+    
+
+    // TODO: check memory leakage
     return 0;
 }
 
