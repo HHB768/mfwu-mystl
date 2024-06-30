@@ -63,11 +63,11 @@ private:
 class malloc_alloc;
 class default_alloc;
 
-#ifdef __USE_MALLOC
+#ifdef __USE_MALLOC__
 typedef malloc_alloc alloc;
-#else  // !__USE_MALLOC
+#else  // !__USE_MALLOC__
 typedef default_alloc alloc;
-#endif  // __USE_MALLOC
+#endif  // __USE_MALLOC__
 
 #if 0
 #   define __THROW_BAD_ALLOC throw ::std::bad_alloc
@@ -188,7 +188,17 @@ public:
         q->free_list_link = *my_free_list;  // q->next = head;
         *my_free_list = q;  // head = q;
     }
-    static void* reallocate(void* p, size_t old_size, size_t new_size) { return nullptr; }  // TODO
+    static void* reallocate(void* p, size_t old_size, size_t new_size) {
+        if (old_size <= __MAX_BYTES/* || new_size <= __MAX_BYTES*/) { return nullptr; }
+        // in fact, only the mem allocated by malloc_alloc
+        // should be realloc to a smaller size
+        return malloc_alloc::reallocate(p, old_size, new_size);
+        // void* res = realloc(p, new_size);
+        // if (0 == res) res = oom_realloc(p, new_size);
+        // return res;
+    }  // TODO
+
+    static void* oom_realloc(void*, size_t) {  /*TODO*/ return nullptr; }
 
 private:
 #ifdef __UNIT_TEST_ALLOCATOR__  // test interface

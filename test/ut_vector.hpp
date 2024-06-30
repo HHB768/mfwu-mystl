@@ -82,6 +82,21 @@ void print_detailed_info(const mfwu::vector<T>& vec) {
 #endif  // __UNIT_TEST_VECTOR_BRIEF__
 }
 
+template <typename T>
+void try_print_range(const mfwu::vector<T>& vec, int start, int end) {
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+    print_basic_info(vec);
+    for (int i = start; i <= end; i++) {
+        try {
+            std::cout << vec[i] << " ";
+        } catch(std::out_of_range) {
+            std::cout << "__idx_out_of_range__ ";
+        }
+    }
+    std::cout << "\n";
+#endif // __UNIT_TEST_VECTOR_BRIEF__
+}
+
 bool unit_test_vector::use_mfwu_vector() {
     std::cout << "\n------- Test: use mfwu::vector -------\n";
     std::cout << "constructing pod data\n";
@@ -221,6 +236,7 @@ bool unit_test_vector::use_mfwu_vector() {
     print_detailed_info(nvec5);
 
     std::cout << "shrinking\n";
+    // TODO: we need to test shrink based on default_malloc later
     vec5.shrink(8);
     print_basic_info(vec5);
     vec5.shrink(4);
@@ -230,6 +246,11 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec5.shrink(4);
     print_basic_info(nvec5);
     
+    std::cout << "testing operators\n";
+    try_print_range(vec5, -1, 5);
+    try_print_range(nvec5, -1, 5);
+
+
 
     // TODO: check memory leakage
     return 0;

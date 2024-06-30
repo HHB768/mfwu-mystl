@@ -7,6 +7,8 @@
 // #   define __UNIT_TEST_VECTOR_BRIEF__
 #endif  // __ALL_BRIEF__
 
+#define __USE_MALLOC__
+
 #include "ut_allocator.hpp"
 #include "ut_iterator.hpp"
 #include "ut_utils.hpp"

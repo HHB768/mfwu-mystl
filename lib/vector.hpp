@@ -9,7 +9,8 @@ namespace mfwu {
 
     class unit_test_vector;
 
-    template <typename T, typename Alloc = mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+    // template <typename T, typename Alloc = mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+    template <typename T, typename Alloc = mfwu::DefaultAllocator<T>>
     class vector {
     public:
         friend class mfwu::unit_test_vector;
@@ -46,10 +47,11 @@ namespace mfwu {
             /* iterators dont manage the memory, the ptrs do */ 
             ~vector_iterator() = default; 
 
-            reference operator[](int idx) = delete;
-            // reference operator[](int idx) {  // delete
-            //     return ptr_[idx];
-            // }
+            // reference operator[](int idx) = delete;
+            // TODO: without unit test
+            reference operator[](int idx) const {
+                return ptr_[idx];
+            }
             /*
             crazy! i have used this one:
             reference operator[](int idx) = delete {  // delete
@@ -362,22 +364,48 @@ namespace mfwu {
         }
 
         void shrink(const size_type& ref_size) {
-            if (ref_size < size() || ref_size >= capacity()) return ;
+            if (ref_size < size() || ref_size >= capacity()) { return ; }
             value_type* start = allocator_.reallocate(&*begin_, 
                                                       capacity(), ref_size);
-            assert(start == &*begin_);  // bcz ref_size < capacity
-            last_ = begin_ + ref_size;  // while in default_alloc it is different
+            if (nullptr == start) {
+                // realloc failed, dont shrink
+                return ;
+            }
+            assert(start == &*begin_);
+            last_ = begin_ + ref_size;
+            
             // TODO: check
-            // default_alloc 的 pool 中分配的内存我是打算在 realloc 中并不释放
-            // 因为本身就很小，释放空间还需要拷贝到小一点的 node 上，没啥意思
-            // 问题就是到时释放的时候可能会找不到对应的节点（因为 last_ 改了）
-            // 所以拟增加一个 real_last_，原来的 last_ 骗骗用户
-            // 但是这个更新想想就烦，最终应该要先实现下面两个替代：
-            // 1、default_alloc 小碎片遇到 shrink 直接重新分配并拷贝
-            // 2、只保证 malloc_alloc 的 shrink
+            // the mem allocated from mem pool is hard to be released
+            // bcz they are really small and we have to copy them from
+            // one node to another, which is quite tiresome...
+            // and if we do that, we should return some size type to
+            // indicate the new_size, which is conflict against the
+            // definition of DefaultAllocator::reallocate
+            // we can only provide:
+            // 1. a highly coupled shrink-reallocate composition...
+            // 2. a shrink that ignore trivial mem realloc from pool
+            // 3. a real_last_ to let last_ pretend to shrink...
+            // now we implement #2
+            // in the default_alloc, realloc will return nullptr if 
+            // the old_size or new_size is less than __MAX_BYTES
+            // and realloc just exactly like that in the malloc_alloc
         }
 
-        value_type& operator[](size_type idx) {
+//         // no, we cannot assume that the user use the macro to
+//         // adjust the allocator, it is actually a template arg
+//         void assert_check(value_type* newstart) {
+// #ifdef __USE_MALLOC__
+//             assert(newstart == &*begin_);  // bcz ref_size < capacity
+// #else  // !__USE_MALLOC__
+//             assert(newstart == &*begin_);
+//             // if (newstart != &*begin_) {
+//             //     begin_ = newstart;
+//             //     end_ = begin_ + size();
+//             // }
+// #endif  // __USE_MALLOC__
+//         }
+
+        value_type& operator[](size_type idx) const {
             if (idx >= size()) {
                 throw std::out_of_range("mfwu::vector - Index out of range");
             }
