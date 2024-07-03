@@ -69,7 +69,7 @@ TODO: X-H2-Z 24.06.21
 // 1 construct
 template <typename T1, typename... Args>
 inline void construct(T1* p, Args&&... args) {
-    new (p) T1{mfwu::forward<Args>(args)...};  // TODO: std::forward
+    new (p) T1{mfwu::forward<Args>(args)...};
 }
 
 /*
@@ -149,7 +149,6 @@ inline void destroy(ForwardIterator first, ForwardIterator last) {
         typename mfwu::iterator_traits<ForwardIterator>::value_type>{});
 }
 
-// TODO: 怎么没有把这几个用上，肯定哪里出了问题
 // 3 uninitialized_copy
 template <typename InputIterator, typename OutputIterator>
 inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator res) {

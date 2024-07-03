@@ -7,7 +7,10 @@
 // #   define __UNIT_TEST_VECTOR_BRIEF__
 #endif  // __ALL_BRIEF__
 
-#define __USE_MALLOC__
+// #define __USE_MALLOC__
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+#   define __VECTOR_MEMORY_CHECK__
+#endif  // __UNIT_TEST_VECTOR_BRIEF__
 
 #include "ut_allocator.hpp"
 #include "ut_iterator.hpp"
@@ -58,6 +61,10 @@ int main() {
     score += !ut_vector.use_vector_algo();
     std::cout << "\n---------- Vector test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    std::cout << "\nTotal number of unit tests: " << ttotal;
+    std::cout << "\nEndof unit tests\n";
+    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++\n";
 
     return 0;
 }

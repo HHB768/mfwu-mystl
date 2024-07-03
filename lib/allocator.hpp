@@ -3,6 +3,8 @@
 
 #include "common.hpp"
 
+#define __COUNTER_START 0
+
 namespace mfwu {
 
 template <typename T>
@@ -79,20 +81,75 @@ typedef default_alloc alloc;
 template <typename T, typename Alloc=alloc>
 class DefaultAllocator {
 public:
-    
+    static volatile int GLOBAL_COUNTER;
     static T* allocate(size_t n=1) {
+#ifdef __VECTOR_MEMORY_CHECK__
+        print_alloc_info(n);
+#endif  // __VECTOR_MEMORY_CHECK__
         return 0 == n ? 0 : (T*)Alloc::allocate(n * sizeof(T));
     }
     static void deallocate(T* p, size_t n=1) {
+#ifdef __VECTOR_MEMORY_CHECK__
+        print_dealloc_info(n);
+#endif  // __VECTOR_MEMORY_CHECK__
         if (0 != n) {
             Alloc::deallocate(p, n * sizeof(T));
         }
     }
     static T* reallocate(T* p, size_t old_n, size_t n=1) {
-        return (T*)Alloc::reallocate(p, old_n * sizeof(T), n * sizeof(T));
+        T* ret = (T*)Alloc::reallocate(p, old_n * sizeof(T), n * sizeof(T));
+        if (ret != nullptr) {
+#ifdef __VECTOR_MEMORY_CHECK__
+        print_realloc_success_info(n - old_n);
+#endif  // __VECTOR_MEMORY_CHECK__
+        } else {
+#ifdef __VECTOR_MEMORY_CHECK__
+        print_realloc_failure_info();
+#endif  // __VECTOR_MEMORY_CHECK__
+       }
+       return ret;
     }
-
+    static void print_alloc_info(const int n) {
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+        std::cout << "+++++++++++++++++++++++++\n";
+        std::cout << "identity: " << T::identity() << "\n";
+        std::cout << "allocate, size = " << n << "\n";
+        GLOBAL_COUNTER += n;
+        std::cout << "global alloc count = " << GLOBAL_COUNTER << "\n";
+        std::cout << "+++++++++++++++++++++++++\n";
+#endif  // __UNIT_TEST_VECTOR_BRIEF__ 
+    }
+    static void print_dealloc_info(const int n) {
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+        std::cout << "+++++++++++++++++++++++++\n";
+        std::cout << "identity: " << T::identity() << "\n";
+        std::cout << "deallocate, size = " << n << "\n";
+        GLOBAL_COUNTER -= n;
+        std::cout << "global alloc count = " << GLOBAL_COUNTER << "\n";
+        std::cout << "+++++++++++++++++++++++++\n";
+#endif  // __UNIT_TEST_VECTOR_BRIEF__ 
+    }
+    static void print_realloc_success_info(const int n) {
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+        std::cout << "+++++++++++++++++++++++++\n";
+        std::cout << "identity: " << T::identity() << "\n";
+        std::cout << "reallocate, size = " << n << "\n";
+        GLOBAL_COUNTER += n;
+        std::cout << "global alloc count = " << GLOBAL_COUNTER << "\n";
+        std::cout << "+++++++++++++++++++++++++\n";
+#endif  // __UNIT_TEST_VECTOR_BRIEF__ 
+    }
+    static void print_realloc_failure_info() {
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+        std::cout << "+++++++++++++++++++++++++\n";
+        std::cout << "identity: " << T::identity() << "\n";
+        std::cout << "reallocate failed\n";
+        std::cout << "+++++++++++++++++++++++++\n";
+#endif  // __UNIT_TEST_VECTOR_BRIEF__ 
+    }
 };  // endof class DefaultAllocator
+template <typename T, typename Alloc>
+volatile int mfwu::DefaultAllocator<T, Alloc>::GLOBAL_COUNTER = __COUNTER_START;
 
 // real alloc, don't keep construct / destroy here
 // just allocate and deallocate the memory
@@ -101,7 +158,7 @@ public:
 class malloc_alloc {
 public:
     friend class unit_test_allocator;
-    // TODO: why we can declare friendship 
+    // QA: why we can declare friendship 
     // without forward declaring the class
     // ChatGPT answer: When all classes are in the same namespace and 
     // the namespace block is processed by the compiler in its entirety,
@@ -193,10 +250,7 @@ public:
         // in fact, only the mem allocated by malloc_alloc
         // should be realloc to a smaller size
         return malloc_alloc::reallocate(p, old_size, new_size);
-        // void* res = realloc(p, new_size);
-        // if (0 == res) res = oom_realloc(p, new_size);
-        // return res;
-    }  // TODO
+    }
 
     static void* oom_realloc(void*, size_t) {  /*TODO*/ return nullptr; }
 

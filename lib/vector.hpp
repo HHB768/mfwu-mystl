@@ -9,12 +9,14 @@ namespace mfwu {
 
     class unit_test_vector;
 
-    // template <typename T, typename Alloc = mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
-    template <typename T, typename Alloc = mfwu::DefaultAllocator<T>>
+    // TODO: test another allocator
+    // template <typename T, typename Alloc = mfwu::DefaultAllocator<T, mfwu::default_alloc>>
+    template <typename T, typename Alloc = mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
     class vector {
     public:
         friend class mfwu::unit_test_vector;
 
+        // actually the behaviors of raw pointer
         class vector_iterator
             : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {
         public:
@@ -135,7 +137,7 @@ namespace mfwu {
         // to check your vector_iterator definition
 
         // vector() = default;
-        vector() : begin_(), end_(), last_(), allocator_() {}
+        vector() : begin_(), end_(), last_() {}
         // For POD types, there’s no default initialization (members remain uninitialized).
         // For non-POD types, members are either zero-initialized or default-constructed 
         //     based on whether the class has a user-provided constructor12. 😊
@@ -156,28 +158,34 @@ namespace mfwu {
             value_type* start = allocator_.allocate(n);
             init_iterator(start, n);
 
-            mfwu::uninitialized_copy(values.begin(), values.end(), begin());
+            mfwu::uninitialized_copy(values.begin(), values.end(), begin_);
         }
         vector(const vector& vec) {
-            reset_and_copy(vec, *this);  // TODO: check
+            reset_and_copy(vec, *this);
         }
         vector(vector&& vec) {
             reset_and_move(vec, *this);
         }
         template <typename ForwardIterator>
         vector(ForwardIterator first, ForwardIterator last) {
-            // TODO
-        }
-        // TODO: 2d vector init
+            // TODO: check this
+            typename mfwu::iterator_traits<ForwardIterator>::difference_type n
+                = mfwu::distance(first, last);
+            value_type* start = allocator_.allocate(n);
+            init_iterator(start, n);
+            mfwu::uninitialized_copy(first, last, begin_);
+       }
         ~vector() {
             reinit();
-            // TODO: how to ensure iterator(?) and allocator free their memory
-            // is it necessary to reset_iterator? no?
+            // TODO: how to ensure allocators free their memory
+            // is it necessary to reset_iterator? no? lets try:
+            // destroy();
+            // deallocate();
         }
 
         iterator begin() const { return begin_; }
         iterator end() const { return end_; }
-        value_type& back() { return *end_; }
+        value_type& back() { return begin_[size()-1]; }
         size_type size() const { return end_ - begin_; }
         size_type capacity() const { return last_ - begin_; }  // type conversion? long -> unsigned long
         bool empty() const { return end_ == begin_; }
@@ -204,10 +212,11 @@ namespace mfwu {
             // similar but just allocate
             if (c <= capacity()) { return ; }
             vector tmp = vector();
+            // TODO: try to realloc begin_
             value_type* start = tmp.allocator_.allocate(c);
             tmp.init_iterator(start, size(), c);
             mfwu::uninitialized_copy(begin_, end_, start);
-            reset_and_move(tmp, *this);  // TODO: CHECK
+            reset_and_move(tmp, *this);
         }
         void clear() {
             // destroy the objects but not deallocate the memory
@@ -226,7 +235,7 @@ namespace mfwu {
             }
         }
         template <typename... Args>
-        void emplace_back(Args&&... args) {  // 不太懂这块... TODO
+        void emplace_back(Args&&... args) {
             if (end_ != last_) {
                 mfwu::construct(&*end_, std::forward<Args>(args)...);
                 ++end_;
@@ -274,7 +283,6 @@ namespace mfwu {
             if (end_ + n <= last_) {
                 // mfwu::uninitialized_copy(it, end_, it + n); 
                 // unsafe, senario: it + n < end_
-                // TODO: check
                 if (it + n > end_) {
                     mfwu::construct(end_, it + n, value);
                     mfwu::uninitialized_copy(it, end_, it + n);
@@ -291,7 +299,7 @@ namespace mfwu {
                 insert(begin_ + idx, value, n);
             }
             // TODO: refer to std impl _M_range_insert()
-            // TODO: tldr
+            // X-Q3: tldr
         }
         void insert(iterator it, std::initializer_list<value_type>& values) {
             assert(begin_ <= it && it <= end_);
@@ -314,7 +322,6 @@ namespace mfwu {
             }
         }
         void insert(iterator it, iterator first, iterator last) {
-            // TODO: insert(other.first ~ other.last) to position it
             assert(begin_ <= it && it <= end_);
             int n = last - first;
             if (end_ + n <= last_) {
@@ -359,7 +366,7 @@ namespace mfwu {
                 && begin_ <= last  && last  <= end_);
             int n = last - first;
             mfwu::copy(last, end_, first);
-            mfwu::destroy(first + (end_ - last), end_);  // TODO: check
+            mfwu::destroy(first + (end_ - last), end_);
             end_ -= n;
         }
 
@@ -374,7 +381,6 @@ namespace mfwu {
             assert(start == &*begin_);
             last_ = begin_ + ref_size;
             
-            // TODO: check
             // the mem allocated from mem pool is hard to be released
             // bcz they are really small and we have to copy them from
             // one node to another, which is quite tiresome...
@@ -414,38 +420,40 @@ namespace mfwu {
         void operator=(const vector& vec) {
             reset_and_copy(vec, *this);
         }
-        void operator=(const vector&& vec) {
+        void operator=(vector&& vec) {
             reset_and_move(vec, *this);
         }
         bool operator!=(const vector& vec) const {
+            // TODO: check vec is valid (begin_ != nullptr)
+            // check other func if valid
             // cmp value_type first
             // static_assert(this::value_type, vec::value_type)
             if (size() != vec.size()) {
-                return false;
+                return true;
             }
             for (iterator it1 = begin_, it2 = vec.begin_;
                 it1 != end_ && it2 != vec.end_;
                 it1++, it2++) {
                 if (*it1 != *it2) {
-                    return false;
+                    return true;
                 }
             }
-            return true;
+            return false;
         }
         bool operator==(const vector& vec) const {
-            return !(this != vec);
+            return !(*this != vec);
         }
         bool operator<(const vector& vec) const {
-            return aux_cmp(vec, false);
+            return cmp_aux(vec, false);
         }
         bool operator>=(const vector& vec) const {
-            return !(this < vec);
+            return !(*this < vec);
         }
         bool operator>(const vector& vec) const {
-            return aux_cmp(vec, true);
+            return cmp_aux(vec, true);
         }
         bool operator<=(const vector& vec) const {
-            return !(this > vec);
+            return !(*this > vec);
         }
 
     private:
@@ -532,7 +540,7 @@ namespace mfwu {
             reset_and_move(tmp, *this);
         }
 
-        bool aux_cmp(const vector& vec, bool is_larger = true) const {
+        bool cmp_aux(const vector& vec, bool is_larger = true) const {
             for (iterator it1 = begin_, it2 = vec.begin_;
                  it1 != end_ || it2 != vec.end_;
                  it1++, it2++) {

@@ -14,6 +14,41 @@ private:
     struct pod_data {
         int a;
         char b, c, d, e;
+        bool operator==(const pod_data& other) const {
+            return a == other.a 
+                && b == other.b && c == other.c 
+                && d == other.d && e == other.e;
+        }
+        bool operator!=(const pod_data& other) const {
+            return !(*this == other);
+        }
+        bool operator>(const pod_data& other) const {
+            return cmp_aux(other, true);
+        }
+        bool operator<=(const pod_data& other) const {
+            return !(*this > other);
+        }
+        bool operator<(const pod_data& other) const {
+            return cmp_aux(other, false);
+        }
+        bool operator>=(const pod_data& other) const {
+            return !(*this < other);
+        }
+        static std::string identity() {
+            return "pod_data";
+        }
+    private:
+        bool cmp_aux(const pod_data& other, bool is_larger) const {
+            if (a > other.a) return is_larger;
+            if (a < other.a) return !is_larger;
+            if (b > other.b) return is_larger;
+            if (b < other.b) return !is_larger;
+            if (c > other.c) return is_larger;
+            if (c < other.c) return !is_larger;
+            if (d > other.d) return is_larger;
+            if (d < other.d) return !is_larger;
+            return false; 
+        }
     };
     struct npod_data {
         int a;
@@ -27,6 +62,13 @@ private:
         npod_data operator--(int) {
             --a;
             return *this;
+        }
+        // explicitly define a implicit conversion
+        operator int() const {
+            return a;
+        }
+        static std::string identity() {
+            return "non-pod_data";
         }
     };
     friend std::ostream& operator<<(std::ostream&, const pod_data&);
@@ -113,7 +155,7 @@ bool unit_test_vector::use_mfwu_vector() {
     mfwu::vector<pod_data> vec6 = vec2;
     print_basic_info(vec6);
 
-    std::cout << "constructing non-pod data\n";
+    std::cout << "\nconstructing non-pod data\n";
     mfwu::vector<npod_data> nvec1;
     print_basic_info(nvec1);
     mfwu::vector<npod_data> nvec2(1);
@@ -127,7 +169,7 @@ bool unit_test_vector::use_mfwu_vector() {
     mfwu::vector<npod_data> nvec6 = nvec2;
     print_basic_info(nvec6);
 
-    std::cout << "reserving\n";
+    std::cout << "\nreserving\n";
     vec5.reserve(1);
     vec5.reserve(5);
     print_detailed_info(vec5);
@@ -140,7 +182,7 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec5.reserve(1);
     print_detailed_info(nvec5);
 
-    std::cout << "resizing\n";
+    std::cout << "\nresizing\n";
     vec5.resize(1);
     vec5.resize(5);
     print_detailed_info(vec5);
@@ -153,13 +195,13 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec5.resize(1);
     print_detailed_info(nvec5);
 
-    std::cout << "clearing\n";
+    std::cout << "\nclearing\n";
     vec5.clear();
     print_basic_info(vec5);
     nvec5.clear();
     print_basic_info(nvec5);
 
-    std::cout << "emplacing/pushing back\n";
+    std::cout << "\nemplacing/pushing back\n";
     vec6.emplace_back(2, 'a', 'c', 'e', 's');
     print_detailed_info(vec6);
     vec6.emplace_back(pod_data{});
@@ -175,7 +217,7 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec6.push_back({3});
     print_detailed_info(nvec6);
 
-    std::cout << "poping back\n";
+    std::cout << "\npoping back\n";
     vec6.pop_back();
     print_detailed_info(vec6);
     vec6.pop_back();
@@ -192,7 +234,7 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec6.pop_back();
     print_detailed_info(nvec6);
 
-    std::cout << "inserting\n";
+    std::cout << "\ninserting\n";
     vec5.insert(0, pod_data{1, 'q', 'w', 'e', 'r'});
     print_detailed_info(vec5);
     vec5.insert(1, {2, 't', 'y', 't', 'y'}, 5);
@@ -220,7 +262,7 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec5.insert(it2, tmp.begin(), tmp.end());
     print_detailed_info(nvec5);
     
-    std::cout << "erasing\n";
+    std::cout << "\nerasing\n";
     vec5.erase(5);
     print_detailed_info(vec5);
     vec5.erase(it1);
@@ -235,7 +277,7 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec5.erase(nvec5.begin(), it2);
     print_detailed_info(nvec5);
 
-    std::cout << "shrinking\n";
+    std::cout << "\nshrinking\n";
     // TODO: we need to test shrink based on default_malloc later
     vec5.shrink(8);
     print_basic_info(vec5);
@@ -246,17 +288,77 @@ bool unit_test_vector::use_mfwu_vector() {
     nvec5.shrink(4);
     print_basic_info(nvec5);
     
-    std::cout << "testing operators\n";
+    std::cout << "\nindexing\n";
     try_print_range(vec5, -1, 5);
     try_print_range(nvec5, -1, 5);
 
+    std::cout << "\ncomparing\n";
+    vec6 = vec5;
+    print_detailed_info(vec6);
+    vec4 = mfwu::move(vec5);
+    print_detailed_info(vec4);
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+    std::cout << "vec6 ==/!=/>=/<=/>/< vec4 : ";
+    std::cout << (vec6 == vec4 ? "true" : "false") << "/";
+    std::cout << (vec6 != vec4 ? "true" : "false") << "/";
+    std::cout << (vec6 >= vec4 ? "true" : "false") << "/";
+    std::cout << (vec6 <= vec4 ? "true" : "false") << "/";
+    std::cout << (vec6 > vec4 ? "true" : "false") << "/";
+    std::cout << (vec6 < vec4 ? "true" : "false") << "\n";
+#else  // __UNIT_TEST_VECTOR_BRIEF__
+    vec6 == vec4; vec6 != vec4; vec6 >= vec4; vec6 <= vec4;
+    vec6 > vec4; vec6 < vec4;
+#endif  // __UNIT_TEST_VECTOR_BRIEF__
+    
+    nvec6 = nvec5;
+    print_detailed_info(nvec6);
+    nvec4 = mfwu::move(nvec5);
+    print_detailed_info(nvec4);
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+    std::cout << "nvec6 ==/!=/>=/<=/>/< nvec4 : ";
+    std::cout << (nvec6 == nvec4 ? "true" : "false") << "/";
+    std::cout << (nvec6 != nvec4 ? "true" : "false") << "/";
+    std::cout << (nvec6 >= nvec4 ? "true" : "false") << "/";
+    std::cout << (nvec6 <= nvec4 ? "true" : "false") << "/";
+    std::cout << (nvec6 > nvec4 ? "true" : "false") << "/";
+    std::cout << (nvec6 < nvec4 ? "true" : "false") << "\n";
+#else  // __UNIT_TEST_VECTOR_BRIEF__
+    nvec6 == nvec4; nvec6 != nvec4; nvec6 >= nvec4; nvec6 <= nvec4;
+    nvec6 > nvec4; nvec6 < nvec4;
+#endif  // __UNIT_TEST_VECTOR_BRIEF__
 
+    mfwu::vector<pod_data> vec7 = vec6;
+    vec7.pop_back();
+    print_detailed_info(vec7);
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+    std::cout << "vec6 >/< vec7 : ";
+    std::cout << (vec6 > vec7 ? "true" : "false") << "/";
+    std::cout << (vec6 < vec7 ? "true" : "false") << "\n";
+#else  // __UNIT_TEST_VECTOR_BRIEF__
+    vec6 > vec7;
+    vec6 < vec7;
+#endif  // __UNIT_TEST_VECTOR_BRIEF__
+    
+    mfwu::vector<npod_data> nvec7 = nvec6;
+    nvec7.back() = npod_data{1};
+    print_detailed_info(nvec7);
+#ifndef __UNIT_TEST_VECTOR_BRIEF__
+    std::cout << "nvec6 >/< nvec7 : ";
+    std::cout << (nvec6 > nvec7 ? "true" : "false") << "/";
+    std::cout << (nvec6 < nvec7 ? "true" : "false") << "\n";
+#else  // __UNIT_TEST_VECTOR_BRIEF__
+    nvec6 > nvec7;
+    nvec6 < nvec7;
+#endif  // __UNIT_TEST_VECTOR_BRIEF__
 
-    // TODO: check memory leakage
+    // check memory leakage: see #define __VECTOR_MEMORY_CHECK__ in main()
+    // add monitors in Alloc::allocate/deallocate/reallocate
+    
     return 0;
 }
 
 bool unit_test_vector::use_vector_algo() {
+    // TODO: <algorithm>
     return 0;
 }
 

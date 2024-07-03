@@ -23,7 +23,6 @@ public:
     using difference_type = Difference;
 };  // endof class iterator
 
-// TODO: operator= copy constructor
 template <typename T,
           typename Pointer=T*,
           typename Reference=T&,
