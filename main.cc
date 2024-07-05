@@ -16,6 +16,7 @@
 #include "ut_iterator.hpp"
 #include "ut_utils.hpp"
 #include "ut_vector.hpp"
+#include "ut_list.hpp"
 
 int main() {
     int ttotal = 0;

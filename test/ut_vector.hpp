@@ -1,7 +1,6 @@
 #define __UNIT_TEST_VECTOR__
 
 #include "vector.hpp"
-#include <iostream>
 
 namespace mfwu {
 
