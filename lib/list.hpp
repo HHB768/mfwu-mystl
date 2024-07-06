@@ -84,55 +84,49 @@ public:
     using size_type = size_t;
 
     // TODO: what is the diff between new and alloc & construct
-    ForwardLinkedList() : head_(new node(42)), tail_(new node(6)) /*allocator_()*/ {
-        connect(head_, tail_);
-    }
+    ForwardLinkedList() : head_(new node(42)) /*allocator_()*/ {}
     ForwardLinkedList(size_type n, const value_type& val=value_type()) 
-        : head_(new node(42)), tail_(new node(6)) {
+        : head_(new node(42)) {
         node* prev = head_;
         for (int i = 0; i < n; i++) {
-            node* newnode = new node(val, prev, nullptr);
+            node* newnode = new node(val);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
     }
     template <typename InputIterator>
     ForwardLinkedList(InputIterator first, InputIterator last) 
-        : head_(new node(42)), tail_(new node(6)) {
+        : head_(new node(42)) {
         node* prev = head_;
         for ( ; first != last; first++) {
-            node* newnode = new node(*first, prev, nullptr);
+            node* newnode = new node(*first);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
     }
     ForwardLinkedList(const std::initializer_list<value_type>& values)
-        : head_(new node(42)), tail_(new node(6)) {
+        : head_(new node(42)) {
         node* prev = head_;
         for (const value_type& val : values) {
-            node* newnode = new node(val, prev, nullptr);
+            node* newnode = new node(val);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
     }
     ForwardLinkedList(const ForwardLinkedList& lst) 
-        : head_(new node(*lst.head_)), tail_(new node(*lst.tail_)) {
+        : head_(new node(*lst.head_)) {
         node* prev = head_;
         for (node* lstnode = lst.head_->next;
-             lstnode != lst.tail_; 
+             lstnode != nullptr; 
              lstnode = lstnode->next) {
-            node* newnode = new node(*lstnode, prev, nullptr);
+            node* newnode = new node(*lstnode);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
     }
     ForwardLinkedList(ForwardLinkedList&& lst) 
-        : head_(lst.head_), tail_(lst.tail_) {
-        lst.reset_ends();
+        : head_(lst.head_) {
+        lst.head_ = nullptr;
     }
     ~ForwardLinkedList() {
         destroy();
@@ -148,141 +142,134 @@ public:
         return head_->next->val;
     }
     value_type back() {
-        return tail_->prev->val;
+        // TODO
     }
     iterator begin() {
         return head_->next;
     }
     iterator end() {
-        return tail_;
+        // TODO
     }
     
     bool empty() {
-        return head_->next == tail_;
+        return head_->next == nullptr;
     }
     size_type size() {
-        return mfwu::distance(begin_, end_);  // TODO
+        size_type n = 0;
+        for (node* cur = head_->next; 
+             cur != nullptr;
+             cur = cur->next, ++n) {}
     }
 
     void resize(size_type ref_size) {
         node* cur = head_;
         for (int i = 0; i < ref_size; i++, cur = cur->next) {
-            if (cur->next == tail_) {
+            if (cur->next == nullptr) {
                 int n = ref_size - i;
                 cur = add_n_nodes(cur, n, value_type());
-                connect(cur, tail_);
-                break;
+                return ;
             }
         }
-        node* prev = cur->prev;
-        destroy(cur, tail_);
-        connect(prev, tail_)
+        destroy(cur);
     }
 
     void push_front(const value_type& val) {
-        node* newnode = new node(val, head_, head_->next);
-        head_->next->prev = newnode;
+        node* newnode = new node(val, head_->next);
         head_->next = newnode;
     }
     void push_back(const value_type& val) {
-        node* newnode = new node(val, tail_->prev, tail);
-        tail_->prev->next = newnode;
-        tail_->prev = newnode;
+        node* cur = head_;
+        for ( ; cur->next != nullptr; cur = cur->next) {}
+        node* newnode = new node(val);
+        cur->next = newnode;
     }
     void pop_front() {
         if (empty()) return ;
         node* next = head_->next->next;
         delete head_->next;
-        connect(head_, next);
+        head_->next = next;
     }
     void pop_back() {
         if (empty()) return ;
-        node* prev = tail_->prev->prev;
-        delete tail_->prev;
-        connect(prev, tail_);
+        node* prev = head_;
+        for ( ; prev->next->next == nullptr; prev = prev->next) {}
+        delete prev->next;
+        prev->next = nullptr;
     }
     void insert(iterator it, const value_type& val) {
-        node* cur = it.get_ptr();
-        node* newnode = new node(val, cur->prev, cur);
-        cur->prev->next = newnode;
-        cur->prev = newnode;
+        node* prev = head_;
+        for ( ; prev->next != it.get_ptr(); prev = prev->next) {}
+        node* newnode = new node(val, prev->next);
+        prev->next = newnode;
     }
     void insert(iterator it, const value_type& val, size_type n) {
-        node* prev = it.get_ptr()->prev;
+        node* prev = head_;
+        for ( ; prev->next != it.get_ptr(); prev = prev->next) {}
         node* next = prev->next;
         prev = add_n_nodes(prev, n, val);
-        connect(prev, next);
+        prev->next = next;
     }
     template <typename InputIterator>
     void insert(iterator it, InputIterator first, InputIterator last) {
-        node* next = it.get_ptr();
-        node* prev = next->prev;
+        node* prev = head_;
+        for ( ; prev->next == it.get_ptr(); prev = prev->next) {}
+        node* next = prev->next;
         for ( ; first != last; first++) {
-            node* newnode = new node(*first, prev, nullptr);
+            node* newnode = new node(*first, nullptr);
             prev = newnode;
         }
-        connect(prev, next);
+        prev->next = next;
     }
     void erase(iterator it) {
-        node* cur = it.get_ptr();
-        cur->prev->next = cur->next;
-        cur->next->prev = cur->prev;
-        delete cur;
+        node* prev = head_;
+        for ( ; prev->next = it.get_ptr(); prev = prev->next) {}
+        node* next = prev->next->next;
+        delete prev->next;
+        prev->next = next;
     }
     void erase(iterator first, iterator last) {
-        node* prev = first.get_ptr()->prev;
-        node* next = last.get_ptr();
-        for (node* cur = prev->next; cur != next; ) {
-            cur = cur->next;
-            delete cur->prev;
+        node* prev = head_;
+        for ( ; prev->next != first.get_ptr(); prev = prev->next;) {}
+        for (node* cur = prev->next; cur != last.get_ptr(); ) {
+            node* next = cur->next;
+            delete cur;
+            cur = next;
         }
-        connect(prev, next);
+        prev->next = last.get_ptr();
     }
-
-
 private:
-    void connect(node* former, node* latter) {
-        former->next = latter;
-        latter->prev = former;
-    }
-    void reset_ends() {
-        head_ = nullptr;
-        tail_ = nullptr;
-    }
     void destroy() {
-        for ( ; head_ != tail_; ) {
+        for ( ; head_ != nullptr; ) {
             node* next = head_->next;
             delete head_;
             head_ = next;
         }
-        delete tail_;
-    }
-    void reinit() {
-        destroy();
-        reset_ends();
     }
     static void reset_and_copy(const DoubleLinkedList& src, DoubleLinkedList& dst) {
         dst.destroy();
         dst.head_ = new node(*src.head_);
-        dst.tail_ = new node(*src.tail_);
         node* prev = dst.head_;
         for (node* srcnode = src.head_->next;
-             srcnode != src.tail_; 
+             srcnode != nullptr; 
              srcnode = srcnode->next) {
-            node* dstnode = new node(*srcnode, prev, nullptr);
+            node* dstnode = new node(*srcnode);
             prev->next = dstnode;
             prev = dstnode;
         }
-        connect(prev, dst.tail_);
     }
     static void reset_and_move(DoubleLinkedList& src, DoubleLinkedList& dst) {
         dst.destroy();
         dst.head_ = src.head_;
-        dst.tail_ = src.tail_;
-        src.reset_ends();
+        src.head_ = nullptr;
+    }
+    node* add_n_nodes(node* prev, int n, const typename node::value_type& val) {
+        for (int i = 0; i < n; i++) {
+            prev->next = new node(val);
+            prev = prev->next;
+        }
+        return prev;
     }
     node* head_;
-    node* tail_;
     Alloc allocator_;
 
 };  // endof class ForwardLinkedList
@@ -572,6 +559,13 @@ private:
         dst.head_ = src.head_;
         dst.tail_ = src.tail_;
         src.reset_ends();
+    }
+    node* add_n_nodes(node* prev, int n, const typename node::value_type& val) {
+        for (int i = 0; i < n; i++) {
+            prev->next = new node(val, prev, nullptr);
+            prev = prev->next;
+        }
+        return prev;
     }
     node* head_;
     node* tail_;
