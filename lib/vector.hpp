@@ -417,11 +417,13 @@ public:
         }
         return begin_[idx];
     }
-    void operator=(const vector& vec) {
+    vector& operator=(const vector& vec) {
         reset_and_copy(vec, *this);
+        return *this;
     }
-    void operator=(vector&& vec) {
+    vector& operator=(vector&& vec) {
         reset_and_move(vec, *this);
+        return *this;
     }
     bool operator!=(const vector& vec) const {
         // TODO: check vec is valid (begin_ != nullptr)

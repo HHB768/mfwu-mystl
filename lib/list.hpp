@@ -7,6 +7,34 @@
 
 namespace mfwu {
 
+// a tiny fix from
+// https://blog.csdn.net/mightbxg/article/details/108382265
+
+// case1: T* can cast to C*
+template <template <typename...> class C, typename...Ts>
+std::true_type is_base_of_template_impl(const C<Ts...>*); 
+// case2: T* cannot cast to C*
+template <template <typename...> class C>
+std::false_type is_base_of_template_impl(...);
+
+template <template <typename...> class C, typename T>
+using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
+// TODO: fix other containers
+
+// standard solutions :
+// c++11:
+// template<typename _InputIterator,
+//     typename = std::_RequireInputIter<_InputIterator>>
+// where:
+// template<typename _InIter>
+// using _RequireInputIter =
+//     __enable_if_t<is_convertible<__iter_category_t<_InIter>,
+//                 input_iterator_tag>::value>;
+// c++98:
+// Check whether it's an integral type.  If so, it's not an iterator.
+// typedef typename std::__is_integer<_InputIterator>::__type _Integral;
+// _M_initialize_dispatch(__first, __last, _Integral());
+
 template <typename T>
 struct forward_linked_node {
     using value_type = T;
@@ -24,10 +52,11 @@ struct forward_linked_node {
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 class ForwardLinkedList {
 public:
+    template <typename Node>
     class list_iterator 
-        : public mfwu::iterator<T, mfwu::forward_iterator_tag> {
+        : public mfwu::iterator<Node, mfwu::forward_iterator_tag> {
     public:
-        using Iter = mfwu::iterator<T, mfwu::forward_iterator_tag>;
+        using Iter = mfwu::iterator<Node, mfwu::forward_iterator_tag>;
         using value_type = typename Iter::value_type;
         using iterator_category = typename Iter::iterator_category;
         using pointer = typename Iter::pointer;
@@ -47,6 +76,7 @@ public:
         list_iterator& operator=(list_iterator&& it) {
             ptr_ = mfwu::move(it.ptr_);
             it.ptr_ = nullptr;
+            return *this;
         }
 
         typename value_type::value_type operator*() const {
@@ -72,7 +102,7 @@ public:
         bool operator!=(const list_iterator& it) const {
             return !(*this == it);
         }
-        value_type* get_ptr() {
+        value_type* get_ptr() const {
             return ptr_;
         }
     private:
@@ -94,7 +124,10 @@ public:
             prev = newnode;
         }
     }
-    template <typename InputIterator>
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<is_base_of_template<
+                mfwu::iterator, InputIterator>::value>
+             >
     ForwardLinkedList(InputIterator first, InputIterator last) 
         : head_(new node(42)) {
         node* prev = head_;
@@ -133,32 +166,37 @@ public:
     }
     ForwardLinkedList& operator=(const ForwardLinkedList& lst) {
         reset_and_copy(lst, *this);
+        return *this;
     }
     ForwardLinkedList& operator=(ForwardLinkedList&& lst) {
         reset_and_move(lst, *this);
+        return *this;
     }
 
-    value_type& front() {
+    value_type& front() const {
         return head_->next->val;
     }
-    value_type back() {
-        // TODO
+    value_type back() const {
+        node* cur = head_->next;
+        for ( ; cur->next != nullptr; cur = cur->next) {}
+        return cur->val;
     }
-    iterator begin() {
+    iterator begin() const {
         return head_->next;
     }
-    iterator end() {
-        // TODO
+    iterator end() const {
+        return nullptr;
     }
     
-    bool empty() {
+    bool empty() const {
         return head_->next == nullptr;
     }
-    size_type size() {
+    size_type size() const {
         size_type n = 0;
         for (node* cur = head_->next; 
              cur != nullptr;
              cur = cur->next, ++n) {}
+        return n;
     }
 
     void resize(size_type ref_size) {
@@ -192,7 +230,7 @@ public:
     void pop_back() {
         if (empty()) return ;
         node* prev = head_;
-        for ( ; prev->next->next == nullptr; prev = prev->next) {}
+        for ( ; prev->next->next != nullptr; prev = prev->next) {}
         delete prev->next;
         prev->next = nullptr;
     }
@@ -212,24 +250,25 @@ public:
     template <typename InputIterator>
     void insert(iterator it, InputIterator first, InputIterator last) {
         node* prev = head_;
-        for ( ; prev->next == it.get_ptr(); prev = prev->next) {}
+        for ( ; prev->next != it.get_ptr(); prev = prev->next) {}
         node* next = prev->next;
         for ( ; first != last; first++) {
             node* newnode = new node(*first, nullptr);
+            prev->next = newnode;
             prev = newnode;
         }
         prev->next = next;
     }
     void erase(iterator it) {
         node* prev = head_;
-        for ( ; prev->next = it.get_ptr(); prev = prev->next) {}
+        for ( ; prev->next != it.get_ptr(); prev = prev->next) {}
         node* next = prev->next->next;
         delete prev->next;
         prev->next = next;
     }
     void erase(iterator first, iterator last) {
         node* prev = head_;
-        for ( ; prev->next != first.get_ptr(); prev = prev->next;) {}
+        for ( ; prev->next != first.get_ptr(); prev = prev->next) {}
         for (node* cur = prev->next; cur != last.get_ptr(); ) {
             node* next = cur->next;
             delete cur;
@@ -245,7 +284,15 @@ private:
             head_ = next;
         }
     }
-    static void reset_and_copy(const DoubleLinkedList& src, DoubleLinkedList& dst) {
+    void destroy(node* prev) {
+        for (node* cur = prev->next; cur != nullptr; ) {
+            node* next = cur->next;
+            delete cur;
+            cur = next;
+        }
+        prev->next = nullptr;
+    }
+     static void reset_and_copy(const ForwardLinkedList& src, ForwardLinkedList& dst) {
         dst.destroy();
         dst.head_ = new node(*src.head_);
         node* prev = dst.head_;
@@ -257,7 +304,7 @@ private:
             prev = dstnode;
         }
     }
-    static void reset_and_move(DoubleLinkedList& src, DoubleLinkedList& dst) {
+    static void reset_and_move(ForwardLinkedList& src, ForwardLinkedList& dst) {
         dst.destroy();
         dst.head_ = src.head_;
         src.head_ = nullptr;
@@ -294,10 +341,11 @@ struct double_linked_node {
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 class DoubleLinkedList {
 public:
+    template <typename Node>
     class list_iterator 
-        : public mfwu::iterator<T, mfwu::bidirectional_iterator_tag> {
+        : public mfwu::iterator<Node, mfwu::bidirectional_iterator_tag> {
     public:
-        using Iter = mfwu::iterator<T, mfwu::bidirectional_iterator_tag>;
+        using Iter = mfwu::iterator<Node, mfwu::bidirectional_iterator_tag>;
         using value_type = typename Iter::value_type;
         using iterator_category = typename Iter::iterator_category;
         using pointer = typename Iter::pointer;
@@ -317,6 +365,7 @@ public:
         list_iterator& operator=(list_iterator&& it) {
             ptr_ = mfwu::move(it.ptr_);
             it.ptr_ = nullptr;
+            return *this;
         }
 
         typename value_type::value_type operator*() const {
@@ -351,7 +400,7 @@ public:
         bool operator!=(const list_iterator& it) const {
             return !(*this == it);
         }
-        value_type* get_ptr() {
+        value_type* get_ptr() const {
             return ptr_;
         }
     private:
@@ -376,7 +425,10 @@ public:
         }
         connect(prev, tail_);
     }
-    template <typename InputIterator>
+    template <typename InputIterator,
+            typename = typename std::enable_if_t<is_base_of_template<
+            mfwu::iterator, InputIterator>::value>
+            >
     DoubleLinkedList(InputIterator first, InputIterator last) 
         : head_(new node(42)), tail_(new node(6)) {
         node* prev = head_;
@@ -403,7 +455,7 @@ public:
         for (node* lstnode = lst.head_->next;
              lstnode != lst.tail_; 
              lstnode = lstnode->next) {
-            node* newnode = new node(*lstnode, prev, nullptr);
+            node* newnode = new node(lstnode->val, prev, nullptr);
             prev->next = newnode;
             prev = newnode;
         }
@@ -418,29 +470,31 @@ public:
     }
     DoubleLinkedList& operator=(const DoubleLinkedList& lst) {
         reset_and_copy(lst, *this);
+        return *this;
     }
     DoubleLinkedList& operator=(DoubleLinkedList&& lst) {
         reset_and_move(lst, *this);
+        return *this;
     }
 
-    value_type& front() {
+    value_type& front() const {
         return head_->next->val;
     }
-    value_type back() {
+    value_type back() const {
         return tail_->prev->val;
     }
-    iterator begin() {
+    iterator begin() const {
         return head_->next;
     }
-    iterator end() {
+    iterator end() const {
         return tail_;
     }
     
-    bool empty() {
+    bool empty() const {
         return head_->next == tail_;
     }
-    size_type size() {
-        return mfwu::distance(begin_, end_);
+    size_type size() const {
+        return mfwu::distance(begin(), end());
     }
 
     void resize(size_type ref_size) {
@@ -453,9 +507,8 @@ public:
                 break;
             }
         }
-        node* prev = cur->prev;
-        destroy(cur, tail_);
-        connect(prev, tail_)
+        destroy(cur);
+        connect(cur, tail_);
     }
 
     void push_front(const value_type& val) {
@@ -464,7 +517,7 @@ public:
         head_->next = newnode;
     }
     void push_back(const value_type& val) {
-        node* newnode = new node(val, tail_->prev, tail);
+        node* newnode = new node(val, tail_->prev, tail_);
         tail_->prev->next = newnode;
         tail_->prev = newnode;
     }
@@ -498,6 +551,7 @@ public:
         node* prev = next->prev;
         for ( ; first != last; first++) {
             node* newnode = new node(*first, prev, nullptr);
+            prev->next = newnode;
             prev = newnode;
         }
         connect(prev, next);
@@ -520,7 +574,7 @@ public:
 
 
 private:
-    void connect(node* former, node* latter) {
+    static void connect(node* former, node* latter) {
         former->next = latter;
         latter->prev = former;
     }
@@ -536,6 +590,14 @@ private:
         }
         delete tail_;
     }
+    void destroy(node* prev) {
+        for (node* cur = prev->next; cur != tail_; ) {
+            node* next = cur->next;
+            delete cur;
+            cur = next;
+        }
+        prev->next = tail_;
+    }
     void reinit() {
         destroy();
         reset_ends();
@@ -548,7 +610,7 @@ private:
         for (node* srcnode = src.head_->next;
              srcnode != src.tail_; 
              srcnode = srcnode->next) {
-            node* dstnode = new node(*srcnode, prev, nullptr);
+            node* dstnode = new node(srcnode->val, prev, nullptr);
             prev->next = dstnode;
             prev = dstnode;
         }

@@ -4,7 +4,8 @@
 #   define __UNIT_TEST_ALLOCATOR_BRIEF__
 #   define __UNIT_TEST_ITERATOR_BRIEF__
 #   define __UNIT_TEST_UTILS_BRIEF__
-// #   define __UNIT_TEST_VECTOR_BRIEF__
+#   define __UNIT_TEST_VECTOR_BRIEF__
+// #   define __UNIT_TEST_LIST_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -24,6 +25,7 @@ int main() {
     mfwu::unit_test_iterator ut_iter;
     mfwu::unit_test_utils ut_utils;
     mfwu::unit_test_vector ut_vector;
+    mfwu::unit_test_list ut_list;
 
     int score = 0;
     int total = 2;
@@ -63,6 +65,19 @@ int main() {
     std::cout << "\n---------- Vector test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
+
+    score = 0;
+    total = 4;
+    ttotal += total;
+    score += !ut_list.use_forward_list_iterator();
+    score += !ut_list.use_mfwu_forward_list();
+    score += !ut_list.use_list_iterator();
+    score += !ut_list.use_mfwu_list();
+    std::cout << "\n---------- List test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+
+    std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;
     std::cout << "\nEndof unit tests\n";
     std::cout << "+++++++++++++++++++++++++++++++++++++++++++++\n";
