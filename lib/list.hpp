@@ -6,6 +6,7 @@
 #include "utils.hpp"
 
 namespace mfwu {
+// TODO: code changed, re-check
 
 // a tiny fix from
 // https://blog.csdn.net/mightbxg/article/details/108382265
@@ -72,6 +73,7 @@ public:
         ~list_iterator() {}
         list_iterator& operator=(const list_iterator& it) {
             ptr_ = it.ptr_;
+            return *this;
         }
         list_iterator& operator=(list_iterator&& it) {
             ptr_ = mfwu::move(it.ptr_);
@@ -79,7 +81,7 @@ public:
             return *this;
         }
 
-        typename value_type::value_type operator*() const {
+        typename value_type::value_type& operator*() const {
             return ptr_->val;
         }
         typename value_type::value_type* operator->() const {
@@ -361,6 +363,7 @@ public:
         ~list_iterator() {}
         list_iterator& operator=(const list_iterator& it) {
             ptr_ = it.ptr_;
+            return *this;
         }
         list_iterator& operator=(list_iterator&& it) {
             ptr_ = mfwu::move(it.ptr_);
@@ -368,7 +371,7 @@ public:
             return *this;
         }
 
-        typename value_type::value_type operator*() const {
+        typename value_type::value_type& operator*() const {
             return ptr_->val;
         }
         typename value_type::value_type* operator->() const {
@@ -638,6 +641,9 @@ template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_allo
 using forward_list = mfwu::ForwardLinkedList<T, Alloc>;
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 using list = mfwu::DoubleLinkedList<T, Alloc>;
+
+// TODO: more functions
+// TODO: check memory leakage
 
 }  // endof namespace mfwu
 
