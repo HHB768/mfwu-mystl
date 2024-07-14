@@ -8,6 +8,7 @@
 namespace mfwu {
 
 const size_t BLK_SIZE = 16;  // 512
+// TODO: should be a template arg
 
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 class block {
@@ -82,6 +83,9 @@ public:
     iterator end() {
         return end_;
     }
+    value_type* start() {
+        return blk_;
+    }
     value_typ& front() {
         return begin_[0];
     }
@@ -103,8 +107,11 @@ public:
     using pblock = block*;
 
     class deque_iterator 
-        : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {
+        : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {  // TODO: really? check list.hpp too
     public:
+        // template <typename U, typename Al>
+        // friend class deque<U, Al>;  // TODO: check
+
         using Iter = mfwu::iterator<T, mfwu::random_access_iterator_tag>;
         using value_type = typename Iter::value_type;
         using iterator_category = typename Iter::iterator_category;
@@ -236,6 +243,12 @@ public:
         bool operator>=(const deque_iterator& it) const {
             return !(*this < it);
         }
+        pblock* get_pos() const {
+            return pos_;
+        }
+        pointer get_cur() const {
+            return cur_;
+        }
     private:
         void to_prev_block(int n=1) {
             pos_ -= n;
@@ -252,7 +265,7 @@ public:
         pblock* pos_;
 
     };  // endof class deque_iterator
-    using iterator = deque_iterator<T, mfwu::random_access_iterator_tag>;
+    using iterator = deque_iterator;
 
     deque() : ctrl_(nullptr), last_(nullptr), begin_(nullptr), end_(nullptr) {}
     deque(int n, const value_type& val=value_type()) {
@@ -321,7 +334,7 @@ public:
         typename block::iterator it = (*begin_)->push_front(val);
         // block no space
         if (it == nullptr) {
-            add_prev_block();
+            add_front_block();
             it = (*begin_)->push_front(val);
             // TODO: check: should success
         }
@@ -330,13 +343,54 @@ public:
         if (begin_ == end_) { add_next_block(); }
         typename block::iterator it = (*(end_ - 1))->push_back(val);
         if (it == nullptr) {
-            add_next_block();
+            add_back_block();
             it = (*begin_)->push_back(val);
         }
     }
-    void pop_front(const value_type& val) {
-        typename block::iterator it = (*)
+    void pop_front() {
+        if (begin_ == end_) { return ; }
+        typename block::iterator it = (*begin_)->pop_front();
+        if (it == nullptr) {
+            std::cout << "block empty!\n";  // TODO: check
+        } else if (it == (*begin_)->end()) {
+            // block empty
+            del_front_block();
+        }
     } 
+    void pop_back() {
+        if (begin_ == end_) { return ; }
+        typename block::iterator it = (*(end_ - 1))->pop_back();
+        if (it == nullptr) {
+            std::cout << "block empty!\n";  // TODO
+            del_back_block();
+        }
+    }
+
+    void insert(int idx, const value_type& val) {
+        insert(begin() + idx, val);
+    }
+    void insert(iterator it, const value_type& val) {
+        pblock* blk = it.get_pos();
+        int head_free = (*blk)->begin() - (*blk)->start();
+        int tail_free = (*blk)->start() + BLK_SIZE - (*blk)->end();
+        if (head_free > 0 && head_free > tail_free) {
+            (*blk)->insert(it.get_cur(), true);
+        } else if (tail_free > 0 && tail_free > head_free) {
+            (*blk)->insert(it.get_cur(), false);
+        } else {  // full
+            int size_before = it.get_cur() - (*blk)->start();
+            if (size_before > BLK_SIZE / 2) {
+                blk = insert_before_block(blk, (*blk)->begin(), it.get_cur());
+                blk++;
+                mfwu::destroy((*blk)->begin(), (*blk)->begin() + size_before);
+                (*blk)->set_begin(size_before);  //
+            } else {
+                // 不用担心，我看了源码剖析，实现就是这么逆天的，做吧
+                // 哦对，他不搞范围insert/erase了hhh
+            }
+        }
+
+    }
 
 private:
     size_type init(size_type n=0) {

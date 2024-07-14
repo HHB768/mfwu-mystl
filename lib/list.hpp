@@ -340,7 +340,9 @@ struct double_linked_node {
 
 // class mfwu::unit_test_list;
 
+// TODO: list is circular，which means that head_ and tail_ are actually same
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+// TODO: you can allocate and deallocate mem with alloc, but i dont think it is necessary
 class DoubleLinkedList {
 public:
     template <typename Node>
@@ -575,6 +577,15 @@ public:
         connect(prev, next);
     }
 
+    // TODO:
+    // remove(val)
+    // unique()
+    // clear()
+    // transfer(it, first, last)
+    // splice(it, list)
+    // reverse()
+    // sort()
+    // merge(list)
 
 private:
     static void connect(node* former, node* latter) {
