@@ -648,6 +648,247 @@ private:
     Alloc allocator_;
 
 };  // endof class DoubleLinkedList
+
+
+template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+class CircularDoubleLinkedList {
+public:
+    using node = mfwu::double_linked_node<T>;
+    using iterator = mfwu::DoubleLinkedList<T, Alloc>::list_iterator<node>;
+    using value_type = T;
+    using size_type = size_t;
+
+    DoubleLinkedList() : head_(new node(6)) {
+        connect(head_, head_);
+    }
+    DoubleLinkedList(size_type n, const value_type& val=value_type()) 
+        : head_(new node(42)), tail_(new node(6)) {
+        node* prev = head_;
+        for (int i = 0; i < n; i++) {
+            node* newnode = new node(val, prev, nullptr);
+            prev->next = newnode;
+            prev = newnode;
+        }
+        connect(prev, tail_);
+    }
+    template <typename InputIterator,
+            typename = typename std::enable_if_t<is_base_of_template<
+            mfwu::iterator, InputIterator>::value>
+            >
+    DoubleLinkedList(InputIterator first, InputIterator last) 
+        : head_(new node(42)), tail_(new node(6)) {
+        node* prev = head_;
+        for ( ; first != last; first++) {
+            node* newnode = new node(*first, prev, nullptr);
+            prev->next = newnode;
+            prev = newnode;
+        }
+        connect(prev, tail_);
+    }
+    DoubleLinkedList(const std::initializer_list<value_type>& values)
+        : head_(new node(42)), tail_(new node(6)) {
+        node* prev = head_;
+        for (const value_type& val : values) {
+            node* newnode = new node(val, prev, nullptr);
+            prev->next = newnode;
+            prev = newnode;
+        }
+        connect(prev, tail_);
+    }
+    DoubleLinkedList(const DoubleLinkedList& lst) 
+        : head_(new node(*lst.head_)), tail_(new node(*lst.tail_)) {
+        node* prev = head_;
+        for (node* lstnode = lst.head_->next;
+             lstnode != lst.tail_; 
+             lstnode = lstnode->next) {
+            node* newnode = new node(lstnode->val, prev, nullptr);
+            prev->next = newnode;
+            prev = newnode;
+        }
+        connect(prev, tail_);
+    }
+    DoubleLinkedList(DoubleLinkedList&& lst) 
+        : head_(lst.head_), tail_(lst.tail_) {
+        lst.reset_ends();
+    }
+    ~DoubleLinkedList() {
+        destroy();
+    }
+    DoubleLinkedList& operator=(const DoubleLinkedList& lst) {
+        reset_and_copy(lst, *this);
+        return *this;
+    }
+    DoubleLinkedList& operator=(DoubleLinkedList&& lst) {
+        reset_and_move(lst, *this);
+        return *this;
+    }
+
+    value_type& front() const {
+        return head_->next->val;
+    }
+    value_type back() const {
+        return tail_->prev->val;
+    }
+    iterator begin() const {
+        return head_->next;
+    }
+    iterator end() const {
+        return tail_;
+    }
+    
+    bool empty() const {
+        return head_->next == tail_;
+    }
+    size_type size() const {
+        return mfwu::distance(begin(), end());
+    }
+
+    void resize(size_type ref_size) {
+        node* cur = head_;
+        for (int i = 0; i < ref_size; i++, cur = cur->next) {
+            if (cur->next == tail_) {
+                int n = ref_size - i;
+                cur = add_n_nodes(cur, n, value_type());
+                connect(cur, tail_);
+                break;
+            }
+        }
+        destroy(cur);
+        connect(cur, tail_);
+    }
+
+    void push_front(const value_type& val) {
+        node* newnode = new node(val, head_, head_->next);
+        head_->next->prev = newnode;
+        head_->next = newnode;
+    }
+    void push_back(const value_type& val) {
+        node* newnode = new node(val, tail_->prev, tail_);
+        tail_->prev->next = newnode;
+        tail_->prev = newnode;
+    }
+    void pop_front() {
+        if (empty()) return ;
+        node* next = head_->next->next;
+        delete head_->next;
+        connect(head_, next);
+    }
+    void pop_back() {
+        if (empty()) return ;
+        node* prev = tail_->prev->prev;
+        delete tail_->prev;
+        connect(prev, tail_);
+    }
+    void insert(iterator it, const value_type& val) {
+        node* cur = it.get_ptr();
+        node* newnode = new node(val, cur->prev, cur);
+        cur->prev->next = newnode;
+        cur->prev = newnode;
+    }
+    void insert(iterator it, const value_type& val, size_type n) {
+        node* prev = it.get_ptr()->prev;
+        node* next = prev->next;
+        prev = add_n_nodes(prev, n, val);
+        connect(prev, next);
+    }
+    template <typename InputIterator>
+    void insert(iterator it, InputIterator first, InputIterator last) {
+        node* next = it.get_ptr();
+        node* prev = next->prev;
+        for ( ; first != last; first++) {
+            node* newnode = new node(*first, prev, nullptr);
+            prev->next = newnode;
+            prev = newnode;
+        }
+        connect(prev, next);
+    }
+    void erase(iterator it) {
+        node* cur = it.get_ptr();
+        cur->prev->next = cur->next;
+        cur->next->prev = cur->prev;
+        delete cur;
+    }
+    void erase(iterator first, iterator last) {
+        node* prev = first.get_ptr()->prev;
+        node* next = last.get_ptr();
+        for (node* cur = prev->next; cur != next; ) {
+            cur = cur->next;
+            delete cur->prev;
+        }
+        connect(prev, next);
+    }
+
+    // TODO:
+    // remove(val)
+    // unique()
+    // clear()
+    // transfer(it, first, last)
+    // splice(it, list)
+    // reverse()
+    // sort()
+    // merge(list)
+
+private:
+    static void connect(node* former, node* latter) {
+        former->next = latter;
+        latter->prev = former;
+    }
+    void reset_ends() {
+        head_ = nullptr;
+        tail_ = nullptr;
+    }
+    void destroy() {
+        for ( ; head_ != tail_; ) {
+            node* next = head_->next;
+            delete head_;
+            head_ = next;
+        }
+        delete tail_;
+    }
+    void destroy(node* prev) {
+        for (node* cur = prev->next; cur != tail_; ) {
+            node* next = cur->next;
+            delete cur;
+            cur = next;
+        }
+        prev->next = tail_;
+    }
+    void reinit() {
+        destroy();
+        reset_ends();
+    }
+    static void reset_and_copy(const DoubleLinkedList& src, DoubleLinkedList& dst) {
+        dst.destroy();
+        dst.head_ = new node(*src.head_);
+        dst.tail_ = new node(*src.tail_);
+        node* prev = dst.head_;
+        for (node* srcnode = src.head_->next;
+             srcnode != src.tail_; 
+             srcnode = srcnode->next) {
+            node* dstnode = new node(srcnode->val, prev, nullptr);
+            prev->next = dstnode;
+            prev = dstnode;
+        }
+        connect(prev, dst.tail_);
+    }
+    static void reset_and_move(DoubleLinkedList& src, DoubleLinkedList& dst) {
+        dst.destroy();
+        dst.head_ = src.head_;
+        dst.tail_ = src.tail_;
+        src.reset_ends();
+    }
+    node* add_n_nodes(node* prev, int n, const typename node::value_type& val) {
+        for (int i = 0; i < n; i++) {
+            prev->next = new node(val, prev, nullptr);
+            prev = prev->next;
+        }
+        return prev;
+    }
+    node* head_;
+    node* tail_;
+    Alloc allocator_;
+
+};  // endof class DoubleLinkedList
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 using forward_list = mfwu::ForwardLinkedList<T, Alloc>;
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
