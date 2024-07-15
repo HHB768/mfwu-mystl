@@ -8,34 +8,6 @@
 namespace mfwu {
 // TODO: code changed, re-check
 
-// a tiny fix from
-// https://blog.csdn.net/mightbxg/article/details/108382265
-
-// case1: T* can cast to C*
-template <template <typename...> class C, typename...Ts>
-std::true_type is_base_of_template_impl(const C<Ts...>*); 
-// case2: T* cannot cast to C*
-template <template <typename...> class C>
-std::false_type is_base_of_template_impl(...);
-
-template <template <typename...> class C, typename T>
-using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
-// TODO: fix other containers
-
-// standard solutions :
-// c++11:
-// template<typename _InputIterator,
-//     typename = std::_RequireInputIter<_InputIterator>>
-// where:
-// template<typename _InIter>
-// using _RequireInputIter =
-//     __enable_if_t<is_convertible<__iter_category_t<_InIter>,
-//                 input_iterator_tag>::value>;
-// c++98:
-// Check whether it's an integral type.  If so, it's not an iterator.
-// typedef typename std::__is_integer<_InputIterator>::__type _Integral;
-// _M_initialize_dispatch(__first, __last, _Integral());
-
 template <typename T>
 struct forward_linked_node {
     using value_type = T;
@@ -649,7 +621,7 @@ private:
 
 };  // endof class DoubleLinkedList
 
-
+// TODO: without test
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 class CircularDoubleLinkedList {
 public:
@@ -658,67 +630,66 @@ public:
     using value_type = T;
     using size_type = size_t;
 
-    DoubleLinkedList() : head_(new node(6)) {
+    CircularDoubleLinkedList() : head_(new node(6)) {
         connect(head_, head_);
     }
-    DoubleLinkedList(size_type n, const value_type& val=value_type()) 
-        : head_(new node(42)), tail_(new node(6)) {
+    CircularDoubleLinkedList(size_type n, const value_type& val=value_type()) 
+        : head_(new node(6)) {
         node* prev = head_;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; ++i) {
             node* newnode = new node(val, prev, nullptr);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
+        connect(prev, head_);
     }
     template <typename InputIterator,
-            typename = typename std::enable_if_t<is_base_of_template<
-            mfwu::iterator, InputIterator>::value>
-            >
-    DoubleLinkedList(InputIterator first, InputIterator last) 
-        : head_(new node(42)), tail_(new node(6)) {
+              typename = typename std::enable_if_t<is_base_of_template<
+              mfwu::iterator, InputIterator>::value>>
+    CircularDoubleLinkedList(InputIterator first, InputIterator last) 
+        : head_(new node(6)) {
         node* prev = head_;
-        for ( ; first != last; first++) {
+        for ( ; first != last; ++first) {
             node* newnode = new node(*first, prev, nullptr);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
+        connect(prev, head_);
     }
-    DoubleLinkedList(const std::initializer_list<value_type>& values)
-        : head_(new node(42)), tail_(new node(6)) {
+    CircularDoubleLinkedList(const std::initializer_list<value_type>& values)
+        : head_(new node(6)) {
         node* prev = head_;
         for (const value_type& val : values) {
             node* newnode = new node(val, prev, nullptr);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
+        connect(prev, head_);
     }
-    DoubleLinkedList(const DoubleLinkedList& lst) 
-        : head_(new node(*lst.head_)), tail_(new node(*lst.tail_)) {
+    CircularDoubleLinkedList(const CircularDoubleLinkedList& lst) 
+        : head_(new node(*lst.head_)) {
         node* prev = head_;
         for (node* lstnode = lst.head_->next;
-             lstnode != lst.tail_; 
+             lstnode != lst.head_; 
              lstnode = lstnode->next) {
             node* newnode = new node(lstnode->val, prev, nullptr);
             prev->next = newnode;
             prev = newnode;
         }
-        connect(prev, tail_);
+        connect(prev, head_);
     }
-    DoubleLinkedList(DoubleLinkedList&& lst) 
-        : head_(lst.head_), tail_(lst.tail_) {
+    CircularDoubleLinkedList(CircularDoubleLinkedList&& lst) 
+        : head_(lst.head_) {
         lst.reset_ends();
     }
-    ~DoubleLinkedList() {
+    ~CircularDoubleLinkedList() {
         destroy();
     }
-    DoubleLinkedList& operator=(const DoubleLinkedList& lst) {
+    CircularDoubleLinkedList& operator=(const   CircularDoubleLinkedList& lst) {
         reset_and_copy(lst, *this);
         return *this;
     }
-    DoubleLinkedList& operator=(DoubleLinkedList&& lst) {
+    CircularDoubleLinkedList& operator=(CircularDoubleLinkedList&& lst) {
         reset_and_move(lst, *this);
         return *this;
     }
@@ -727,17 +698,17 @@ public:
         return head_->next->val;
     }
     value_type back() const {
-        return tail_->prev->val;
+        return head_->prev->val;
     }
     iterator begin() const {
         return head_->next;
     }
     iterator end() const {
-        return tail_;
+        return head_;
     }
     
     bool empty() const {
-        return head_->next == tail_;
+        return head_->next == head_;
     }
     size_type size() const {
         return mfwu::distance(begin(), end());
@@ -746,15 +717,15 @@ public:
     void resize(size_type ref_size) {
         node* cur = head_;
         for (int i = 0; i < ref_size; i++, cur = cur->next) {
-            if (cur->next == tail_) {
+            if (cur->next == head_) {
                 int n = ref_size - i;
                 cur = add_n_nodes(cur, n, value_type());
-                connect(cur, tail_);
+                connect(cur, head_);
                 break;
             }
         }
         destroy(cur);
-        connect(cur, tail_);
+        connect(cur, head_);
     }
 
     void push_front(const value_type& val) {
@@ -763,9 +734,9 @@ public:
         head_->next = newnode;
     }
     void push_back(const value_type& val) {
-        node* newnode = new node(val, tail_->prev, tail_);
-        tail_->prev->next = newnode;
-        tail_->prev = newnode;
+        node* newnode = new node(val, head_->prev, head_);
+        head_->prev->next = newnode;
+        head_->prev = newnode;
     }
     void pop_front() {
         if (empty()) return ;
@@ -775,9 +746,9 @@ public:
     }
     void pop_back() {
         if (empty()) return ;
-        node* prev = tail_->prev->prev;
-        delete tail_->prev;
-        connect(prev, tail_);
+        node* prev = head_->prev->prev;
+        delete head_->prev;
+        connect(prev, head_);
     }
     void insert(iterator it, const value_type& val) {
         node* cur = it.get_ptr();
@@ -835,23 +806,22 @@ private:
     }
     void reset_ends() {
         head_ = nullptr;
-        tail_ = nullptr;
     }
     void destroy() {
-        for ( ; head_ != tail_; ) {
-            node* next = head_->next;
-            delete head_;
-            head_ = next;
+        for (node* nd = head_->next ; nd != head_; ) {
+            node* next = nd->next;
+            delete next;
+            nd = next;
         }
-        delete tail_;
+        delete head_;
     }
     void destroy(node* prev) {
-        for (node* cur = prev->next; cur != tail_; ) {
+        for (node* cur = prev->next; cur != head_; ) {
             node* next = cur->next;
             delete cur;
             cur = next;
         }
-        prev->next = tail_;
+        prev->next = head_;
     }
     void reinit() {
         destroy();
@@ -860,21 +830,19 @@ private:
     static void reset_and_copy(const DoubleLinkedList& src, DoubleLinkedList& dst) {
         dst.destroy();
         dst.head_ = new node(*src.head_);
-        dst.tail_ = new node(*src.tail_);
         node* prev = dst.head_;
         for (node* srcnode = src.head_->next;
-             srcnode != src.tail_; 
+             srcnode != src.head_; 
              srcnode = srcnode->next) {
             node* dstnode = new node(srcnode->val, prev, nullptr);
             prev->next = dstnode;
             prev = dstnode;
         }
-        connect(prev, dst.tail_);
+        connect(prev, dst.head_);
     }
     static void reset_and_move(DoubleLinkedList& src, DoubleLinkedList& dst) {
         dst.destroy();
         dst.head_ = src.head_;
-        dst.tail_ = src.tail_;
         src.reset_ends();
     }
     node* add_n_nodes(node* prev, int n, const typename node::value_type& val) {
@@ -885,7 +853,6 @@ private:
         return prev;
     }
     node* head_;
-    node* tail_;
     Alloc allocator_;
 
 };  // endof class DoubleLinkedList
