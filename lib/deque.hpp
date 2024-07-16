@@ -371,24 +371,25 @@ public:
     }
     void insert(iterator it, const value_type& val) {
         pblock* blk = it.get_pos();
-        int head_free = (*blk)->begin() - (*blk)->start();
-        int tail_free = (*blk)->start() + BLK_SIZE - (*blk)->end();
-        if (head_free > 0 && head_free > tail_free) {
-            (*blk)->insert(it.get_cur(), true);
-        } else if (tail_free > 0 && tail_free > head_free) {
-            (*blk)->insert(it.get_cur(), false);
-        } else {  // full
-            int size_before = it.get_cur() - (*blk)->start();
-            if (size_before > BLK_SIZE / 2) {
-                blk = insert_before_block(blk, (*blk)->begin(), it.get_cur());
-                blk++;
-                mfwu::destroy((*blk)->begin(), (*blk)->begin() + size_before);
-                (*blk)->set_begin(size_before);  //
-            } else {
-                // 不用担心，我看了源码剖析，实现就是这么逆天的，做吧
-                // 哦对，他不搞范围insert/erase了hhh
-            }
-        }
+        
+        // int head_free = (*blk)->begin() - (*blk)->start();
+        // int tail_free = (*blk)->start() + BLK_SIZE - (*blk)->end();
+        // if (head_free > 0 && head_free > tail_free) {
+        //     (*blk)->insert(it.get_cur(), true);
+        // } else if (tail_free > 0 && tail_free > head_free) {
+        //     (*blk)->insert(it.get_cur(), false);
+        // } else {  // full
+        //     int size_before = it.get_cur() - (*blk)->start();
+        //     if (size_before > BLK_SIZE / 2) {
+        //         blk = insert_before_block(blk, (*blk)->begin(), it.get_cur());
+        //         blk++;
+        //         mfwu::destroy((*blk)->begin(), (*blk)->begin() + size_before);
+        //         (*blk)->set_begin(size_before);  //
+        //     } else {
+        //         // 不用担心，我看了源码剖析，实现就是这么逆天的，做吧
+        //         // 哦对，他不搞范围insert/erase了hhh
+        //     }
+        // }
 
     }
 
