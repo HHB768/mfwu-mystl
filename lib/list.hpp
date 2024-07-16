@@ -819,6 +819,10 @@ public:
     }
 
     // TODO:
+    void remove(const value_type& val) {
+        node* prev = head_;
+        
+    }
     // remove(val)
     // unique()
     // clear()
