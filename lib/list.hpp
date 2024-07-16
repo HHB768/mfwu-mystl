@@ -791,15 +791,52 @@ public:
 
     // TODO:
     void remove(const value_type& val) {
-        node* prev = head_;
-        
+        for (node* cur = head_->next; cur != head_; ) {
+            if (cur->val == val) {
+                node* next = cur->val;
+                delete cur;
+                cur = next;
+            } else {
+                cur = cur->next;
+            }
+        }
     }
-    // remove(val)
-    // unique()
-    // clear()
-    // transfer(it, first, last)
+    void unique() {
+        for (node* cur = head_->next; cur != head_) {
+            while (cur->next != head_ 
+                   && cur->next->val == cur->val) {
+                node* next = cur->next->next;
+                delete cur->next;
+                cur->next = next;
+            }
+            cur = cur->next;
+        }
+    }
+    void clear() {
+        for (node* cur = head_->next ; cur != head_; ) {
+            node* next = cur->next;
+            delete next;
+            cur = next;
+        }
+    }
+    void transfer(iterator it, iterator first, iterator last) {
+        node* cur = it.get_ptr();
+        node* prev = cur->prev;
+        node* first_prev = first.get_ptr()->prev;
+        node* last_prev = last.get_ptr()->prev;
+        connect(prev, first.get_ptr());
+        connect(last_prev, cur);
+        connect(first_prev, last.get_ptr());
+    }
     // splice(it, list)
-    // reverse()
+    void reverse() {
+        for (node* cur = head_; cur != head_; ) {
+            node* next = cur->next;
+            cur->next = cur->prev;
+            cur->prev = next;
+            cur = next;
+        }
+    }
     // sort()
     // merge(list)
 
@@ -812,10 +849,10 @@ private:
         head_ = nullptr;
     }
     void destroy() {
-        for (node* nd = head_->next ; nd != head_; ) {
-            node* next = nd->next;
+        for (node* cur = head_->next ; cur != head_; ) {
+            node* next = cur->next;
             delete next;
-            nd = next;
+            cur = next;
         }
         delete head_;
     }
