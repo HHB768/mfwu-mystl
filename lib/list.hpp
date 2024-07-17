@@ -318,7 +318,7 @@ template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_allo
 class DoubleLinkedList {
 public:
     template <typename Node>
-    class list_iterator 
+    class list_iterator   // TODO: value_type can be T?
         : public mfwu::iterator<Node, mfwu::bidirectional_iterator_tag> {
     public:
         using Iter = mfwu::iterator<Node, mfwu::bidirectional_iterator_tag>;

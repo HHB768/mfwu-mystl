@@ -7,13 +7,14 @@
 
 namespace mfwu {
 
-const size_t BLK_SIZE = 16;  // 512
+// const size_t BLK_SIZE = 16;  // 512
 // TODO: should be a template arg
 
-template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
-class block {
+template <typename T, size_t BLK_SIZE=16,
+          typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+struct block {
 public:
-    friend class mfwu::deque<T, Alloc>;  // TODO
+    // friend class mfwu::deque<T, Alloc>;  // TODO
 
     using value_type = T;
     using iterator = value_type*;
@@ -33,7 +34,7 @@ public:
             begin_ = blk_;
             end_ = blk_ + n;
         }
-        construct(begin_, end_, val);
+        mfwu::construct(begin_, end_, val);
     }
     // destroy and deallocate
     ~block() {
@@ -62,52 +63,41 @@ public:
         mfwu::destroy(begin_++);
         return begin_;
     }
-
     iterator pop_back() {
         if (begin_ >= end_) {
             return nullptr;
         }
         mfwu::destroy(--end_);
+        if (end_ == begin_) {
+            return end_;
+        }
         return end_ - 1;
     }
 
-    size_type size() {
-        return end_ - begin_;
-    }
-    bool empty() {
-        return end_ == begin_;
-    }
-    iterator begin() {
-        return begin_;
-    }
-    iterator end() {
-        return end_;
-    }
-    value_type* start() {
-        return blk_;
-    }
-    value_typ& front() {
-        return begin_[0];
-    }
-    value_type& back() {
-        return begin_[size() - 1];
-    }
-private:
+    size_type size() const { return end_ - begin_; }
+    bool empty() const { return end_ == begin_; }
+    iterator begin() const { return begin_; }
+    iterator end() const { return end_; }
+    value_type* start() const { return blk_; }
+    value_type& front() const { return begin_[0]; }
+    value_type& back() const { return begin_[size() - 1]; }
+// private:
     value_type* blk_;
     iterator begin_, end_;
     Alloc allocator_;
 };  // endof class block
 
-template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+template <typename T, size_t BLK_SIZE=16,
+          typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 class deque {
 public:
     using value_type = T;
     using size_type = size_t;
-    using block = mfwu::block<T, Alloc>;
+    using block = mfwu::block<T, BLK_SIZE, Alloc>;
     using pblock = block*;
 
     class deque_iterator 
-        : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {  // TODO: really? check list.hpp too
+        : public mfwu::iterator<T, mfwu::random_access_iterator_tag> {  // TODO: really?
     public:
         // template <typename U, typename Al>
         // friend class deque<U, Al>;  // TODO: check
@@ -121,6 +111,8 @@ public:
 
         deque_iterator() : cur_(nullptr), begin_(nullptr), end_(nullptr),
                            pos_(nullptr) {}
+        deque_iterator(pointer cur, pblock* pos) : cur_(cur),
+            begin_((*pos)->begin()), end_((*pos)->end()), pos_(pos) {}
         deque_iterator(pointer cur, pointer begin, pointer end, pblock* pos) 
             : cur_(cur), begin_(begin), end_(end), pos_(pos) {}
         deque_iterator(const deque_iterator& it)
@@ -249,6 +241,7 @@ public:
         pointer get_cur() const {
             return cur_;
         }
+
     private:
         void to_prev_block(int n=1) {
             pos_ -= n;
@@ -295,7 +288,7 @@ public:
         dq.ctrl_ = dq.last_ = nullptr;
     }
     ~deque() {
-        mfwu::destroy(begin(), end());
+        // mfwu::destroy(begin(), end());
         for (pblock* blk = ctrl_; blk < last_; blk++) {
             (*blk)->~block();
         }
@@ -319,18 +312,17 @@ public:
         return (*(end_ - 1))->back();
     }
     iterator begin() const {
-        return iterator((*begin_)->begin(), (*begin_)->begin(),
-                        (*begin_)->end(), begin_)
+        return iterator((*begin_)->begin(), begin_);
     }
     iterator end() const {
-        return iterator(nullptr, nullptr, nullptr, end_);
+        return iterator(nullptr, end_);
     }
     value_type& operator[](int idx) {
         // TODO: out of range
         return *(begin() + idx);  // trytry
     }
     void push_front(const value_type& val) {
-        if (begin_ == end_) { add_prev_block(); }  // no block
+        if (begin_ == end_) { add_front_block(); }  // no block
         typename block::iterator it = (*begin_)->push_front(val);
         // block no space
         if (it == nullptr) {
@@ -340,7 +332,7 @@ public:
         }
     }
     void push_back(const value_type& val) {
-        if (begin_ == end_) { add_next_block(); }
+        if (begin_ == end_) { add_back_block(); }
         typename block::iterator it = (*(end_ - 1))->push_back(val);
         if (it == nullptr) {
             add_back_block();
@@ -362,6 +354,7 @@ public:
         typename block::iterator it = (*(end_ - 1))->pop_back();
         if (it == nullptr) {
             std::cout << "block empty!\n";  // TODO
+        } else if (it == (*begin_)->end()) {
             del_back_block();
         }
     }
@@ -372,10 +365,17 @@ public:
     void insert(iterator it, const value_type& val) {
         pblock* blk = it.get_pos();
         if ((*blk)->size() == BLK_SIZE) {
-            blk = insert_before_block(blk, (*blk)->begin(), it.get_cur());
-            blk++;
-            mfwu::destroy((*blk)->begin(), (*blk)->begin() + size_before);
-            (*blk)->set_begin(size_before);  // TODO: IN THE BLOCK
+            if (it.get_cur() - (*blk)->begin() < BLK_SIZE / 2) {
+                blk = insert_before_block(blk, (*blk)->begin(), it.get_cur());
+                blk++;
+                mfwu::destroy((*blk)->begin(), (*blk)->begin() + size_before);
+                (*blk)->set_begin(size_before);  // TODO: IN THE BLOCK
+            } else {
+                blk = insert_before_block(blk + 1, it.get_cur(), (*blk)->end());
+                blk--;
+                mfwu::destroy((*blk)->begin() + size_before, (*blk)->end());
+                (*blk)->set_end(size_before);  // check
+            }
         } else {
             bool is_head_free = (*blk)->begin() - (*blk)->start();
             bool is_tail_free = (*blk)->start() + BLK_SIZE - (*blk)->end();
@@ -390,7 +390,7 @@ public:
             } else if (is_tail_free) {
                 (*blk)->insert(it.get_cur(), false);
             } else {
-
+                std::cout << "impossible to come here\n";  // TODO
             }
         }
     }
@@ -419,6 +419,76 @@ private:
             it += BLK_SIZE;
         }
     }
+    void add_front_block() {
+        if (begin_ > ctrl_) {
+            --begin_;
+            *begin = new block();
+        } else {
+            req_mem_front();
+            add_front_block();
+        }
+    }
+    void add_back_block() {
+        if (end_ < last_) {
+            *end_ = new block();
+            ++end_;
+        } else {
+            req_mem_back();
+            add_back_block();
+        }
+    }
+    void del_front_block() {
+        if (begin_ < end_) {
+            (*begin_)->~block();  // or delete?
+            ++begin_;
+        }
+    }
+    void del_back_block() {
+        if (begin_ < end_) {
+            --end_;
+            (*end_)->~block();
+        }
+    }
+    pblock* insert_before_block(pblock* blk,
+        block::iterator first, block::iterator last) {
+        if (begin_ > ctrl_ && end_ < last_) {
+            if (blk - begin_ < end_ - blk) {
+                pblock* pp = move_forward(blk);
+                (*pp)->construct(first, last);
+            } else {
+                pblock* pp = move_backward(blk);
+                (*pp)->construct(first, last);
+            }
+        } else if (begin_ > ctrl_) {
+            pblock* pp = move_forward(blk);
+            (*pp)->construct(first, last);
+        } else if (end_ < last_) {
+            pblock* pp = move_backward(blk);
+            (*pp)->construct(first, last);
+        } else {
+            int idx = blk - ctrl_;
+            req_mem_back();
+            return insert_before_block(ctrl_ + idx, first, last);
+        }
+    }
+    pblock* move_forward(pblock* blk) {
+        pblock* pp = begin_;
+        for ( ; pp != blk; ++pp) {
+            *(pp - 1) = *pp;
+        }
+        (*(pp -1))->destroy();
+        --begin_;
+        return pp - 1;
+    }
+    pblock* move_backward(pblock* blk) {
+        pblock* pp = end_;
+        for ( ; pp != blk; --pp) {
+            *pp = *(pp - 1);
+        }
+        (*pp)->destroy();
+        ++end_;
+        return pp;
+    }
     pblock* ctrl_;
     pblock* last_;
     pblock* begin_;
@@ -426,6 +496,7 @@ private:
 
     // TODO: how about a list ctrl?
     // no, you should support random access
+    // list + mapping to node ?
     
     // block* pos_;
 };
