@@ -15,6 +15,8 @@
 #include <memory>
 #include <cassert>
 
+#include <bits/stdc++.h>  // TODO: in test
+
 namespace mfwu {
 
 typedef long ptrdiff_t;

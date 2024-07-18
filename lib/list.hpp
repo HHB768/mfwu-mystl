@@ -896,11 +896,12 @@ private:
     node* head_;
     Alloc allocator_;
 
-};  // endof class DoubleLinkedList
+};  // endof class CircularDoubleLinkedList
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 using forward_list = mfwu::ForwardLinkedList<T, Alloc>;
 template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 using list = mfwu::DoubleLinkedList<T, Alloc>;
+// using list = mfwu::CircularDoubleLinkedList<T, Alloc>;  // without test
 
 // TODO: more functions
 // TODO: check memory leakage
