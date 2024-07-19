@@ -394,6 +394,11 @@ public:
             }
         }
     }
+    template <typename InputIterator>
+    void insert(iterator it, InputIterator first, InputIterator last) {
+
+    }
+    
 
 private:
     size_type init(size_type n=0) {

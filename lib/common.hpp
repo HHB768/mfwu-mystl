@@ -78,6 +78,13 @@ using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*
 // typedef typename std::__is_integer<_InputIterator>::__type _Integral;
 // _M_initialize_dispatch(__first, __last, _Integral());
 
+template <typename T>
+void swap(T& a, T& b) {
+    T temp = a;
+    a = mfwu::move(b);
+    b = mfwu::move(a);
+}
+
 
 }  // endof namespace mfwu
 
