@@ -149,7 +149,7 @@ bool unit_test_list::use_list_iterator() {
                   // warning! dont use ++/-- in << stream
                   // the computing order may be right2left
 #else  // __UNIT_TEST_LIST_BRIEF__
-        mfwu::distance(lst.begin(), --++it--++);
+        mfwu::distance(lst.begin(), --++it);
         *it = 1;
 #endif  // __UNIT_TEST_LIST_BRIEF__
 #endif  // __UNIT_TEST_LIST__
@@ -158,6 +158,8 @@ bool unit_test_list::use_list_iterator() {
     return 0;
 }
 
+// TODO: collect these print-func in the ut class
+// TODO: same in vector
 template <typename T>
 void print_basic_info(const mfwu::list<T>& lst) {
 #ifdef __UNIT_TEST_LIST__

@@ -14,9 +14,14 @@ struct less {
 
 // TODO: list_heap
 
-template <typename T, typename Container=mfwu::vector<T>, typename ComparingFunc>
+class /*::mfwu::*/unit_test_heap;  
+// you cannot declare it with path if it is already in the same namespace
+
+template <typename T, typename Container=mfwu::vector<T>, typename CmpFunctor=mfwu::less<T>>
 class heap {
 public:
+    friend class mfwu::unit_test_heap;
+
     using value_type = T;
     using size_type = size_t;
     using iterator = typename Container::iterator;
@@ -25,7 +30,12 @@ public:
     heap(int n, const value_type& val) : arr(n, val) {}
     heap(const heap& h) : arr(h.arr) {}
     heap(heap&& h) : arr(mfwu::move(h.arr)) {}
-    heap(const std::initializer_list<value_type>& vals) : arr(val) {}
+    heap(const std::initializer_list<value_type>& vals) : arr(vals) {
+        for (int i = size() / 2 - 1; i >= 0; i--) {
+            adjust(size(), i);
+        }
+        sort();
+    }
     ~heap() {}
 
     heap& operator=(const heap& h) {
@@ -50,26 +60,54 @@ public:
         arr.pop_back();
         percolate_down(0);
     }
+    // !!!
+    void sort() {
+        for (int i = size() - 1; i >= 1; i--) {
+            mfwu::swap(arr[0], arr[i]);
+            adjust(i, 0);
+        }
+    }
 
 private:
+    // !!1
+    void adjust(size_type len, size_type parent) {
+        size_type child = parent * 2 + 1;
+        if (child >= len) return ;
+        if (child + 1 < len && arr[child] < arr[child + 1]) { ++child; }
+        if (arr[child] > arr[parent]) {
+            mfwu::swap(arr[child], arr[parent]);
+            adjust(len, child);
+        }
+    }
     // default: larger ---> smaller
-    void percolate_down(size_typen parent) {
-        size_type child = parent * 2;
-        if (arr[child] < arr[child + 1]) { ++child; }
-        while (child > parent) {
-            swap(arr[child], arr[parent]);
+    void percolate_down(size_type parent) {
+        size_type child = parent * 2 + 1;
+        if (child >= size()) return ;
+        if (child + 1 < size() && arr[child] < arr[child + 1]) { ++child; }
+        while (arr[child] > arr[parent]) {
+            mfwu::swap(arr[child], arr[parent]);
             parent = child;
-            child = parent * 2;
-            if (arr[child] < arr[child + 1]) { ++child; }
+            child = parent * 2 + 1;
+            if (child >= size()) { break; } 
+            if (child + 1 < size() && arr[child] < arr[child + 1]) { ++child; }
         }
     }
     void percolate_up(size_type child) {
-        size_type parent = child / 2;
-        while (child > parent) {
+        if (child == 0) return ;
+        size_type parent = (child - 1) / 2;
+        while (arr[child] > arr[parent]) {
             mfwu::swap(arr[child], arr[parent]);
+            print_arr();
+            if (parent == 0) return ;
             child = parent;
-            parent = child / 2;
+            parent = (child - 1) / 2;            
         }
+    }
+    void print_arr() {
+        for (int i=0; i < size(); i++) {
+            std::cout << arr[i] << " ";
+        }
+        std::cout << "\n";
     }
     Container arr;
 };  // endof class heap

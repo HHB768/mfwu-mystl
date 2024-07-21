@@ -79,12 +79,33 @@ using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*
 // _M_initialize_dispatch(__first, __last, _Integral());
 
 template <typename T>
-void swap(T& a, T& b) {
-    T temp = a;
+inline void swap(T&& a, T&& b) {
+    T temp = mfwu::move(a);
     a = mfwu::move(b);
-    b = mfwu::move(a);
+    b = mfwu::move(temp);
+}
+template <typename T>
+inline void swap(T& a, T& b) {
+    swap(mfwu::move(a), mfwu::move(b));
+}
+template <typename T>
+inline void swap(T&& a, T& b) {
+    swap(mfwu::move(a), mfwu::move(b));
+}
+template <typename T>
+inline void swap(T& a, T&& b) {
+    swap(mfwu::move(a), mfwu::move(b));
 }
 
+inline int roundup22(int n) {
+    n -= 1;
+    n |= n >> 1;
+    n |= n >> 2;
+    n |= n >> 4;
+    n |= n >> 8;
+    n |= n >> 16;
+    return n < 0 ? 1 : n + 1; 
+}
 
 }  // endof namespace mfwu
 

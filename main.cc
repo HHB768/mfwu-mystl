@@ -5,7 +5,7 @@
 #   define __UNIT_TEST_ITERATOR_BRIEF__
 #   define __UNIT_TEST_UTILS_BRIEF__
 #   define __UNIT_TEST_VECTOR_BRIEF__
-// #   define __UNIT_TEST_LIST_BRIEF__
+#   define __UNIT_TEST_LIST_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -18,6 +18,7 @@
 #include "ut_utils.hpp"
 #include "ut_vector.hpp"
 #include "ut_list.hpp"
+#include "ut_heap.hpp"
 
 int main() {
     int ttotal = 0;
@@ -26,6 +27,7 @@ int main() {
     mfwu::unit_test_utils ut_utils;
     mfwu::unit_test_vector ut_vector;
     mfwu::unit_test_list ut_list;
+    mfwu::unit_test_heap ut_heap;
 
     int score = 0;
     int total = 2;
@@ -74,6 +76,13 @@ int main() {
     score += !ut_list.use_list_iterator();
     score += !ut_list.use_mfwu_list();
     std::cout << "\n---------- List test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 1;
+    ttotal += total;
+    score += !ut_heap.use_mfwu_heap();
+    std::cout << "\n---------- Heap test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
 

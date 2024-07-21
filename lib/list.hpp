@@ -626,7 +626,7 @@ template <typename T, typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_allo
 class CircularDoubleLinkedList {
 public:
     using node = mfwu::double_linked_node<T>;
-    using iterator = mfwu::DoubleLinkedList<T, Alloc>::list_iterator<node>;
+    using iterator = typename mfwu::DoubleLinkedList<T, Alloc>::list_iterator<node>;
     using value_type = T;
     using size_type = size_t;
 
@@ -802,7 +802,7 @@ public:
         }
     }
     void unique() {
-        for (node* cur = head_->next; cur != head_) {
+        for (node* cur = head_->next; cur != head_; ) {
             while (cur->next != head_ 
                    && cur->next->val == cur->val) {
                 node* next = cur->next->next;
@@ -868,7 +868,7 @@ private:
         destroy();
         reset_ends();
     }
-    static void reset_and_copy(const DoubleLinkedList& src, DoubleLinkedList& dst) {
+    static void reset_and_copy(const CircularDoubleLinkedList& src, CircularDoubleLinkedList& dst) {
         dst.destroy();
         dst.head_ = new node(*src.head_);
         node* prev = dst.head_;
@@ -881,7 +881,7 @@ private:
         }
         connect(prev, dst.head_);
     }
-    static void reset_and_move(DoubleLinkedList& src, DoubleLinkedList& dst) {
+    static void reset_and_move(CircularDoubleLinkedList& src, CircularDoubleLinkedList& dst) {
         dst.destroy();
         dst.head_ = src.head_;
         src.reset_ends();
