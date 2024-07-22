@@ -7,6 +7,7 @@ namespace mfwu {
 class unit_test_heap {
 public:
     bool use_mfwu_heap();
+    bool use_cmp_functor();
 private:
     template <typename T, typename Container, typename CmpFunctor>
     void print_heap_vec(const mfwu::heap<T, Container, CmpFunctor>& h);
@@ -20,8 +21,8 @@ private:
 template <typename T, typename Container, typename CmpFunctor>
 void unit_test_heap::print_heap_vec(const mfwu::heap<T, Container, CmpFunctor>& h) {
 #ifndef __UNIT_TEST_HEAP_BRIEF__
-    std::cout << "arr: ";
-    for (auto&& element : h.arr) {
+    std::cout << "arr_: ";
+    for (auto&& element : h.arr_) {
         std::cout << element << " ";
     }
     std::cout << "\n";
@@ -37,7 +38,7 @@ void unit_test_heap::print_heap_struct(const mfwu::heap<T, Container, CmpFunctor
     int col_idx = 0;
     for (int i = 0; i < h.size(); i++) {
         print_space(max_width / col_num);
-        std::cout << h.arr[i];
+        std::cout << h.arr_[i];
         print_space(max_width / col_num - 1);
         col_idx++;
         if (col_idx >= col_num) {
@@ -114,6 +115,31 @@ bool unit_test_heap::use_mfwu_heap() {
     print_heap_detail(hp5);
     hp6.sort();
     print_heap_detail(hp6);
+
+    return 0;
+}
+
+template <typename T>
+struct greater {
+    bool operator()(const T& a, const T& b) {
+        return a > b;
+    }
+};  // endof struct greater
+
+bool unit_test_heap::use_cmp_functor() {
+    std::cout << "\n------- Test: use cmp functor -------\n";
+    std::cout << "making heap and sorting with default mfwu::less<int>\n";
+    mfwu::heap<int> hp1 = {1, 2, 3, 4, 5, 6, 7, 8,
+                           1, 3, 5, 7, 2, 4, 6, 8};
+    print_heap_detail(hp1);
+    hp1.sort();
+    print_heap_detail(hp1);
+    std::cout << "making heap and sorting with new mfwu::greater<int>\n";
+    mfwu::heap<int, mfwu::vector<int>, mfwu::greater<int>> hp2 = 
+        {1, 2, 3, 4, 5, 6, 7, 8, 1, 3, 5, 7, 2, 4, 6, 8};
+    print_heap_detail(hp2);
+    hp2.sort();
+    print_heap_detail(hp2);
 
     return 0;
 }

@@ -80,9 +80,10 @@ int main() {
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     score = 0;
-    total = 1;
+    total = 2;
     ttotal += total;
     score += !ut_heap.use_mfwu_heap();
+    score += !ut_heap.use_cmp_functor();
     std::cout << "\n---------- Heap test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
