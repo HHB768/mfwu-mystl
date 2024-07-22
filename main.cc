@@ -6,6 +6,7 @@
 #   define __UNIT_TEST_UTILS_BRIEF__
 #   define __UNIT_TEST_VECTOR_BRIEF__
 #   define __UNIT_TEST_LIST_BRIEF__
+#   define __UNIT_TEST_HEAP_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__

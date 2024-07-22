@@ -185,7 +185,8 @@ public:
 
     iterator begin() const { return begin_; }
     iterator end() const { return end_; }
-    value_type& back() { return begin_[size()-1]; }
+    value_type& front() const { return begin_[0]; }
+    value_type& back() const { return begin_[size()-1]; }
     size_type size() const { return end_ - begin_; }
     size_type capacity() const { return last_ - begin_; }  // type conversion? long -> unsigned long
     bool empty() const { return end_ == begin_; }

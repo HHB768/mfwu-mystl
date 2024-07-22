@@ -27,19 +27,15 @@ public:
     using iterator = typename Container::iterator;
 
     heap() : arr() {}
-    heap(int n, const value_type& val) : arr(n, val) {}
+    // heap(int n, const value_type& val) : arr(n, val) {}
     heap(const heap& h) : arr(h.arr) {}
     heap(heap&& h) : arr(mfwu::move(h.arr)) {}
-    heap(const std::initializer_list<value_type>& vals) : arr(vals) {
-        for (int i = size() / 2 - 1; i >= 0; i--) {
-            adjust(size(), i);
-        }
-        sort();
-    }
+    heap(const std::initializer_list<value_type>& vals) 
+        : arr(vals) { make_heap(); }
     ~heap() {}
 
     heap& operator=(const heap& h) {
-        arr = h.arr;
+        arr = h.arr;  // reset and copy
         return *this;
     }
     heap& operator=(heap&& h) {
@@ -60,23 +56,33 @@ public:
         arr.pop_back();
         percolate_down(0);
     }
-    // !!!
+    
+    // heap sort (smaller ---> larger)
     void sort() {
         for (int i = size() - 1; i >= 1; i--) {
             mfwu::swap(arr[0], arr[i]);
-            adjust(i, 0);
+            adjust(0, i);
         }
     }
 
+    template <typename InputIterator>
+    void push(InputIterator first, InputIterator last) {
+        arr.insert(arr.end(), first, last);
+        make_heap();  // TODO
+    }
+
 private:
-    // !!1
-    void adjust(size_type len, size_type parent) {
+    void make_heap() {
+        for (int i = size() / 2 - 1; i >= 0; i--) { adjust(i, size()); }
+    }
+    // adjust recursively
+    void adjust(size_type parent, size_type len) {
         size_type child = parent * 2 + 1;
         if (child >= len) return ;
         if (child + 1 < len && arr[child] < arr[child + 1]) { ++child; }
         if (arr[child] > arr[parent]) {
             mfwu::swap(arr[child], arr[parent]);
-            adjust(len, child);
+            adjust(child, len);
         }
     }
     // default: larger ---> smaller
@@ -97,7 +103,7 @@ private:
         size_type parent = (child - 1) / 2;
         while (arr[child] > arr[parent]) {
             mfwu::swap(arr[child], arr[parent]);
-            print_arr();
+            // print_arr();
             if (parent == 0) return ;
             child = parent;
             parent = (child - 1) / 2;            
