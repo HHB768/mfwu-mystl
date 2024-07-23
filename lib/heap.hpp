@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "vector.hpp"
+#include "queue.hpp"
 
 namespace mfwu {
 template <typename T>
@@ -12,21 +13,43 @@ struct less {
     }
 };  // endof struct less
 
+// TODO: without test
 template <typename T, typename CmpFunctor=mfwu::less<T>>
 class list_heap {
-    list_heap() : head_(new node{T{}, nullptr, nullptr, nullptr}) {}
-    list_heap(const std::initializer_list<T>& vals) 
-        : head_(new node{T{}, nullptr, nullptr, nullptr, nullptr}) {
-
+    list_heap() : lst_() {}
+    list_heap(const std::initializer_list<T>& vals) {
+        mfwu::vector<T> vec = vals;
+        vec.sort();
+        lst_ = mfwu::list<T>(vec.begin(), vec.end());
     }
+    list_heap(const list_heap& h) : lst_(h.lst_) {}
+    list_heap(list_heap&& h) : lst_(mfwu::move(h.lst_)) {}
+    ~list_heap() {}
+
+    list_heap& operator=(const list_heap& h) {
+        lst_ = h.lst_;
+    }
+    list_heap& operator=(list_heap&& h) {
+        lst_ = mfwu::move(h.lst_);
+    }
+
+    bool empty() const {
+        return lst_.empty();
+    }
+    size_t size() const {
+        return lst_.size();
+    }
+    void push(const T& val) {
+        auto it = lst_.begin();
+        for ( ; it != lst_.end(); it++) {
+            if (*it > val) { break; }
+        }
+        lst_.insert(it, val);
+    }
+    void pop() { lst_.pop_front(); }
+    // TODO
 private:
-    struct node {
-        T val;
-        node* parent = nullptr;
-        node* left = nullptr;
-        node* right = nullptr;
-    };  // endof struct node
-    node* head_;
+    mfwu::list<T> lst_;
 };  // endof class list_heap
 
 class /*::mfwu::*/unit_test_heap;  
