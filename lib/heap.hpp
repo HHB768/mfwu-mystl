@@ -6,14 +6,8 @@
 #include "queue.hpp"
 
 namespace mfwu {
-template <typename T>
-struct less {
-    bool operator()(const T& a, const T& b) const {
-        return a < b;
-    }
-};  // endof struct less
-
 // TODO: without test
+// 一个比heap更简单但更低效的计时器
 template <typename T, typename CmpFunctor=mfwu::less<T>>
 class list_heap {
     list_heap() : lst_() {}

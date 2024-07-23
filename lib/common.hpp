@@ -107,6 +107,13 @@ inline int roundup22(int n) {
     return n < 0 ? 1 : n + 1; 
 }
 
+template <typename T>
+struct less {
+    bool operator()(const T& a, const T& b) const {
+        return a < b;
+    }
+};  // endof struct less
+
 }  // endof namespace mfwu
 
 #endif  // __COMMON_HPP__

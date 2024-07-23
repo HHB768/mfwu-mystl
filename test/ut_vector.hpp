@@ -96,6 +96,8 @@ bool unit_test_vector::use_vector_iterator() {
     mfwu::vector<npod_data> vec = {1, 2, 3, 4, 5, 6};
     for (mfwu::vector<npod_data>::iterator it = vec.begin(); 
          it < vec.end(); it+=2, --it, it++, --it, ++it, it = &*it) {
+            // see this: we dont exam the it--, so we found a const qualifier
+            // on it-- on 7.23 / 2024, what a coincidence!
         std::cout << mfwu::distance(vec.begin(), it) 
                   << " : " << (++(*it))-- << "  ";
     }

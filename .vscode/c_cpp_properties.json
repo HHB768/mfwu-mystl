@@ -4,7 +4,9 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/lib/**",
-                "${workspaceFolder}/test/**"
+                "${workspaceFolder}/test/**",
+                "${workspaceFolder}/lib",
+                "${workspaceFolder}/test"
             ],
             "defines": [
                 "__UNIT_TEST_ALLOCATOR__=1"

@@ -76,7 +76,7 @@ public:
             --ptr_;
             return *this;
         }
-        vector_iterator operator--(int) const {
+        vector_iterator operator--(int) {
             vector_iterator tmp = *this;
             --ptr_;
             return tmp;
@@ -411,6 +411,9 @@ public:
 //             // }
 // #endif  // __USE_MALLOC__
 //         }
+    void sort() {
+        mfwu::sort(begin(), end());  // TODO: without test
+    }
 
     value_type& operator[](size_type idx) const {
         if (idx >= size()) {
