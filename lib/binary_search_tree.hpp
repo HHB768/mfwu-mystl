@@ -16,6 +16,16 @@ public:
         node* parent;
         node* left;
         node* right;
+        node() : val(), parent(nullptr),
+                 left(nullptr), right(nullptr) {}
+        node(const value_type& v) : val(v), parent(nullptr),
+                                    left(nullptr), right(nullptr) {}
+        node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
+                               left(nullptr), right(nullptr) {}
+        node(const value_type& v, node* p, node* l, node* r) 
+            : val(v), parent(p), left(l), right(r) {}
+        node(value_type&& v, node* p, node* l, node* r)
+            : val(mfwu::move(v)), parent(p), left(l), right(r) {}
     };  // endof struct node
     
     binary_search_tree() : head_(nullptr) {}
@@ -32,11 +42,11 @@ public:
         bst.head_ = nullptr;
     }
     ~binary_search_tree() {
-        destroy_tree(head_);
+        this->destroy_tree(head_);
     }
 
     binary_search_tree& operator=(const binary_search_tree& bst) {
-        copy(bst);
+        this->copy(bst);
         return *this;
     }
     binary_search_tree& operator(binary_search_tree&& bst) {
@@ -47,11 +57,21 @@ public:
     bool empty() const { return head_ == nullptr; }
     size_type size() const { size(head_); }
 
+    value_type& head() const { return head_->val; }
+
     void push(const value_type& val) {
-        
+        push(head_, val);
     }
-
-
+    void pop() {
+        node* leaf = get_leaf(head_);
+        head_->val = leaf->val;
+        if (leaf->parent->left == leaf) {
+            leaf->parent->left = nullptr;
+        } else {
+            leaf->parent->right = nullptr;
+        }
+        delete leaf;
+    }
 
 private:
     void destroy_tree(node* root) {
@@ -76,10 +96,23 @@ private:
                 ret->parent = root;
             }
         } else {
-            push(root->left);
+            node* ret = push(root->left);
+            if (ret) {
+                root->left = ret;
+                ret->parent = root;
+            }
         }
         return nullptr;
     }
+    node* get_leaf(node* root) {
+        if (root == nullptr) return nullptr;
+        node* ret = get_leaf(root->left);
+        if (ret == nullptr) {
+            ret = get_leaf(root->right);
+        } 
+        return ret;
+    }
+
     node* head_;
 };  // endof class binary_search_tree
 
