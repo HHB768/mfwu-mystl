@@ -60,11 +60,15 @@ public:
 
     bool empty() const { return root_ == nullptr; }
     size_type size() const { size(root_); }
+    size_type height() const { height(root_); }
 
     value_type& root() const { return root_->val; }
 
     void push(const value_type& val) {
         push(root_, val);
+    }
+    void pop(const value_type& val) {
+        
     }
     void pop(node* root) {
         if (root == nullptr) return ;
@@ -88,6 +92,27 @@ public:
     void pop() {
         pop(root_);
     }
+
+    void pre_order() const {
+
+    }
+    void in_order() const {
+
+    }
+    void post_order() const {
+
+    }
+
+    value_type minimum() const {
+
+    }
+    value_type maximum() const {
+
+    }
+    node* search(const value_type& val) {
+
+    }
+    
 
 private:
     void copy(const binary_search_tree& bst) {
@@ -134,7 +159,7 @@ private:
                 ret->parent = root;
             }
         } else {
-            node* ret = push(root->left);
+            node* ret = push(root->left, val);
             if (ret) {
                 root->left = ret;
                 ret->parent = root;

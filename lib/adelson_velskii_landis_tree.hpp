@@ -10,7 +10,25 @@ class avl_tree {
 public:
     using value_type = T;
     using size_type = size_t;
-    using node = tree_node<T>;
+
+    struct avl_node {
+        value_type val;   
+        size_t height;  // TODO: change heights when rotate
+        avl_node* parent;
+        avl_node* left;
+        avl_node* right;
+        avl_node() : val(), parent(nullptr),
+                    left(nullptr), right(nullptr) {}
+        avl_node(const value_type& v) : val(v), parent(nullptr),
+                                    left(nullptr), right(nullptr) {}
+        avl_node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
+                                left(nullptr), right(nullptr) {}
+        avl_node(const value_type& v, node* p, node* l, node* r) 
+            : val(v), parent(p), left(l), right(r) {}
+        avl_node(value_type&& v, node* p, node* l, node* r)
+            : val(mfwu::move(v)), parent(p), left(l), right(r) {}
+    };  // endof struct avl_node
+    using node = avl_node;
 
     avl_tree() : root_() {}
     avl_tree(const std::initializer_list<value_type>& vals) {
@@ -28,7 +46,7 @@ public:
         destroy_tree(root_);
     }
 
-    push(const value_type& val) {
+    void push(const value_type& val) {
         
     }
     
