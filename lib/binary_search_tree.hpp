@@ -5,30 +5,34 @@
 
 namespace mfwu {
 
+// TODO: test
 template <typename T, typename CmpFunctor>
 class binary_search_tree {
 public:
     using value_type = T;
     using size_type = size_t;
 
-    struct node {
+    template <typename U>
+    struct tree_node {
+        using value_type = U;
         value_type val;    
-        node* parent;
-        node* left;
-        node* right;
-        node() : val(), parent(nullptr),
+        tree_node* parent;
+        tree_node* left;
+        tree_node* right;
+        tree_node() : val(), parent(nullptr),
                  left(nullptr), right(nullptr) {}
-        node(const value_type& v) : val(v), parent(nullptr),
+        tree_node(const value_type& v) : val(v), parent(nullptr),
                                     left(nullptr), right(nullptr) {}
-        node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
+        tree_node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
                                left(nullptr), right(nullptr) {}
-        node(const value_type& v, node* p, node* l, node* r) 
+        tree_node(const value_type& v, node* p, node* l, node* r) 
             : val(v), parent(p), left(l), right(r) {}
-        node(value_type&& v, node* p, node* l, node* r)
+        tree_node(value_type&& v, node* p, node* l, node* r)
             : val(mfwu::move(v)), parent(p), left(l), right(r) {}
     };  // endof struct node
+    using node = tree_node<T>;
     
-    binary_search_tree() : head_(nullptr) {}
+    binary_search_tree() : root_(nullptr) {}
     binary_search_tree(const std::initializer_list<value_type>& vals) {
         for (value_type& val : vals) {
             push(val);
@@ -38,11 +42,11 @@ public:
         copy(bst);
     } 
     binary_search_tree(binary_search_tree&& bst) 
-        : head_(bst.head_) {
-        bst.head_ = nullptr;
+        : root_(bst.root_) {
+        bst.root_ = nullptr;
     }
     ~binary_search_tree() {
-        this->destroy_tree(head_);
+        this->destroy_tree(root_);
     }
 
     binary_search_tree& operator=(const binary_search_tree& bst) {
@@ -50,27 +54,39 @@ public:
         return *this;
     }
     binary_search_tree& operator(binary_search_tree&& bst) {
-        head_ = bst.head_;
-        bst.head_ = nullptr;
+        root_ = bst.root_;
+        bst.root_ = nullptr;
     }
 
-    bool empty() const { return head_ == nullptr; }
-    size_type size() const { size(head_); }
+    bool empty() const { return root_ == nullptr; }
+    size_type size() const { size(root_); }
 
-    value_type& head() const { return head_->val; }
+    value_type& head() const { return root_->val; }
 
     void push(const value_type& val) {
-        push(head_, val);
+        push(root_, val);
+    }
+    void pop(node* root) {
+        if (root == nullptr) return ;
+        if (root->left == nullptr && root->right == nullptr) {
+            pop_node(root);
+        } else if (root->left == nullptr) {
+            root->val = root->right->val;
+            pop_node(root->right);
+        } else if (root->right == nullptr) {
+            root->val = root->left->val;
+            pop_node(root->left);
+        } else {
+            node* next = root->right;
+            while (next->left != nullptr) {
+                next = next->left;
+            }
+            root->val = next->val;
+            pop_node(next);
+        }
     }
     void pop() {
-        node* leaf = get_leaf(head_);
-        head_->val = leaf->val;
-        if (leaf->parent->left == leaf) {
-            leaf->parent->left = nullptr;
-        } else {
-            leaf->parent->right = nullptr;
-        }
-        delete leaf;
+        pop(root_);
     }
 
 private:
@@ -78,6 +94,14 @@ private:
         if (!root) return ;
         destroy_tree(root->left);
         destroy_tree(root->right);
+        delete root;
+    }
+    void pop_node(node* root) {
+        if (root->parent->left == root) {
+            root->parent->left == nullptr;
+        } else {
+            root->parent->right == nullptr;
+        }
         delete root;
     }
     size_type size(node* root) {
@@ -104,16 +128,8 @@ private:
         }
         return nullptr;
     }
-    node* get_leaf(node* root) {
-        if (root == nullptr) return nullptr;
-        node* ret = get_leaf(root->left);
-        if (ret == nullptr) {
-            ret = get_leaf(root->right);
-        } 
-        return ret;
-    }
 
-    node* head_;
+    node* root_;
 };  // endof class binary_search_tree
 
 }  // endof namespace mfwu

@@ -114,6 +114,16 @@ struct less {
     }
 };  // endof struct less
 
+template <typename T>
+class double_linked_node;
+template <typename T>
+using list_node = double_linked_node<T>;
+
+template <typename T>
+class binary_search_tree;
+template <typename T>
+using tree_node = binary_search_tree::tree_node<T>;
+
 }  // endof namespace mfwu
 
 #endif  // __COMMON_HPP__
