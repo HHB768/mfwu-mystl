@@ -120,9 +120,9 @@ template <typename T>
 using list_node = double_linked_node<T>;
 
 template <typename T>
-class binary_search_tree;
+class bst_node;
 template <typename T>
-using tree_node = binary_search_tree::tree_node<T>;
+using tree_node = bst_node<T>;
 
 }  // endof namespace mfwu
 

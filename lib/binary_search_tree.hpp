@@ -5,32 +5,32 @@
 
 namespace mfwu {
 
+template <typename U>
+struct bst_node {
+    using value_type = U;
+    value_type val;    
+    bst_node* parent;
+    bst_node* left;
+    bst_node* right;
+    bst_node() : val(), parent(nullptr),
+                left(nullptr), right(nullptr) {}
+    bst_node(const value_type& v) : val(v), parent(nullptr),
+                                left(nullptr), right(nullptr) {}
+    bst_node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
+                            left(nullptr), right(nullptr) {}
+    bst_node(const value_type& v, node* p, node* l, node* r) 
+        : val(v), parent(p), left(l), right(r) {}
+    bst_node(value_type&& v, node* p, node* l, node* r)
+        : val(mfwu::move(v)), parent(p), left(l), right(r) {}
+};  // endof struct node
+
 // TODO: test
 template <typename T, typename CmpFunctor>
 class binary_search_tree {
 public:
     using value_type = T;
     using size_type = size_t;
-
-    template <typename U>
-    struct tree_node {
-        using value_type = U;
-        value_type val;    
-        tree_node* parent;
-        tree_node* left;
-        tree_node* right;
-        tree_node() : val(), parent(nullptr),
-                 left(nullptr), right(nullptr) {}
-        tree_node(const value_type& v) : val(v), parent(nullptr),
-                                    left(nullptr), right(nullptr) {}
-        tree_node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
-                               left(nullptr), right(nullptr) {}
-        tree_node(const value_type& v, node* p, node* l, node* r) 
-            : val(v), parent(p), left(l), right(r) {}
-        tree_node(value_type&& v, node* p, node* l, node* r)
-            : val(mfwu::move(v)), parent(p), left(l), right(r) {}
-    };  // endof struct node
-    using node = tree_node<T>;
+    using node = mfwu::bst_node<T>;
     
     binary_search_tree() : root_(nullptr) {}
     binary_search_tree(const std::initializer_list<value_type>& vals) {
@@ -61,7 +61,7 @@ public:
     bool empty() const { return root_ == nullptr; }
     size_type size() const { size(root_); }
 
-    value_type& head() const { return root_->val; }
+    value_type& root() const { return root_->val; }
 
     void push(const value_type& val) {
         push(root_, val);
@@ -90,6 +90,20 @@ public:
     }
 
 private:
+    void copy(const binary_search_tree& bst) {
+        root_ = copy_tree(bst.root_);
+    }
+    node* copy_tree(node* root) {
+        if (root == nullptr) return nullptr;
+        node* copy_root = new node(root);
+        node* left = copy_tree(root->left);
+        node* right = copy_tree(root->right);
+        copy_root->left = left;
+        copy_root->right = right;
+        left->parent = copy_root;
+        right->parent = copy_root;
+        return copy_root;
+    }
     void destroy_tree(node* root) {
         if (!root) return ;
         destroy_tree(root->left);
