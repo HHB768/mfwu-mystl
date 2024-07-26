@@ -68,7 +68,8 @@ public:
         push(root_, val);
     }
     void pop(const value_type& val) {
-        
+        node* cur = search(val);
+        pop(cur);
     }
     void pop(node* root) {
         if (root == nullptr) return ;
@@ -93,8 +94,8 @@ public:
         pop(root_);
     }
 
-    void pre_order() const {
-
+    void pre_order(void(*usr_func(const value_type& val))) const {
+        pre_order_aux(root, usr_func);
     }
     void in_order() const {
 
@@ -104,13 +105,21 @@ public:
     }
 
     value_type minimum() const {
-
+        node* cur = root_;
+        wihle (cur->left != nullptr) {
+            cur = cur->left;
+        }
+        return cur->val;
     }
     value_type maximum() const {
-
+        node* cur = root_;
+        wihle (cur->right != nullptr) {
+            cur = cur->right;
+        }
+        return cur->val;
     }
     node* search(const value_type& val) {
-
+        return search(root_, val);
     }
     
 
@@ -167,6 +176,34 @@ private:
         }
         return nullptr;
     }
+    void pre_order_aux(node* root, void(*usr_func(const value_type& val))) {
+        if (root == nullptr) { return ; }
+        usr_func(root->val);
+        pre_order_aux(root->left);
+        pre_order_aux(root->right);
+    }
+    void in_order_aux(node* root, void(*usr_func(const value_type& val))) {
+        if (root == nullptr) { return ; }
+        in_order_aux(root->left);
+        usr_func(root->val);
+        in_order_aux(root->right);
+    }
+    void post_order_aux(node* root, void(*usr_func(const value_type& val))) {
+        if (root == nullptr) { return ; }
+        post_order_aux(root->left);
+        post_order_aux(root->right);
+        usr_func(root->val);
+    }
+    node* search(node* root, const value_type& val) {
+        if (root == nullptr) { return nullptr; }
+        if (root->val == val) { return root; }
+        if (root->val > val) {
+            return search(root->left, val);
+        } else {
+            return search(root->right, val);
+        }
+    }
+    
 
     node* root_;
 };  // endof class binary_search_tree
