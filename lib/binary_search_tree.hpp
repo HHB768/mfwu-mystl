@@ -2,6 +2,7 @@
 #define __BINARY_SEARCH_TREE_HPP__
 
 #include "common.hpp"
+#include "vector.hpp"
 
 namespace mfwu {
 
@@ -24,10 +25,12 @@ struct bst_node {
         : val(mfwu::move(v)), parent(p), left(l), right(r) {}
 };  // endof struct node
 
+class unit_test_bst;
 // TODO: test
-template <typename T, typename CmpFunctor>
+template <typename T, typename CmpFunctor=mfwu::less<T>>
 class binary_search_tree {
 public:
+    friend class mfwu::unit_test_bst;
     using value_type = T;
     using size_type = size_t;
     using node = mfwu::bst_node<T>;
@@ -50,6 +53,7 @@ public:
     }
 
     binary_search_tree& operator=(const binary_search_tree& bst) {
+        this->destroy_tree(root_);  // TODO
         this->copy(bst);
         return *this;
     }
@@ -59,8 +63,8 @@ public:
     }
 
     bool empty() const { return root_ == nullptr; }
-    size_type size() const { size(root_); }
-    size_type height() const { height(root_); }
+    size_type size() const { return size(root_); }
+    size_type height() const { return height(root_); }
 
     value_type& root() const { return root_->val; }
 
@@ -94,14 +98,35 @@ public:
         pop(root_);
     }
 
-    void pre_order(void(*usr_func(const value_type& val))) const {
-        pre_order_aux(root, usr_func);
+    void pre_order(void(*usr_func(const value_type& val))) {
+        pre_order_aux(root_, usr_func);
     }
-    void in_order() const {
-
+    void in_order(void(*usr_func(const value_type& val))) {
+        in_order_aux(root_, usr_func);
     }
-    void post_order() const {
-
+    void post_order(void(*usr_func(const value_type& val))) {
+        post_order_aux(root_, usr_func);
+    }
+    mfwu::vector<value_type> sequentialize() const  {
+        mfwu::vector<value_type> res;
+        std::queue<node*> q;  // TODO: mfwu::queue
+        if (root_ == nullptr) return res;
+        q.emplace(root_);
+        while (!q.empty()) {
+            size_type size = q.size();
+            for (int i = 0; i < size; i++) {
+                node* cur = q.front();
+                res.emplace_back(cur->val);
+                if (cur->left != nullptr) {
+                    q.emplace(cur->left);
+                }
+                if (cur->right != nullptr) {
+                    q.emplace(cur->right);
+                }
+                q.pop();
+            }
+        }
+        return res;
     }
 
     value_type minimum() const {
@@ -121,14 +146,13 @@ public:
     node* search(const value_type& val) {
         return search(root_, val);
     }
-    
 
 private:
     void copy(const binary_search_tree& bst) {
         root_ = copy_tree(bst.root_);
     }
     node* copy_tree(node* root) {
-        if (root == nullptr) return nullptr;
+        if (root == nullptr) { return nullptr; }
         node* copy_root = new node(root);
         node* left = copy_tree(root->left);
         node* right = copy_tree(root->right);
@@ -155,6 +179,10 @@ private:
     size_type size(node* root) {
         if (root == nullptr) return 0;
         return 1 + size(root->left) + size(root->right);
+    }
+    size_type height(node* root) {
+        if (root == nullptr) { return 0; }
+        return max(height(root->left), height(root->right)) + 1;
     }
     node* push(node* root, const value_type& val) {
         if (root == nullptr) {
@@ -204,7 +232,6 @@ private:
         }
     }
     
-
     node* root_;
 };  // endof class binary_search_tree
 

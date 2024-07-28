@@ -15,7 +15,6 @@ private:
     void print_heap_struct(const mfwu::heap<T, Container, CmpFunctor>& h);
     template <typename T, typename Container, typename CmpFunctor>
     void print_heap_detail(const mfwu::heap<T, Container, CmpFunctor>& h);
-    static void print_space(int n) { for (int i=0; i<n; i++) { std::cout << " "; } }
 };  // endof class unit_test_heap
 
 template <typename T, typename Container, typename CmpFunctor>
@@ -31,24 +30,7 @@ void unit_test_heap::print_heap_vec(const mfwu::heap<T, Container, CmpFunctor>& 
 template <typename T, typename Container, typename CmpFunctor>
 void unit_test_heap::print_heap_struct(const mfwu::heap<T, Container, CmpFunctor>& h) {
 #ifndef __UNIT_TEST_HEAP_BRIEF__
-    int rounded_size = roundup22(h.size());
-    int max_width = rounded_size;
-    int line_idx = 0;
-    int col_num = 1;
-    int col_idx = 0;
-    for (int i = 0; i < h.size(); i++) {
-        print_space(max_width / col_num);
-        std::cout << h.arr_[i];
-        print_space(max_width / col_num - 1);
-        col_idx++;
-        if (col_idx >= col_num) {
-            line_idx++;
-            col_num *= 2;
-            col_idx = 0;
-            std::cout << "\n";
-        }
-    }
-    if (col_idx) { std::cout << "\n"; }
+    mfwu::print_seq_tree(h.arr_);
 #endif  // __UNIT_TEST_HEAP_BRIEF__
 }
 template <typename T, typename Container, typename CmpFunctor>

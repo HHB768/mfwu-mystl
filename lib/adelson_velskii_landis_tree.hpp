@@ -51,14 +51,108 @@ public:
         destroy_tree(root_);
     }
 
+    bool empty() const { return root_ == nullptr; }
+    size_type size() const { return size(root_); }
+    size_type height() const { return root_->height; }
+    value_type& root() const { return root_->val; }
+
     void push(const value_type& val) {
         push(root_, val);
+    }
+    void pop(const value_type& val) {
+        node* cur = search(val);
+        pop(cur);
+    }
+    void pop(node* root) {
+        if (root == nullptr) return ;
+        if (root->left == nullptr && root->right == nullptr) {
+            pop_node(root);
+        } else if (root->left == nullptr) {
+            root->val = root->right->val;
+            pop_node(root->right);
+        } else if (root->right == nullptr) {
+            root->val = root->left->val;
+            pop_node(root->left);
+        } else {
+            node* next = root->right;
+            while (next->left != nullptr) {
+                next = next->left;
+            }
+            root->val = next->val;
+            pop_node(next);
+        }
+        maintain(cur);  // TODO
+    }
+    void pop() {
+        pop(root_);
+    }
+
+    void pre_order(void(*usr_func(const value_type& val))) const {
+        pre_order_aux(root_, usr_func);
+    }
+    void in_order(void(*usr_func(const value_type& val))) const {
+        in_order_aux(root_, usr_func);
+    }
+    void post_order(void(*usr_func(const value_type& val))) const {
+        post_order_aux(root_, usr_func);
+    }
+    
+    value_type minimum() const {
+        node* cur = root_;
+        wihle (cur->left != nullptr) {
+            cur = cur->left;
+        }
+        return cur->val;
+    }
+    value_type maximum() const {
+        node* cur = root_;
+        wihle (cur->right != nullptr) {
+            cur = cur->right;
+        }
+        return cur->val;
+    }
+    node* search(const value_type& val) {
+        return search(root_, val);
+    }
+    
+private:
+    void copy(const avl_tree& avlt) {
+        root_ = copy_tree(avlt.root_);
+    }
+    node* copy_tree(node* root) {
+        if (root == nullptr) { return nullptr; }
+        node* copy_root = new node(root);
+        node* left = copy_tree(root->left);
+        node* right = copy_tree(root->right);
+        copy_root->left = left;
+        copy_root->right = right;
+        left->parent = copy_root;
+        right->parent = copy_root;
+        return copy_root;
+    }
+    void destroy_tree(node* root) {
+        if (root == nullptr) return ;
+        destroy_tree(root->left);
+        destroy_tree(root->right);
+        delete root;
+    }
+    void pop_node(node* root) {
+        if (root->parent->left == root) {
+            root->parent->left == nullptr;
+        } else {
+            root->parent->right == nullptr;
+        }
+        delete root;
+    }
+    size_type size(node* root) {
+        if (root == nullptr) return 0;
+        return 1 + size(root->left) + size(root->right);
     }
     ienb push(node* root, const value_type& val) {
         ienb ie{nullptr, false};
         bool thisside = false;
         if (root == nullptr) {
-            ie.newnode = new node(val, 1, nullptr, nullptr, nullptr);
+            ie.newnode = new node(val);
             return ie;
         }
         if (val > root->val) {
@@ -78,7 +172,7 @@ public:
         }
         root->height++;
         if (root->right->height - root->left->height > 1
-            || root->left->height - root->right->height > 1) {
+         || root->left->height - root->right->height > 1) {
             root->height--;
             if (thisside && ie.lastside) {
                 root->right->height++;
@@ -95,15 +189,6 @@ public:
             }
         } 
         return {nullptr, thisside};
-    }
-    
-    
-private:
-    void destroy_tree(node* root) {
-        if (root == nullptr) return ;
-        destroy_tree(root->left);
-        destroy_tree(root->right);
-        delete root;
     }
     void rotate_ll(node* root) {
         node* parent = root->parent;
@@ -156,6 +241,33 @@ private:
     void rotate_rl(node* root) {
         rotate_rr(root->right);
         rotate_ll(root);
+    }
+    void pre_order_aux(node* root, void(*usr_func(const value_type& val))) {
+        if (root == nullptr) { return ; }
+        usr_func(root->val);
+        pre_order_aux(root->left);
+        pre_order_aux(root->right);
+    }
+    void in_order_aux(node* root, void(*usr_func(const value_type& val))) {
+        if (root == nullptr) { return ; }
+        in_order_aux(root->left);
+        usr_func(root->val);
+        in_order_aux(root->right);
+    }
+    void post_order_aux(node* root, void(*usr_func(const value_type& val))) {
+        if (root == nullptr) { return ; }
+        post_order_aux(root->left);
+        post_order_aux(root->right);
+        usr_func(root->val);
+    }
+    node* search(node* root, const value_type& val) {
+        if (root == nullptr) { return nullptr; }
+        if (root->val == val) { return root; }
+        if (root->val > val) {
+            return search(root->left, val);
+        } else {
+            return search(root->right, val);
+        }
     }
     node* root_;
 };  // endof class mfwu
