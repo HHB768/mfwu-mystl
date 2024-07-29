@@ -114,12 +114,14 @@ bool unit_test_heap::use_cmp_functor() {
     mfwu::heap<int> hp1 = {1, 2, 3, 4, 5, 6, 7, 8,
                            1, 3, 5, 7, 2, 4, 6, 8};
     print_heap_detail(hp1);
+    std::cout << "sorting\n";
     hp1.sort();
     print_heap_detail(hp1);
     std::cout << "making heap and sorting with new mfwu::greater<int>\n";
     mfwu::heap<int, mfwu::vector<int>, mfwu::greater<int>> hp2 = 
         {1, 2, 3, 4, 5, 6, 7, 8, 1, 3, 5, 7, 2, 4, 6, 8};
     print_heap_detail(hp2);
+    std::cout << "sorting\n";
     hp2.sort();
     print_heap_detail(hp2);
 

@@ -3,7 +3,7 @@
 
 #include "common.hpp"
 #include "vector.hpp"
-#include "queue.hpp"
+// #include "queue.hpp"
 
 namespace mfwu {
 // TODO: without test
@@ -54,8 +54,8 @@ class heap {
 public:
     friend class mfwu::unit_test_heap;
 
-    using value_type = Container::value_type;
-    using size_type = Container::size_type;
+    using value_type = typename Container::value_type;
+    using size_type = typename Container::size_type;
     using container_type = Container;
     // using iterator = typename Container::iterator;
 

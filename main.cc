@@ -20,6 +20,7 @@
 #include "ut_vector.hpp"
 #include "ut_list.hpp"
 #include "ut_heap.hpp"
+#include "ut_bst.hpp"
 
 int main() {
     int ttotal = 0;
@@ -29,6 +30,7 @@ int main() {
     mfwu::unit_test_vector ut_vector;
     mfwu::unit_test_list ut_list;
     mfwu::unit_test_heap ut_heap;
+    mfwu::unit_test_bst ut_bst;
 
     int score = 0;
     int total = 2;
@@ -88,11 +90,10 @@ int main() {
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     score = 0;
-    total = 2;
+    total = 1;
     ttotal += total;
-    score += !ut_heap.use_mfwu_heap();
-    score += !ut_heap.use_cmp_functor();
-    std::cout << "\n---------- Heap test result -----------\n";
+    score += !ut_bst.use_mfwu_bst();
+    std::cout << "\n---------- BST test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
 

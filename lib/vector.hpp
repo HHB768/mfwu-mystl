@@ -4,6 +4,7 @@
 #include "allocator.hpp"
 #include "iterator.hpp"
 #include "utils.hpp"
+#include "algorithm.hpp"
 
 namespace mfwu {
 

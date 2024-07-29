@@ -146,6 +146,7 @@ void print_seq_tree(Sequence seq) {
     int line_idx = 0;
     int col_num = 1;
     int col_idx = 0;
+
     for (int i = 0; i < seq.size(); i++) {
         print_space(max_width / col_num);
         std::cout << seq[i];

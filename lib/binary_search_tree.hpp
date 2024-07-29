@@ -16,13 +16,31 @@ struct bst_node {
     bst_node() : val(), parent(nullptr),
                 left(nullptr), right(nullptr) {}
     bst_node(const value_type& v) : val(v), parent(nullptr),
-                                left(nullptr), right(nullptr) {}
+                                    left(nullptr), right(nullptr) {}
     bst_node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
-                            left(nullptr), right(nullptr) {}
-    bst_node(const value_type& v, node* p, node* l, node* r) 
+                               left(nullptr), right(nullptr) {}
+    bst_node(const value_type& v, bst_node* p, bst_node* l, bst_node* r) 
         : val(v), parent(p), left(l), right(r) {}
-    bst_node(value_type&& v, node* p, node* l, node* r)
+    bst_node(value_type&& v, bst_node* p, bst_node* l, bst_node* r)
         : val(mfwu::move(v)), parent(p), left(l), right(r) {}
+    bst_node(const bst_node& node) : val(node.val), parent(node.parent),
+                                    left(node.left), right(node.right) {}
+    bst_node(bst_node&& node) : val(mfwu::move(node.val)),
+        parent(node.parent), left(node.left), right(node.right) {
+        node.parent = node.left = node.right = nullptr;
+    }
+    bst_node& operator=(const bst_node& node) {
+        val = node.val; parent = node.parent;
+        left = node.left; right = node.right;
+        return *this;
+    }
+    bst_node& operator=(bst_node&& node) {
+        val = mfwu::move(node.val);
+        parent = node.parent;
+        left = node.left; right = node.right;
+        node.parent = node.left = node.right = nullptr;
+        return *this;
+    }
 };  // endof struct node
 
 class unit_test_bst;
@@ -36,13 +54,14 @@ public:
     using node = mfwu::bst_node<T>;
     
     binary_search_tree() : root_(nullptr) {}
-    binary_search_tree(const std::initializer_list<value_type>& vals) {
-        for (value_type& val : vals) {
+    binary_search_tree(const std::initializer_list<value_type>& vals)
+        : root_(nullptr) {
+        for (const value_type& val : vals) {
             push(val);
         }
     }
     binary_search_tree(const binary_search_tree& bst) {
-        copy(bst);
+        this->copy(bst);
     } 
     binary_search_tree(binary_search_tree&& bst) 
         : root_(bst.root_) {
@@ -57,9 +76,10 @@ public:
         this->copy(bst);
         return *this;
     }
-    binary_search_tree& operator(binary_search_tree&& bst) {
+    binary_search_tree& operator=(binary_search_tree&& bst) {
         root_ = bst.root_;
         bst.root_ = nullptr;
+        return *this;
     }
 
     bool empty() const { return root_ == nullptr; }
@@ -69,6 +89,10 @@ public:
     value_type& root() const { return root_->val; }
 
     void push(const value_type& val) {
+        if (root_ == nullptr) {
+            root_ = new node(val);
+            return ;
+        }
         push(root_, val);
     }
     void pop(const value_type& val) {
@@ -78,33 +102,33 @@ public:
     void pop(node* root) {
         if (root == nullptr) return ;
         if (root->left == nullptr && root->right == nullptr) {
-            pop_node(root);
+            pop_node(root, nullptr);
         } else if (root->left == nullptr) {
-            root->val = root->right->val;
-            pop_node(root->right);
+            // std::cout << root->right->val << "\n";
+            pop_node(root, root->right);
+            // std::cout << "?\n";
         } else if (root->right == nullptr) {
-            root->val = root->left->val;
-            pop_node(root->left);
+            pop_node(root, root->left);
         } else {
             node* next = root->right;
             while (next->left != nullptr) {
                 next = next->left;
             }
             root->val = next->val;
-            pop_node(next);
+            pop(next);
         }
     }
     void pop() {
         pop(root_);
     }
 
-    void pre_order(void(*usr_func(const value_type& val))) {
+    void pre_order(void(*usr_func)(const value_type& val)) {
         pre_order_aux(root_, usr_func);
     }
-    void in_order(void(*usr_func(const value_type& val))) {
+    void in_order(void(*usr_func)(const value_type& val)) {
         in_order_aux(root_, usr_func);
     }
-    void post_order(void(*usr_func(const value_type& val))) {
+    void post_order(void(*usr_func)(const value_type& val)) {
         post_order_aux(root_, usr_func);
     }
     mfwu::vector<value_type> sequentialize() const  {
@@ -130,15 +154,17 @@ public:
     }
 
     value_type minimum() const {
+        if (root_ == nullptr) return {};
         node* cur = root_;
-        wihle (cur->left != nullptr) {
+        while (cur->left != nullptr) {
             cur = cur->left;
         }
         return cur->val;
     }
     value_type maximum() const {
+        if (root_ == nullptr) return {};
         node* cur = root_;
-        wihle (cur->right != nullptr) {
+        while (cur->right != nullptr) {
             cur = cur->right;
         }
         return cur->val;
@@ -153,13 +179,14 @@ private:
     }
     node* copy_tree(node* root) {
         if (root == nullptr) { return nullptr; }
-        node* copy_root = new node(root);
+        node* copy_root = new node(*root);
+        // std::cout << copy_root->val << "\n";
         node* left = copy_tree(root->left);
         node* right = copy_tree(root->right);
         copy_root->left = left;
         copy_root->right = right;
-        left->parent = copy_root;
-        right->parent = copy_root;
+        if (left)  left->parent = copy_root;
+        if (right) right->parent = copy_root;
         return copy_root;
     }
     void destroy_tree(node* root) {
@@ -168,19 +195,24 @@ private:
         destroy_tree(root->right);
         delete root;
     }
-    void pop_node(node* root) {
-        if (root->parent->left == root) {
-            root->parent->left == nullptr;
+    void pop_node(node* root, node* next) {
+        if (root->parent == nullptr) {
+            // std::cout << root_->val << "\n";
+            root_ = next;
+            // std::cout << root_->val << "\n";
+            root_->parent = nullptr;
+        } else if (root->parent->left == root) {
+            root->parent->left = next;
         } else {
-            root->parent->right == nullptr;
+            root->parent->right = next;
         }
         delete root;
     }
-    size_type size(node* root) {
+    size_type size(node* root) const {
         if (root == nullptr) return 0;
         return 1 + size(root->left) + size(root->right);
     }
-    size_type height(node* root) {
+    size_type height(node* root) const {
         if (root == nullptr) { return 0; }
         return max(height(root->left), height(root->right)) + 1;
     }
@@ -204,30 +236,35 @@ private:
         }
         return nullptr;
     }
-    void pre_order_aux(node* root, void(*usr_func(const value_type& val))) {
+    void pre_order_aux(node* root, void(*usr_func)(const value_type& val)) {
         if (root == nullptr) { return ; }
         usr_func(root->val);
-        pre_order_aux(root->left);
-        pre_order_aux(root->right);
+        pre_order_aux(root->left, usr_func);
+        pre_order_aux(root->right, usr_func);
     }
-    void in_order_aux(node* root, void(*usr_func(const value_type& val))) {
+    void in_order_aux(node* root, void(*usr_func)(const value_type& val)) {
         if (root == nullptr) { return ; }
-        in_order_aux(root->left);
+        in_order_aux(root->left, usr_func);
         usr_func(root->val);
-        in_order_aux(root->right);
+        in_order_aux(root->right, usr_func);
     }
-    void post_order_aux(node* root, void(*usr_func(const value_type& val))) {
+    void post_order_aux(node* root, void(*usr_func)(const value_type& val)) {
         if (root == nullptr) { return ; }
-        post_order_aux(root->left);
-        post_order_aux(root->right);
+        post_order_aux(root->left, usr_func);
+        post_order_aux(root->right, usr_func);
         usr_func(root->val);
     }
     node* search(node* root, const value_type& val) {
         if (root == nullptr) { return nullptr; }
+        // std::cout << root->val << "\n";
+        // std::cout << val << "\n";
         if (root->val == val) { return root; }
         if (root->val > val) {
+            // std::cout << "left\n";
+            // std::cout << (root->right == nullptr ? "true" : "false") << "\n";
             return search(root->left, val);
         } else {
+            // std::cout << "right\n";
             return search(root->right, val);
         }
     }
