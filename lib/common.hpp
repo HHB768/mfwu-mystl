@@ -124,43 +124,6 @@ class bst_node;
 template <typename T>
 using tree_node = bst_node<T>;
 
-template <typename T>
-inline T max(const T& a, const T& b) {
-    return a < b ? b : a;
-}
-
-template <typename T>
-inline T min(const T& a, const T& b) {
-    return a < b ? a : b;
-}
-
-inline void print_space(int n) { 
-    for (int i=0; i<n; i++) {
-        std::cout << " "; 
-    } 
-}
-template <typename Sequence>
-void print_seq_tree(Sequence seq) {
-    int rounded_size = roundup22(seq.size());
-    int max_width = rounded_size;
-    int line_idx = 0;
-    int col_num = 1;
-    int col_idx = 0;
-
-    for (int i = 0; i < seq.size(); i++) {
-        print_space(max_width / col_num);
-        std::cout << seq[i];
-        print_space(max_width / col_num - 1);
-        col_idx++;
-        if (col_idx >= col_num) {
-            line_idx++;
-            col_num *= 2;
-            col_idx = 0;
-            std::cout << "\n";
-        }
-    }
-    if (col_idx) { std::cout << "\n"; }
-}
 
 }  // endof namespace mfwu
 

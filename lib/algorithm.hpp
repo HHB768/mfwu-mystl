@@ -1,6 +1,7 @@
 #ifndef __ALGORITHM_HPP__
 #define __ALGORITHM_HPP__
 
+#include "common.hpp"
 #include "iterator.hpp"
 #include "utils.hpp"
 
@@ -76,6 +77,43 @@ void sort(RandomAccessIterator first,
 // void sort(mfwu::vector<int>& vec) {
 //     sort(vec, 0, vec.size());
 // }
+template <typename T>
+inline T max(const T& a, const T& b) {
+    return a < b ? b : a;
+}
+
+template <typename T>
+inline T min(const T& a, const T& b) {
+    return a < b ? a : b;
+}
+
+inline void print_space(int n) { 
+    for (int i=0; i<n; i++) {
+        std::cout << " "; 
+    } 
+}
+template <typename Sequence>
+void print_heap_struct(const Sequence& seq) {
+    int rounded_size = roundup22(seq.size());
+    int max_width = rounded_size;
+    int line_idx = 0;
+    int col_num = 1;
+    int col_idx = 0;
+
+    for (int i = 0; i < seq.size(); i++) {
+        print_space(max_width / col_num);
+        std::cout << seq[i];
+        print_space(max_width / col_num - 1);
+        col_idx++;
+        if (col_idx >= col_num) {
+            line_idx++;
+            col_num *= 2;
+            col_idx = 0;
+            std::cout << "\n";
+        }
+    }
+    if (col_idx) { std::cout << "\n"; }
+}
 
 }  // endof namespace mfwu
 

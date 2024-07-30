@@ -1,8 +1,46 @@
 #define __UNIT_TEST_BST__
 
 #include "binary_search_tree.hpp"
+#include "vector.hpp"
 
 namespace mfwu {
+
+
+template <typename Node>
+mfwu::vector<std::string> tree2vec(Node* root) {
+    using node = Node;
+    mfwu::vector<std::string> ret;
+    if (root == nullptr) return {};
+    std::queue<node*> q;
+    q.emplace(root);
+    while (!q.empty()) {
+        size_t size = q.size();
+        bool flag = false;
+        for (int i = 0; i < size; i++) {
+            node* cur = q.front();
+            if (cur == nullptr) {
+                q.emplace(nullptr);
+                q.emplace(nullptr);
+                ret.emplace_back(" ");
+            } else {
+                q.emplace(cur->left);
+                q.emplace(cur->right);
+                if (cur->left || cur->right) {
+                    flag = true;
+                }
+                ret.emplace_back(std::to_string(cur->val));
+            }
+            q.pop();
+        }
+        if (!flag) break;
+    }
+    return ret;
+} 
+
+template <typename Node>
+void print_tree_struct(Node* root) {
+    print_heap_struct(tree2vec(root));
+}
 
 class unit_test_bst {
 public:
@@ -15,13 +53,8 @@ private:
         std::cout << "size(): " << bst.size() << " "
                   << "height(): " << bst.height() << "\n";
                   //<< "root(): " << bst.root() << "\n";
-        std::cout << "maximum(): " << bst.maximum() << " "
-                  << "minimum(): " << bst.minimum() << "\n";
-    }
-    template <typename T, typename CmpFunctor>
-    void print_tree_struct(
-        const mfwu::binary_search_tree<T, CmpFunctor>& bst) {
-        // TODO
+        // std::cout << "maximum(): " << bst.maximum() << " "
+        //           << "minimum(): " << bst.minimum() << "\n";
     }
     template <typename T, typename CmpFunctor>
     void print_detailed_info(
@@ -30,13 +63,15 @@ private:
         mfwu::vector<int> bst_seq = bst.sequentialize();
         for (int i : bst_seq) { std::cout << i << " "; }
         std::cout << "\n";
-        print_tree_struct(bst);
+        mfwu::print_tree_struct(bst.root_);
     }
-    // you have to add this static qualifier
+    // you cannot place test_func here
     // bcz 'this' obj will make this func ptr is of
     // void(unit_test_bst::*)(const int&) instead of
     // void(*) (const int&), understand?
-};  // endof class unit_test_bst
+    // endof class unit_test_bst
+};  
+
 
 template <typename T>
 void test_func(const T& val) {
@@ -112,11 +147,11 @@ bool unit_test_bst::use_mfwu_bst() {
               << "\nans->right->val: " 
               << (ans->right ? std::to_string(ans->right->val) : "null") << "\n";
 
-    bst7.pre_order(&test_func<int>);
+    bst6.pre_order(&test_func<int>);
     std::cout << "\n";
-    bst7.in_order(&test_func<int>);
+    bst6.in_order(&test_func<int>);
     std::cout << "\n";
-    bst7.post_order(&test_func<int>);
+    bst6.post_order(&test_func<int>);
     std::cout << "\n";
     return 0;
 }

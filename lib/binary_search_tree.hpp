@@ -180,7 +180,6 @@ private:
     node* copy_tree(node* root) {
         if (root == nullptr) { return nullptr; }
         node* copy_root = new node(*root);
-        // std::cout << copy_root->val << "\n";
         node* left = copy_tree(root->left);
         node* right = copy_tree(root->right);
         copy_root->left = left;
@@ -197,9 +196,7 @@ private:
     }
     void pop_node(node* root, node* next) {
         if (root->parent == nullptr) {
-            // std::cout << root_->val << "\n";
             root_ = next;
-            // std::cout << root_->val << "\n";
             root_->parent = nullptr;
         } else if (root->parent->left == root) {
             root->parent->left = next;
@@ -256,15 +253,10 @@ private:
     }
     node* search(node* root, const value_type& val) {
         if (root == nullptr) { return nullptr; }
-        // std::cout << root->val << "\n";
-        // std::cout << val << "\n";
         if (root->val == val) { return root; }
         if (root->val > val) {
-            // std::cout << "left\n";
-            // std::cout << (root->right == nullptr ? "true" : "false") << "\n";
             return search(root->left, val);
         } else {
-            // std::cout << "right\n";
             return search(root->right, val);
         }
     }
