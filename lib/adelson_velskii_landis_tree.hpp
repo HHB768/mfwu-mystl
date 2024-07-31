@@ -5,9 +5,12 @@
 
 namespace mfwu {
 
+class unit_test_avl_tree;
+
 template <typename T, typename CmpFunctor=mfwu::less<T>>
 class avl_tree {
 public:
+    friend class mfwu::unit_test_avl_tree;
     using value_type = T;
     using size_type = size_t;
 
@@ -55,6 +58,7 @@ public:
         : root_(nullptr) {
         for (const value_type& val : vals) {
             push(val);
+            std::cout << "push: " << val << "\n";
         }
     }
     avl_tree(const avl_tree& av) {
@@ -203,8 +207,10 @@ private:
                 ret->parent = root;
                 root->right = ret;
             }
-            if ((ssize_t)root->right->height - 
-                (ssize_t)root->left->height > 1) {
+            if ((ssize_t)height(root->right) - 
+                (ssize_t)height(root->left) > 1) {
+                // std::cout << height(root->right) << " "
+                // << height(root->left) << "\n";
                 maintain_r(root);
             }
         } else {
@@ -213,30 +219,26 @@ private:
                 ret->parent = root;
                 root->left = ret;
             }
-            if ((ssize_t)root->left->height - 
-                (ssize_t)root->right->height > 1) {
+            if ((ssize_t)height(root->left) - 
+                (ssize_t)height(root->right) > 1) {
                 maintain_l(root);
             }
         }
         return nullptr;
     }
     void maintain_l(node* root) {
-        root->height--;
-        if (root->left->left->height > root->left->right->height) {
-            root->left->height++;
+        if (height(root->left->left) > 
+            height(root->left->right)) {
             rotate_ll(root);
         } else {
-            root->left->right->height += 2;
             rotate_lr(root);
         }
     }
     void maintain_r(node* root) {
-        root->height--;
-        if (root->right->left->height > root->right->right->height) {
-            root->right->left->height += 2;
+        if (height(root->right->left) >
+            height(root->right->right)) {
             rotate_rl(root);
         } else {
-            root->right->height++;
             rotate_rr(root);
         }
     }
@@ -250,7 +252,7 @@ private:
         node* parent = root->parent;
         node* left = root->left;
         node* leftright = root->left->right;
-
+        std::cout << "ll" << root->val << "\n";
         left->parent = parent;
         if (parent) {
             if (parent->left == root) {
@@ -258,6 +260,8 @@ private:
             } else {
                 parent->right = left;
             }
+        } else {
+            root_ = left;
         }
 
         root->parent = left;
@@ -267,12 +271,14 @@ private:
         if (leftright) {
             leftright->parent = root;
         }
+        root->height = height(root);
+        left->height = height(left);
     }
     void rotate_rr(node* root) {
         node* parent = root->parent;
         node* right = root->right;
         node* rightleft = root->right->left;
-
+        std::cout << "rr" << root->val << "\n";
         right->parent = parent;
         if (parent) {
             if (parent->left == root) {
@@ -280,6 +286,8 @@ private:
             } else {
                 parent->right = right;
             }
+        } else {
+            root_ = right;
         }
 
         root->parent = right;
@@ -289,14 +297,16 @@ private:
         if (rightleft) {
             rightleft->parent = root;
         }
+        root->height = height(root);
+        right->height = height(right);
     }
     void rotate_lr(node* root) {
-        rotate_ll(root->left);
-        rotate_rr(root);
+        rotate_rr(root->left);
+        rotate_ll(root);
     }
     void rotate_rl(node* root) {
-        rotate_rr(root->right);
-        rotate_ll(root);
+        rotate_ll(root->right);
+        rotate_rr(root);
     }
 
     void pop_node(node* root, node* next) {
@@ -332,7 +342,10 @@ private:
     }
     size_type height(node* root) const {
         if (root == nullptr) { return 0; }
-        return max(height(root->left), height(root->right)) + 1;
+        size_type h = 0;
+        if (root->left) h = max(h, root->left->height);
+        if (root->right) h = max(h, root->right->height);
+        return h + 1;
     }
     void pre_order_aux(node* root, void(*usr_func)(const value_type& val)) {
         if (root == nullptr) { return ; }
