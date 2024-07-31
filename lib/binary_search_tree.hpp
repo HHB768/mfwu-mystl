@@ -104,9 +104,7 @@ public:
         if (root->left == nullptr && root->right == nullptr) {
             pop_node(root, nullptr);
         } else if (root->left == nullptr) {
-            // std::cout << root->right->val << "\n";
             pop_node(root, root->right);
-            // std::cout << "?\n";
         } else if (root->right == nullptr) {
             pop_node(root, root->left);
         } else {

@@ -1,69 +1,37 @@
 #define __UNIT_TEST_BST__
 
 #include "binary_search_tree.hpp"
-#include "vector.hpp"
+#include "utils_of_ut.hpp"
 
 namespace mfwu {
-
-
-template <typename Node>
-mfwu::vector<std::string> tree2vec(Node* root) {
-    using node = Node;
-    mfwu::vector<std::string> ret;
-    if (root == nullptr) return {};
-    std::queue<node*> q;
-    q.emplace(root);
-    while (!q.empty()) {
-        size_t size = q.size();
-        bool flag = false;
-        for (int i = 0; i < size; i++) {
-            node* cur = q.front();
-            if (cur == nullptr) {
-                q.emplace(nullptr);
-                q.emplace(nullptr);
-                ret.emplace_back(" ");
-            } else {
-                q.emplace(cur->left);
-                q.emplace(cur->right);
-                if (cur->left || cur->right) {
-                    flag = true;
-                }
-                ret.emplace_back(std::to_string(cur->val));
-            }
-            q.pop();
-        }
-        if (!flag) break;
-    }
-    return ret;
-} 
-
-template <typename Node>
-void print_tree_struct(Node* root) {
-    print_heap_struct(tree2vec(root));
-}
 
 class unit_test_bst {
 public:
     bool use_mfwu_bst();
+    bool use_cmp_functor();
 
 private:
     template <typename T, typename CmpFunctor>
     void print_basic_info(
         const mfwu::binary_search_tree<T, CmpFunctor>& bst) {
+#ifndef __UNIT_TEST_BST_BRIEF__
         std::cout << "size(): " << bst.size() << " "
                   << "height(): " << bst.height() << "\n";
                   //<< "root(): " << bst.root() << "\n";
         // std::cout << "maximum(): " << bst.maximum() << " "
         //           << "minimum(): " << bst.minimum() << "\n";
+#endif  // __UNIT_TEST_BST_BRIEF__
     }
     template <typename T, typename CmpFunctor>
     void print_detailed_info(
         const mfwu::binary_search_tree<T, CmpFunctor>& bst) {
+#ifndef __UNIT_TEST_BST_BRIEF__
         print_basic_info(bst);
         mfwu::vector<int> bst_seq = bst.sequentialize();
         for (int i : bst_seq) { std::cout << i << " "; }
         std::cout << "\n";
         mfwu::print_tree_struct(bst.root_);
+#endif  // __UNIT_TEST_BST_BRIEF__
     }
     // you cannot place test_func here
     // bcz 'this' obj will make this func ptr is of
@@ -75,7 +43,9 @@ private:
 
 template <typename T>
 void test_func(const T& val) {
+#ifndef __UNIT_TEST_BST_BRIEF__
     std::cout << val << " ";
+#endif  // __UNIT_TEST_BST_BRIEF__
 }
 
 bool unit_test_bst::use_mfwu_bst() {
@@ -141,18 +111,31 @@ bool unit_test_bst::use_mfwu_bst() {
 
     std::cout << "searching\n";
     mfwu::binary_search_tree<int>::node* ans = bst7.search(3);
+#ifndef __UNIT_TEST_BST_BRIEF__
     std::cout << "ans->val: " << ans->val
               << "\nans->left->val: " 
               << (ans->left ? std::to_string(ans->left->val) : "null")
               << "\nans->right->val: " 
               << (ans->right ? std::to_string(ans->right->val) : "null") << "\n";
+#endif  // __UNIT_TEST_BST_BRIEF__
 
     bst6.pre_order(&test_func<int>);
+#ifndef __UNIT_TEST_BST_BRIEF__
     std::cout << "\n";
+#endif  // __UNIT_TEST_BST_BRIEF__
     bst6.in_order(&test_func<int>);
+#ifndef __UNIT_TEST_BST_BRIEF__
     std::cout << "\n";
+#endif  // __UNIT_TEST_BST_BRIEF__
     bst6.post_order(&test_func<int>);
+#ifndef __UNIT_TEST_BST_BRIEF__
     std::cout << "\n";
+#endif  // __UNIT_TEST_BST_BRIEF__
+    return 0;
+}
+
+bool unit_test_bst::use_cmp_functor() {
+    // TODO
     return 0;
 }
 

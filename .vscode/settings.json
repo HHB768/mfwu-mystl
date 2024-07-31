@@ -88,6 +88,8 @@
         "variant": "cpp",
         "expected": "cpp",
         "format": "cpp",
-        "stacktrace": "cpp"
+        "stacktrace": "cpp",
+        "spanstream": "cpp",
+        "stdfloat": "cpp"
     }
 }

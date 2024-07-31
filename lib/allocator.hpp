@@ -112,7 +112,7 @@ public:
     static void print_alloc_info(const int n) {
 #ifndef __UNIT_TEST_VECTOR_BRIEF__
         std::cout << "+++++++++++++++++++++++++\n";
-        std::cout << "identity: " << T::identity() << "\n";
+        // std::cout << "identity: " << T::identity() << "\n";
         std::cout << "allocate, size = " << n << "\n";
         GLOBAL_COUNTER += n;
         std::cout << "global alloc count = " << GLOBAL_COUNTER << "\n";
@@ -122,7 +122,7 @@ public:
     static void print_dealloc_info(const int n) {
 #ifndef __UNIT_TEST_VECTOR_BRIEF__
         std::cout << "+++++++++++++++++++++++++\n";
-        std::cout << "identity: " << T::identity() << "\n";
+        // std::cout << "identity: " << T::identity() << "\n";
         std::cout << "deallocate, size = " << n << "\n";
         GLOBAL_COUNTER -= n;
         std::cout << "global alloc count = " << GLOBAL_COUNTER << "\n";
@@ -132,7 +132,7 @@ public:
     static void print_realloc_success_info(const int n) {
 #ifndef __UNIT_TEST_VECTOR_BRIEF__
         std::cout << "+++++++++++++++++++++++++\n";
-        std::cout << "identity: " << T::identity() << "\n";
+        // std::cout << "identity: " << T::identity() << "\n";
         std::cout << "reallocate, size = " << n << "\n";
         GLOBAL_COUNTER += n;
         std::cout << "global alloc count = " << GLOBAL_COUNTER << "\n";
@@ -142,7 +142,7 @@ public:
     static void print_realloc_failure_info() {
 #ifndef __UNIT_TEST_VECTOR_BRIEF__
         std::cout << "+++++++++++++++++++++++++\n";
-        std::cout << "identity: " << T::identity() << "\n";
+        // std::cout << "identity: " << T::identity() << "\n";
         std::cout << "reallocate failed\n";
         std::cout << "+++++++++++++++++++++++++\n";
 #endif  // __UNIT_TEST_VECTOR_BRIEF__ 

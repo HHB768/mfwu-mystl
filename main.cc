@@ -7,9 +7,12 @@
 #   define __UNIT_TEST_VECTOR_BRIEF__
 #   define __UNIT_TEST_LIST_BRIEF__
 #   define __UNIT_TEST_HEAP_BRIEF__
+#   define __UNIT_TEST_BST_BRIEF__
+#   define __UNIT_TEST_AVL_TREE_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
+
 #ifndef __UNIT_TEST_VECTOR_BRIEF__
 #   define __VECTOR_MEMORY_CHECK__
 #endif  // __UNIT_TEST_VECTOR_BRIEF__
@@ -21,6 +24,7 @@
 #include "ut_list.hpp"
 #include "ut_heap.hpp"
 #include "ut_bst.hpp"
+#include "ut_avl_tree.hpp"
 
 int main() {
     int ttotal = 0;
@@ -31,6 +35,7 @@ int main() {
     mfwu::unit_test_list ut_list;
     mfwu::unit_test_heap ut_heap;
     mfwu::unit_test_bst ut_bst;
+    mfwu::unit_test_avl_tree ut_avl_tree;
 
     int score = 0;
     int total = 2;
@@ -90,12 +95,19 @@ int main() {
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     score = 0;
-    total = 1;
+    total = 2;
     ttotal += total;
     score += !ut_bst.use_mfwu_bst();
+    score += !ut_bst.use_cmp_functor();
     std::cout << "\n---------- BST test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
+    score = 0;
+    total = 1;
+    ttotal += total;
+    score += !ut_avl_tree.use_avl_tree();
+    std::cout << "\n---------- AVL_tree test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;

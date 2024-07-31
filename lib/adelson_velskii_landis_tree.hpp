@@ -5,7 +5,7 @@
 
 namespace mfwu {
 
-template <typename T, typename CmpFunctor>
+template <typename T, typename CmpFunctor=mfwu::less<T>>
 class avl_tree {
 public:
     using value_type = T;
@@ -25,7 +25,7 @@ public:
                                    left(nullptr), right(nullptr) {}
         avl_node(const value_type& v, size_type h, avl_node* p, avl_node* l, avl_node* r) 
             : val(v), height(h), parent(p), left(l), right(r) {}
-        avl_node(value_type&& v, avl_node* p, avl_node* l, avl_node* r)
+        avl_node(value_type&& v, size_type h, avl_node* p, avl_node* l, avl_node* r)
             : val(mfwu::move(v)), height(h), parent(p), left(l), right(r) {}
         avl_node(const avl_node& node) : val(node.val), height(node.height),
             parent(node.parent), left(node.left), right(node.right) {}
@@ -45,14 +45,14 @@ public:
     };  // endof struct avl_node
     using node = avl_node;
     
-    struct ienb {
-        node* newnode;
-        bool lastside;
-    };  // endof struct ienb
+    // struct ienb {
+    //     node* newnode;
+    //     bool lastside;
+    // };  // endof struct ienb
 
     avl_tree() : root_(nullptr) {}
     avl_tree(const std::initializer_list<value_type>& vals) 
-        root_(nullptr) {
+        : root_(nullptr) {
         for (const value_type& val : vals) {
             push(val);
         }
@@ -69,12 +69,12 @@ public:
 
     avl_tree& operator=(const avl_tree& av) {
         this->destroy_tree(root_);
-        this->copy(bst);
+        this->copy(av);
         return *this;
     }
     avl_tree& operator=(avl_tree&& av) {
         root_ = av.root_;
-        bst.root_ = nullptr;
+        av.root_ = nullptr;
         return *this;
     }
 
@@ -91,61 +91,38 @@ public:
         }
         push(root_, val);
     }
-    ienb push(node* root, const value_type& val) {
-        ienb ie{nullptr, false};
-        bool thisside = false;
-        if (root == nullptr) {
-            ie.newnode = new node(val, 1, nullptr, nullptr, nullptr);
-            return ie;
-        }
-        if (val > root->val) {
-            ie = push(root->right, val);
-            if (ie.newnode) {
-                ie.newnode->parent = root;
-                root->right = ie.newnode;
-            }
-            thisside = true;
-        } else {
-            ie = push(root->left, val);
-            if (ie.newnode) {
-                ie.newnode->parent = root;
-                root->left = ie.newnode;
-            }
-            thisside = false;
-        }
-        root->height++;
-        if (root->right->height - root->left->height > 1
-            || root->left->height - root->right->height > 1) {
-            root->height--;
-            if (thisside && ie.lastside) {
-                root->right->height++;
-                rotate_rr(root);
-            } else if (thisside && !ie.lastside) {
-                root->right->left->height += 2;
-                rotate_rl(root);
-            } else if (!thisside && ie.lastside) {
-                root->left->right->height += 2;
-                rotate_lr(root);
-            } else {
-                root->left->height++;
-                rotate_ll(root);
-            }
-        } 
-        return {nullptr, thisside};
-    }
     void pop() {
         pop(root_);
     }
     void pop(const value_type& val) {
         node* cur = search(val);
         pop(cur);
-        // can faster?
+        // this approach is hard to maintain the height
+        
+        // 一开始觉得一边找一边记录height和llrr会快一点
+        // 但是这样实现会将很多无用的东西上溯
+        // TODO: 后面再试试吧
+        
     }
-    ienb pop(node* root) {
-        if (root == nullptr) {
-            return ;
+    void pop(node* root) {
+        node* parent = root->parent;
+        if (root == nullptr) return ;
+        if (root->left == nullptr && root->right == nullptr) {
+            pop_node(root, nullptr);
+        } else if (root->left == nullptr) {
+            pop_node(root, root->right);
+        } else if (root->right == nullptr) {
+            pop_node(root, root->left);
+        } else {
+            node* next = root->right;
+            while (next->left != nullptr) {
+                next = next->left;
+            }
+            root->val = next->val;
+            pop(next);
+            return ;  // pop(next) has maintained_up
         }
-        // TODO
+        maintain_up(parent);
     }
 
     void pre_order(void(*usr_func)(const value_type& val)) {
@@ -198,8 +175,9 @@ public:
     node* search(const value_type& val) {
         return search(root_, val);
     }
+    
 private:
-    void copy(const binary_search_tree& bst) {
+    void copy(const avl_tree& bst) {
         root_ = copy_tree(bst.root_);
     }
     node* copy_tree(node* root) {
@@ -212,6 +190,55 @@ private:
         if (left)  left->parent = copy_root;
         if (right) right->parent = copy_root;
         return copy_root;
+    }
+    node* push(node* root, const value_type& val) {
+        if (root == nullptr) {
+            node* cur = new node(val);
+            return cur;
+        }
+        root->height++;
+        if (val >= root->val) {
+            node* ret = push(root->right, val);
+            if (ret) {
+                ret->parent = root;
+                root->right = ret;
+            }
+            if ((ssize_t)root->right->height - 
+                (ssize_t)root->left->height > 1) {
+                maintain_r(root);
+            }
+        } else {
+            node* ret = push(root->left, val);
+            if (ret) {
+                ret->parent = root;
+                root->left = ret;
+            }
+            if ((ssize_t)root->left->height - 
+                (ssize_t)root->right->height > 1) {
+                maintain_l(root);
+            }
+        }
+        return nullptr;
+    }
+    void maintain_l(node* root) {
+        root->height--;
+        if (root->left->left->height > root->left->right->height) {
+            root->left->height++;
+            rotate_ll(root);
+        } else {
+            root->left->right->height += 2;
+            rotate_lr(root);
+        }
+    }
+    void maintain_r(node* root) {
+        root->height--;
+        if (root->right->left->height > root->right->right->height) {
+            root->right->left->height += 2;
+            rotate_rl(root);
+        } else {
+            root->right->height++;
+            rotate_rr(root);
+        }
     }
     void destroy_tree(node* root) {
         if (root == nullptr) return ;
@@ -283,6 +310,21 @@ private:
         }
         delete root;
     }
+    void maintain_up(node* parent) {
+        if (parent == nullptr) return ;
+        parent->height--;
+        while (parent->parent) {
+            parent = parent->parent;
+            parent->height--;
+            if ((ssize_t)parent->left->height - 
+                (ssize_t)parent->right->height > 1) {
+                maintain_l(parent);
+            } else if ((ssize_t)parent->right->height - 
+                       (ssize_t)parent->left->height > 1) {
+                maintain_r(parent);
+            }
+        }
+    }
 
     size_type size(node* root) const {
         if (root == nullptr) return 0;
@@ -291,26 +333,6 @@ private:
     size_type height(node* root) const {
         if (root == nullptr) { return 0; }
         return max(height(root->left), height(root->right)) + 1;
-    }
-    node* push(node* root, const value_type& val) {
-        if (root == nullptr) {
-            root = new node(val);  // node def
-            return root;
-        }
-        if (val >= root->val) {
-            node* ret = push(root->right, val);
-            if (ret) {
-                root->right = ret;
-                ret->parent = root;
-            }
-        } else {
-            node* ret = push(root->left, val);
-            if (ret) {
-                root->left = ret;
-                ret->parent = root;
-            }
-        }
-        return nullptr;
     }
     void pre_order_aux(node* root, void(*usr_func)(const value_type& val)) {
         if (root == nullptr) { return ; }

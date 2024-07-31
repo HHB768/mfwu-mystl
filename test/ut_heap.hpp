@@ -1,6 +1,7 @@
 #define __UNIT_TEST_HEAP__
 
 #include "heap.hpp"
+#include "algorithm.hpp"
 
 namespace mfwu {
 
@@ -30,7 +31,7 @@ void unit_test_heap::print_heap_vec(const mfwu::heap<T, Container, CmpFunctor>& 
 template <typename T, typename Container, typename CmpFunctor>
 void unit_test_heap::print_heap_struct(const mfwu::heap<T, Container, CmpFunctor>& h) {
 #ifndef __UNIT_TEST_HEAP_BRIEF__
-    mfwu::print_seq_tree(h.arr_);
+    mfwu::print_heap_struct(h.arr_);
 #endif  // __UNIT_TEST_HEAP_BRIEF__
 }
 template <typename T, typename Container, typename CmpFunctor>
