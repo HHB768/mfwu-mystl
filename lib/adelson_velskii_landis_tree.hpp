@@ -57,7 +57,6 @@ public:
     avl_tree(const std::initializer_list<value_type>& vals) 
         : root_(nullptr) {
         for (const value_type& val : vals) {
-            // std::cout << "push: " << val << "\n";
             push(val);
         }
     }
@@ -129,13 +128,13 @@ public:
         maintain_up(parent);
     }
 
-    void pre_order(void(*usr_func)(const value_type& val)) {
+    void pre_order(void(*usr_func)(node*)) {
         pre_order_aux(root_, usr_func);
     }
-    void in_order(void(*usr_func)(const value_type& val)) {
+    void in_order(void(*usr_func)(node*)) {
         in_order_aux(root_, usr_func);
     }
-    void post_order(void(*usr_func)(const value_type& val)) {
+    void post_order(void(*usr_func)(node*)) {
         post_order_aux(root_, usr_func);
     }
     mfwu::vector<value_type> sequentialize() const  {
@@ -200,7 +199,6 @@ private:
             node* cur = new node(val);
             return cur;
         }
-        // root->height++;
         node* parent = root->parent;
         if (val >= root->val) {
             node* ret = push(root->right, val);
@@ -211,8 +209,6 @@ private:
             root->height = height(root);
             if ((ssize_t)height(root->right) - 
                 (ssize_t)height(root->left) > 1) {
-                // std::cout << height(root->left) << " "
-                // << height(root->right) << "\n";
                 maintain_r(root);
             }
         } else {
@@ -224,12 +220,9 @@ private:
             root->height = height(root);
             if ((ssize_t)height(root->left) - 
                 (ssize_t)height(root->right) > 1) {
-                // std::cout << height(root->left) << " "
-                // << height(root->right) << "\n";
                 maintain_l(root);
             }
         }
-        // if (parent) parent->height = height(parent);
         return nullptr;
     }
     void maintain_l(node* root) {
@@ -258,7 +251,6 @@ private:
         node* parent = root->parent;
         node* left = root->left;
         node* leftright = root->left->right;
-        // std::cout << "ll" << root->val << "\n";
         left->parent = parent;
         if (parent) {
             if (parent->left == root) {
@@ -278,15 +270,12 @@ private:
             leftright->parent = root;
         }
         root->height = height(root);
-        // std::cout << "root->height = " << root->height << "\n";
         left->height = height(left);
-        // std::cout << "left->height = " << left->height << "\n";
     }
     void rotate_rr(node* root) {
         node* parent = root->parent;
         node* right = root->right;
         node* rightleft = root->right->left;
-        // std::cout << "rr" << root->val << "\n";
         right->parent = parent;
         if (parent) {
             if (parent->left == root) {
@@ -306,9 +295,7 @@ private:
             rightleft->parent = root;
         }
         root->height = height(root);
-        // std::cout << "root->height = " << root->height << "\n";
         right->height = height(right);
-        // std::cout << "right->height = " << right->height << "\n";
     }
     void rotate_lr(node* root) {
         rotate_rr(root->left);
@@ -320,13 +307,16 @@ private:
     }
 
     void pop_node(node* root, node* next) {
+        if (root == nullptr) return ;
         if (root->parent == nullptr) {
             root_ = next;
             root_->parent = nullptr;
         } else if (root->parent->left == root) {
             root->parent->left = next;
+            if (next) next->parent = root->parent;
         } else {
             root->parent->right = next;
+            if (next) next->parent = root->parent;
         }
         delete root;
     }
@@ -356,31 +346,28 @@ private:
         if (root->right) h = max(h, root->right->height);
         return h + 1;
     }
-    void pre_order_aux(node* root, void(*usr_func)(const value_type& val)) {
+    void pre_order_aux(node* root, void(*usr_func)(node*)) {
         if (root == nullptr) { return ; }
-        usr_func(root->val);
+        usr_func(root);
         pre_order_aux(root->left, usr_func);
         pre_order_aux(root->right, usr_func);
     }
-    void in_order_aux(node* root, void(*usr_func)(const value_type& val)) {
+    void in_order_aux(node* root, void(*usr_func)(node*)) {
         if (root == nullptr) { return ; }
         in_order_aux(root->left, usr_func);
-        usr_func(root->val);
+        usr_func(root);
         in_order_aux(root->right, usr_func);
     }
-    void post_order_aux(node* root, void(*usr_func)(const value_type& val)) {
+    void post_order_aux(node* root, void(*usr_func)(node*)) {
         if (root == nullptr) { return ; }
         post_order_aux(root->left, usr_func);
         post_order_aux(root->right, usr_func);
-        usr_func(root->val);
+        usr_func(root);
     }
     node* search(node* root, const value_type& val) {
-        std::cout << "????\n";
         if (root == nullptr) { return nullptr; }
-        std::cout << root->val << "??\n";
         if (root->val == val) { return root; }
         if (root->val > val) {
-            std::cout << "???\n";
             return search(root->left, val);
         } else {
             return search(root->right, val);

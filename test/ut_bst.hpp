@@ -119,6 +119,7 @@ bool unit_test_bst::use_mfwu_bst() {
               << (ans->right ? std::to_string(ans->right->val) : "null") << "\n";
 #endif  // __UNIT_TEST_BST_BRIEF__
 
+    std::cout << "traversing\n";
     bst6.pre_order(&test_func<int>);
 #ifndef __UNIT_TEST_BST_BRIEF__
     std::cout << "\n";
