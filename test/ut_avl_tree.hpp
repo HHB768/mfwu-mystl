@@ -31,24 +31,41 @@ bool unit_test_avl_tree::use_avl_tree() {
     print_detailed_info(av1);
     mfwu::avl_tree<int> av2 = {1, 2, 3, 4, 5, 6, 7, 8, 9,
                                9, 8, 7, 6, 5, 4, 3, 2, 1,
-                               1, 2, 3, 4, 5, 6, 7, 8, 9,
-                               1, 2, 3};
+                               2, 5, 1, 6, 9, 1, 2, 3, 5};
     print_detailed_info(av2);
-    // mfwu::avl_tree<int> av3 = av1;
-    // print_detailed_info(av3);
-    // mfwu::avl_tree<int> av4 = mfwu::move(av2);
-    // print_detailed_info(av4);
-    // mfwu::avl_tree<int> av5 = {3, 4, 1, 1, 1, 5, 5, 5, 9, 4};
-    // print_detailed_info(av5);
-    // mfwu::avl_tree<int> av6;
-    // av6 = av5;
-    // print_detailed_info(av6);
-    // av6 = mfwu::move(av3);
-    // print_detailed_info(av6);
+    mfwu::avl_tree<int> av3 = av1;
+    print_detailed_info(av3);
+    mfwu::avl_tree<int> av4 = mfwu::move(av2);
+    print_detailed_info(av4);
+    mfwu::avl_tree<int> av5 = {3, 4, 1, 1, 1, 5, 5, 5, 9, 4};
+    print_detailed_info(av5);
+    mfwu::avl_tree<int> av6;
+    av6 = av5;
+    print_detailed_info(av6);
+    av6 = mfwu::move(av3);
+    print_detailed_info(av6);
 
-    // av2.rotate_ll(av2.root_->left->right);
-    av2.push(4);
-    print_detailed_info(av2);
+    av5.push(4);
+    av5.push(1);
+    av5.push(0);
+    av5.push(2);
+    av5.push(9);
+    print_detailed_info(av5);
+    for (int i = 0; i < 20; i++) { av5.push(0); }
+    print_detailed_info(av5);
+    
+    print_detailed_info(av4);
+    av4.pop();
+    print_detailed_info(av4);
+    av4.pop(4);
+    print_detailed_info(av4);
+    av4.pop(4);
+    print_detailed_info(av4);
+    av4.pop(4);
+    print_detailed_info(av4);
+    mfwu::avl_tree<int>::node* cur = av4.search(6);
+    av4.pop(cur);
+    print_detailed_info(av4);
 
     return 0;
 }

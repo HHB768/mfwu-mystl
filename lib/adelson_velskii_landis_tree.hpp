@@ -57,8 +57,8 @@ public:
     avl_tree(const std::initializer_list<value_type>& vals) 
         : root_(nullptr) {
         for (const value_type& val : vals) {
+            // std::cout << "push: " << val << "\n";
             push(val);
-            std::cout << "push: " << val << "\n";
         }
     }
     avl_tree(const avl_tree& av) {
@@ -109,8 +109,8 @@ public:
         
     }
     void pop(node* root) {
-        node* parent = root->parent;
         if (root == nullptr) return ;
+        node* parent = root->parent;
         if (root->left == nullptr && root->right == nullptr) {
             pop_node(root, nullptr);
         } else if (root->left == nullptr) {
@@ -200,17 +200,19 @@ private:
             node* cur = new node(val);
             return cur;
         }
-        root->height++;
+        // root->height++;
+        node* parent = root->parent;
         if (val >= root->val) {
             node* ret = push(root->right, val);
             if (ret) {
                 ret->parent = root;
                 root->right = ret;
             }
+            root->height = height(root);
             if ((ssize_t)height(root->right) - 
                 (ssize_t)height(root->left) > 1) {
-                // std::cout << height(root->right) << " "
-                // << height(root->left) << "\n";
+                // std::cout << height(root->left) << " "
+                // << height(root->right) << "\n";
                 maintain_r(root);
             }
         } else {
@@ -219,11 +221,15 @@ private:
                 ret->parent = root;
                 root->left = ret;
             }
+            root->height = height(root);
             if ((ssize_t)height(root->left) - 
                 (ssize_t)height(root->right) > 1) {
+                // std::cout << height(root->left) << " "
+                // << height(root->right) << "\n";
                 maintain_l(root);
             }
         }
+        // if (parent) parent->height = height(parent);
         return nullptr;
     }
     void maintain_l(node* root) {
@@ -252,7 +258,7 @@ private:
         node* parent = root->parent;
         node* left = root->left;
         node* leftright = root->left->right;
-        std::cout << "ll" << root->val << "\n";
+        // std::cout << "ll" << root->val << "\n";
         left->parent = parent;
         if (parent) {
             if (parent->left == root) {
@@ -272,13 +278,15 @@ private:
             leftright->parent = root;
         }
         root->height = height(root);
+        // std::cout << "root->height = " << root->height << "\n";
         left->height = height(left);
+        // std::cout << "left->height = " << left->height << "\n";
     }
     void rotate_rr(node* root) {
         node* parent = root->parent;
         node* right = root->right;
         node* rightleft = root->right->left;
-        std::cout << "rr" << root->val << "\n";
+        // std::cout << "rr" << root->val << "\n";
         right->parent = parent;
         if (parent) {
             if (parent->left == root) {
@@ -298,7 +306,9 @@ private:
             rightleft->parent = root;
         }
         root->height = height(root);
+        // std::cout << "root->height = " << root->height << "\n";
         right->height = height(right);
+        // std::cout << "right->height = " << right->height << "\n";
     }
     void rotate_lr(node* root) {
         rotate_rr(root->left);
@@ -322,17 +332,16 @@ private:
     }
     void maintain_up(node* parent) {
         if (parent == nullptr) return ;
-        parent->height--;
-        while (parent->parent) {
-            parent = parent->parent;
-            parent->height--;
-            if ((ssize_t)parent->left->height - 
-                (ssize_t)parent->right->height > 1) {
+        while (parent) {
+            parent->height = height(parent);
+            if ((ssize_t)height(parent->left) - 
+                (ssize_t)height(parent->right) > 1) {
                 maintain_l(parent);
-            } else if ((ssize_t)parent->right->height - 
-                       (ssize_t)parent->left->height > 1) {
+            } else if ((ssize_t)height(parent->right) - 
+                       (ssize_t)height(parent->left) > 1) {
                 maintain_r(parent);
             }
+            parent = parent->parent;
         }
     }
 
@@ -366,9 +375,12 @@ private:
         usr_func(root->val);
     }
     node* search(node* root, const value_type& val) {
+        std::cout << "????\n";
         if (root == nullptr) { return nullptr; }
+        std::cout << root->val << "??\n";
         if (root->val == val) { return root; }
         if (root->val > val) {
+            std::cout << "???\n";
             return search(root->left, val);
         } else {
             return search(root->right, val);
