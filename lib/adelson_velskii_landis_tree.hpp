@@ -247,6 +247,7 @@ private:
         destroy_tree(root->right);
         delete root;
     }
+    // ll and rotate_right
     void rotate_ll(node* root) {
         node* parent = root->parent;
         node* left = root->left;
@@ -272,6 +273,7 @@ private:
         root->height = height(root);
         left->height = height(left);
     }
+    // rr and rotate_left
     void rotate_rr(node* root) {
         node* parent = root->parent;
         node* right = root->right;
@@ -375,7 +377,7 @@ private:
     }
     
     node* root_;
-};  // endof class mfwu
+};  // endof class avl_tree
 
 }  // endof namespace mfwu
 

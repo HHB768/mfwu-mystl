@@ -8,7 +8,8 @@
 #   define __UNIT_TEST_LIST_BRIEF__
 #   define __UNIT_TEST_HEAP_BRIEF__
 #   define __UNIT_TEST_BST_BRIEF__
-// #   define __UNIT_TEST_AVL_TREE_BRIEF__
+#   define __UNIT_TEST_AVL_TREE_BRIEF__
+#   define __UNIT_TEST_RBTREE_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -25,6 +26,7 @@
 #include "ut_heap.hpp"
 #include "ut_bst.hpp"
 #include "ut_avl_tree.hpp"
+#include "ut_rbtree.hpp"
 
 int main() {
     int ttotal = 0;
@@ -36,6 +38,7 @@ int main() {
     mfwu::unit_test_heap ut_heap;
     mfwu::unit_test_bst ut_bst;
     mfwu::unit_test_avl_tree ut_avl_tree;
+    mfwu::unit_test_rbtree ut_rbtree;
 
     int score = 0;
     int total = 2;
@@ -107,6 +110,14 @@ int main() {
     ttotal += total;
     score += !ut_avl_tree.use_avl_tree();
     score += !ut_avl_tree.use_cmp_functor();
+    std::cout << "\n---------- AVL_tree test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 2;
+    ttotal += total;
+    score += !ut_rbtree.use_rbtree_push();
+    score += !ut_rbtree.use_rbtree_pop();
     std::cout << "\n---------- AVL_tree test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
