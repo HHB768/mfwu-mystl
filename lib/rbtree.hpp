@@ -101,9 +101,37 @@ public:
     }
     void pop(node* root) {
         if (root == nullptr) return ;
-        // TODO
-    }
-    
+        if (root->color == red) {
+            if (root->left == nullptr && root->right == nullptr) {
+                pop_node(root, nullptr);
+            } else if (root->left == nullptr) {
+                pop_node(root, root->right);
+            } else if (root->right == nullptr) {
+                pop_node(root, root->left);
+            } else {  // has both children
+                node* next = get_successor(root);
+                root->val = next->val;
+                pop(next);
+            }
+        } else {  // root is black 
+            // TODO: can we conclude these into uxy?
+            if (root->left == nullptr && root->right == nullptr) {
+                pop_node(root, nullptr);
+                // TODO: maintain
+            } else if (root->left == nullptr) {
+                // 必是右边单走一个红
+                root->val = root->right->val;
+                delete root->right;
+                root->right = nullptr;
+            } else if (root->right == nullptr) {
+                root->val = root->left->val;
+                delete root->left;
+                root->left = nullptr;
+            } else {
+
+            }
+        }
+    }    
     void pre_order(void(*usr_func)(node*)) {
         pre_order_aux(root_, usr_func);
     }
@@ -360,6 +388,90 @@ private:
         root->left = leftright;
         if (leftright) {
             leftright->parent = root;
+        }
+    }
+
+    void pop_node(node* root, node* next) {
+        if (root == nullptr) return ;
+        if (root->parent == nullptr) {
+            set_root(next);
+        } else if (root->parent->left == root) {
+            root->parent->left = next;
+            if (next) { next->parent = root->parent; }
+        } else {
+            root->parent->right = next;
+            if (next) { next->parent = root->parent; }
+        }
+        delete root;
+    }
+    static node* get_successor(node* root) {
+        if (root == nullptr || root->right == nullptr) {
+            return nullptr;
+        }
+        node* next = root->right;
+        while (next->left != nullptr) {
+            next = next->left;
+        }
+        return next;
+    }
+    void brr(node* root) {
+        // impossible
+    }
+    void brb(node* root) {
+        // 'r' must be a leaf
+        // last 'b' must be nullptr
+        node* next = get_successor(root);  // TODO: 上层找过了，别再找了，直接传进来
+        root->val = next->val;
+        pop_node(next, nullptr);  // or pop(next), whatever
+    }
+    void bbr(node* root) {
+        // 'r' must be a leaf
+        node* next = get_successor(root);
+        node* nnext = get_successor(next);
+        root->val = next->val;
+        next->val = nnext->val;
+        next->color = black;
+        pop_node(nnext, nullptr);
+    }
+    void bbb(node* root) {
+        // last 'b' must be nullptr
+        node* next = get_successor(root);
+        if (next == nullptr) {
+            // root is leaf
+            node* parent = root->parent;
+            node* brother = nullptr;
+            if (parent->left == root) {
+                brother = parent->right;
+                pop_node(root, nullptr);
+                if (color(brother) == red) {
+                    Lr();
+                } else {
+                    Lb();
+                }
+            } else {
+                brother = parent->left;
+                pop_node(root, nullptr);
+                if (color(brother) == red) {
+                    Rr();
+                } else {
+                    Rb();
+                }
+            }
+        }
+        root->val = next->val;
+    }
+    void Lr() {}
+    void Lb() {}
+    void Rr() {
+
+    }
+    void Rb(node* brother) {
+        if (color(brother->left) == black && color(brother->right) == black) {
+            Rb0();
+        } else if (color(brother->left) == black && color(brother->right) == red) {
+            Rb2();
+        } else {
+            Rb1();
         }
     }
     
