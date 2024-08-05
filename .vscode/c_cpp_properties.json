@@ -9,7 +9,7 @@
                 "${workspaceFolder}/test"
             ],
             "defines": [
-                "__UNIT_TEST_ALLOCATOR__=1"
+                // "__UNIT_TEST_ALLOCATOR__=1"
             ],
             "cStandard": "c17",
             "cppStandard": "gnu++17",
