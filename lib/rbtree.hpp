@@ -460,18 +460,38 @@ private:
         }
         root->val = next->val;
     }
-    void Lr() {}
-    void Lb() {}
-    void Rr() {
-
+    void Lr() {}  // sym
+    void Lb() {}  // sym
+    void Rr(node* brother) {
+        node* parent = brother->parent;
+        brother->color = black;
+        parent->color = red;
+        rotate_right(parent);
+        Rb(parent->left);
     }
     void Rb(node* brother) {
+        node* parent = brother->parent;
         if (color(brother->left) == black && color(brother->right) == black) {
-            Rb0();
+            // Rb0
+            parent->color = black;
+            brother->color = red;
+            bbb(parent);  // TODO: check
         } else if (color(brother->left) == black && color(brother->right) == red) {
-            Rb2();
-        } else {
-            Rb1();
+            // Rb2
+            brother->color = red;
+            brother->right->color = black;
+            rotate_left(brother);
+            // change into Rb1
+            parent->left->color = parent->color;
+            parent->color = black;
+            parent->left->left->color = black;
+            rotate_right(parent);
+        } else {  // color(brother->left) == red
+            // Rb1
+            brother->color = parent->color;
+            parent->color = black;
+            brother->left->color = black;
+            rotate_right(parent);
         }
     }
     
