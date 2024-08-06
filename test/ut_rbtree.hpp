@@ -74,6 +74,16 @@ bool unit_test_rbtree::use_rbtree_push() {
 }
 
 bool unit_test_rbtree::use_rbtree_pop() {
+    mfwu::rbtree<int> rbt1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    print_detailed_info(rbt1);
+    rbt1.pop();
+    print_detailed_info(rbt1);
+    rbt1.pop(2);
+    print_detailed_info(rbt1);
+    rbt1.pop(5);
+    print_detailed_info(rbt1);
+    rbt1.pop();
+    print_detailed_info(rbt1);
 
     return 0;
 }

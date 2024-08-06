@@ -55,7 +55,6 @@ public:
     rbtree() : root_(nullptr) {}
     rbtree(const std::initializer_list<value_type>& vals) : root_(nullptr) {
         for (auto&& val : vals) { 
-            std::cout << "push value: " << val << "\n";
             push(val); 
         }
     }
@@ -102,33 +101,51 @@ public:
     void pop(node* root) {
         if (root == nullptr) return ;
         if (root->color == red) {
+            std::cout << "pop red: " << root->val << "\n";
             if (root->left == nullptr && root->right == nullptr) {
+                std::cout << "pop red leaf\n";
                 pop_node(root, nullptr);
             } else if (root->left == nullptr) {
-                pop_node(root, root->right);
+                // pop_node(root, root->right);  // is it possible?
+                std::cout << "a?\n";
             } else if (root->right == nullptr) {
-                pop_node(root, root->left);
+                // pop_node(root, root->left);  // is it possible?
+                std::cout << "b?\n";
             } else {  // has both children
+                std::cout << "pop red inner node\n";
                 node* next = get_successor(root);
                 root->val = next->val;
-                pop(next);
+                pop(next);  // remains the structure and pop successor
             }
         } else {  // root is black 
             // TODO: can we conclude these into uxy?
+            std::cout << "pop black: " << root->val << "\n";
             if (root->left == nullptr && root->right == nullptr) {
-                pop_node(root, nullptr);
-                // TODO: maintain
+                std::cout << "pop black leaf\n";
+                bbb(root, nullptr, nullptr);
             } else if (root->left == nullptr) {
+                std::cout << "pop black node 1r\n";
                 // 必是右边单走一个红
                 root->val = root->right->val;
+                // = pop_node(root->right, nullptr)
                 delete root->right;
                 root->right = nullptr;
             } else if (root->right == nullptr) {
+                std::cout << "pop black node 1l\n";
                 root->val = root->left->val;
                 delete root->left;
                 root->left = nullptr;
             } else {
-
+                std::cout << "pop black node 2\n";
+                node* next = get_successor(root);
+                node* nnext = get_successor(next);
+                if (color(next) == black && color(nnext) == black) {
+                    bbb(root, next, nnext);
+                } else if (color(next) == red) {
+                    brb(root, next, nnext);  // nnext must be nullptr
+                } else {
+                    bbr(root, next, nnext);
+                }
             }
         }
     }    
@@ -220,8 +237,6 @@ private:
             if (ret) {  // xrx
                 ret->parent = root;
                 root->right = ret;
-                std::cout << "ret color : " << ret->color << "    "
-                          << "root color : " << root->color << "\n"; 
                 if (root->color == red) {
                     // root->parent must exist
                     // bcz root is red then it is not root_
@@ -235,7 +250,6 @@ private:
                         if (color(parent->left) == red) {
                             rrr(parent);
                         } else { // black
-                            std::cout << "here\n";
                             rrb(parent);
                         }
                     }
@@ -417,25 +431,28 @@ private:
     void brr(node* root) {
         // impossible
     }
-    void brb(node* root) {
+    void brb(node* root, node* next, node* nnext) {
         // 'r' must be a leaf
         // last 'b' must be nullptr
-        node* next = get_successor(root);  // TODO: 上层找过了，别再找了，直接传进来
+        std::cout << "brb: " << root->val << "\n";
         root->val = next->val;
         pop_node(next, nullptr);  // or pop(next), whatever
     }
-    void bbr(node* root) {
+    void bbr(node* root, node* next, node* nnext) {
+        std::cout << "bbr: " << root->val << "\n";
         // 'r' must be a leaf
-        node* next = get_successor(root);
-        node* nnext = get_successor(next);
         root->val = next->val;
         next->val = nnext->val;
         next->color = black;
         pop_node(nnext, nullptr);
+        // or (TODO)
+        // root->val = next->val;
+        // pop_node(next, nnext);
+        // nnext->color = black;
     }
-    void bbb(node* root) {
+    void bbb(node* root, node* next, node* nnext) {
+        std::cout << "bbb: " << root->val << "\n";
         // last 'b' must be nullptr
-        node* next = get_successor(root);
         if (next == nullptr) {
             // root is leaf
             node* parent = root->parent;
@@ -444,38 +461,80 @@ private:
                 brother = parent->right;
                 pop_node(root, nullptr);
                 if (color(brother) == red) {
-                    Lr();
+                    Lr(brother);
                 } else {
-                    Lb();
+                    Lb(brother);
                 }
             } else {
                 brother = parent->left;
                 pop_node(root, nullptr);
                 if (color(brother) == red) {
-                    Rr();
+                    Rr(brother);
                 } else {
-                    Rb();
+                    Rb(brother);
                 }
             }
+        } else {
+            root->val = next->val;
+            // next is leaf
+            bbb(next, nullptr, nullptr);
         }
-        root->val = next->val;
+        
     }
-    void Lr() {}  // sym
-    void Lb() {}  // sym
-    void Rr(node* brother) {
+    void Lr(node* brother) {
+        std::cout << "Lr: " << brother->val << "\n";
         node* parent = brother->parent;
         brother->color = black;
         parent->color = red;
-        rotate_right(parent);
-        Rb(parent->left);
-    }
-    void Rb(node* brother) {
+        rotate_left(parent);
+        Lb(parent->right);
+    }  // sym
+    void Lb(node* brother) {
+        std::cout << "Lb: " << brother->val << "\n";
         node* parent = brother->parent;
         if (color(brother->left) == black && color(brother->right) == black) {
-            // Rb0
+            // in this senario, brother should be a leaf
+            // Lb0
+            bool flag = parent->color == black;
             parent->color = black;
             brother->color = red;
-            bbb(parent);  // TODO: check
+            // maintain(brother(parent));
+            if (flag) maintain_up(parent);
+        } else if (color(brother->left) == red && color(brother->right) == black) {
+            // Lb2
+            brother->color = red;
+            brother->left->color = black;
+            rotate_right(brother);
+            // Lb1
+            parent->right->color = parent->color;
+            parent->color = black;
+            parent->right->right->color = black;
+            rotate_left(parent);
+        } else {  // color(brother->right) == red
+            brother->color = parent->color;
+            parent->color = black;
+            brother->right->color = black;
+            rotate_left(parent);
+        }
+    }  // sym
+    void Rr(node* brother) {
+        std::cout << "Rr: " << brother->val << "\n";
+        node* parent = brother->parent;  // TODO: root_
+        brother->color = black;
+        parent->color = red;
+        rotate_right(parent);
+        Rb(parent->left);  // !
+    }
+    void Rb(node* brother) {
+        std::cout << "Rb: " << brother->val << "\n";
+        node* parent = brother->parent;  // TODO: root_
+        if (color(brother->left) == black && color(brother->right) == black) {
+            // Rb0
+            bool flag = parent->color == black;
+            parent->color = black;
+            brother->color = red;
+            // maintain(brother(parent));
+            if (flag) maintain_up(parent);
         } else if (color(brother->left) == black && color(brother->right) == red) {
             // Rb2
             brother->color = red;
@@ -492,6 +551,28 @@ private:
             parent->color = black;
             brother->left->color = black;
             rotate_right(parent);
+        }
+    }
+    void maintain_up(node* parent) {
+        std::cout << "maintain_up: " << parent->val << "\n";
+        node* gparent = parent->parent;
+        node* brother = nullptr;
+        if (gparent != nullptr) {
+            if (gparent->left == parent) {
+                brother = gparent->right;
+                if (color(brother) == red) {
+                    Lr(brother);
+                } else {
+                    Lb(brother);
+                }
+            } else {
+                brother = gparent->left;
+                if (color(brother) == red) {
+                    Rr(brother);
+                } else {
+                    Rb(brother);
+                }
+            }
         }
     }
     
