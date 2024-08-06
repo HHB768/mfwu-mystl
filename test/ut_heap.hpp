@@ -44,7 +44,7 @@ void unit_test_heap::print_heap_detail(const mfwu::heap<T, Container, CmpFunctor
 }
 
 bool unit_test_heap::use_mfwu_heap() {
-    std::cout << "\n------- Test: use mfwu heap -------\n";
+    std::cout << "\n------- Test: use mfwu::heap -------\n";
     std::cout << "making heap\n";
     mfwu::heap<int> hp1 = {1, 2, 3, 4, 5, 6, 7, 2,
                            2, 5, 6, 6, 8, 8, 3};
@@ -60,7 +60,7 @@ bool unit_test_heap::use_mfwu_heap() {
     hp6 = hp1;
     print_heap_detail(hp6);
 
-    std::cout << "random push/pop test: part 1\n";
+    std::cout << "random pushing/poping test: part 1\n";
     hp5.push(3);
     print_heap_struct(hp5);
     hp5.push(5);
@@ -75,7 +75,7 @@ bool unit_test_heap::use_mfwu_heap() {
     print_heap_struct(hp5);
     hp5.pop();
     print_heap_struct(hp5);
-    std::cout << "random push/pop test: part 2\n";
+    std::cout << "random pushing/poping test: part 2\n";
     hp6.push(1);
     print_heap_struct(hp6);
     hp6.push(9);

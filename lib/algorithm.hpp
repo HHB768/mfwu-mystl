@@ -114,6 +114,36 @@ void print_heap_struct(const Sequence& seq) {
     }
     if (col_idx) { std::cout << "\n"; }
 }
+template <typename Sequence>
+void print_rbtree_heap_struct(const Sequence& seq) {
+    int rounded_size = roundup22(seq.size());
+    int max_width = rounded_size;
+    int line_idx = 0;
+    int col_num = 1;
+    int col_idx = 0;
+
+    for (int i = 0; i < seq.size(); i++) {
+        print_space(max_width / col_num);
+        auto node = seq[i];
+        if (node == nullptr) {
+            std::cout << "\033[0;35m" << "." << "\033[0m";
+        } else if (node->color) {
+            std::cout << "\033[0;32m" << seq[i]->val << "\033[0m";
+        } else {
+            std::cout << "\033[0;31m" << seq[i]->val << "\033[0m";
+        }
+        
+        print_space(max_width / col_num - 1);
+        col_idx++;
+        if (col_idx >= col_num) {
+            line_idx++;
+            col_num *= 2;
+            col_idx = 0;
+            std::cout << "\n";
+        }
+    }
+    if (col_idx) { std::cout << "\n"; }
+}
 
 }  // endof namespace mfwu
 

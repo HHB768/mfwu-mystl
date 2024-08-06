@@ -39,7 +39,7 @@ void test_func(Node* root) {
 }
 
 bool unit_test_avl_tree::use_avl_tree() {
-    std::cout << "\n------- Test: use avl tree -------\n";
+    std::cout << "\n------- Test: use mfwu::avl_tree -------\n";
     std::cout << "building Adelson-Velskii-Landis tree\n";
     mfwu::avl_tree<int> av1;
     print_detailed_info(av1);
@@ -59,7 +59,7 @@ bool unit_test_avl_tree::use_avl_tree() {
     av6 = mfwu::move(av1);
     print_detailed_info(av6);
 
-    std::cout << "random push test\n";
+    std::cout << "random pushing test\n";
     av5.push(4);
     av5.push(1);
     av5.push(0);
@@ -69,7 +69,7 @@ bool unit_test_avl_tree::use_avl_tree() {
     for (int i = 0; i < 20; i++) { av5.push(0); }
     print_detailed_info(av5);
     
-    std::cout << "random pop test\n";
+    std::cout << "random poping test\n";
     print_detailed_info(av4);
     av4.pop();
     print_detailed_info(av4);

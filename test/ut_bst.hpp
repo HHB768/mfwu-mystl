@@ -49,7 +49,7 @@ void test_func(const T& val) {
 }
 
 bool unit_test_bst::use_mfwu_bst() {
-    std::cout << "\n------- Test: use mfwu bst -------\n";
+    std::cout << "\n------- Test: use mfwu::binary_search_tree -------\n";
     std::cout << "building binary search tree\n";
     mfwu::binary_search_tree<int> bst1;
     print_detailed_info(bst1);
@@ -69,7 +69,7 @@ bool unit_test_bst::use_mfwu_bst() {
     bst7 = mfwu::move(bst3);
     print_detailed_info(bst7);
 
-    std::cout << "random push/pop test: part 1\n";
+    std::cout << "random pushing/poping test: part 1\n";
     bst6.push(1);
     print_detailed_info(bst6);
     bst6.push(4);
@@ -89,7 +89,7 @@ bool unit_test_bst::use_mfwu_bst() {
     bst6.pop(bst6.root_->left);
     print_detailed_info(bst6);
 
-    std::cout << "random push/pop test: part 2\n";
+    std::cout << "random pushing/poping test: part 2\n";
     bst7.push(1);
     print_detailed_info(bst7);
     bst7.push(9);

@@ -73,7 +73,7 @@ void print_detailed_info(const mfwu::forward_list<T>& lst) {
 }
 
 bool unit_test_list::use_mfwu_forward_list() {
-    std::cout << "\n------- Test: use mfwu_forward_list -------\n";
+    std::cout << "\n------- Test: use mfwu::forward_list -------\n";
     std::cout << "constructing & copying & moving\n";
     mfwu::forward_list<data> lst1;
     print_detailed_info(lst1);
@@ -185,7 +185,7 @@ void print_detailed_info(const mfwu::list<T>& lst) {
 }
 
 bool unit_test_list::use_mfwu_list() {
-    std::cout << "\n------- Test: use mfwu_list -------\n";
+    std::cout << "\n------- Test: use mfwu::list -------\n";
     std::cout << "constructing & copying & moving\n";
     mfwu::list<data> lst1;
     print_detailed_info(lst1);

@@ -1,6 +1,17 @@
 #ifndef __RBTREE_HPP__
 #define __RBTREE_HPP__
 
+// default
+// #deine __RBTREE_DEBUG__
+
+#ifdef __GLOBAL_DEBUG__
+#   define __RBTREE_DEBUG__
+#else
+#   ifdef __UNIT_TEST_RBTREE_BRIEF__
+#       undef __RBTREE_DEBUG__
+#   endif  // __UNIT_TEST_RBTREE_BRIEF__
+#endif // __GLOBAL_DEBUG__
+
 #include "common.hpp"
 #include "algorithm.hpp"
 #include "adelson_velskii_landis_tree.hpp"
@@ -101,42 +112,62 @@ public:
     void pop(node* root) {
         if (root == nullptr) return ;
         if (root->color == red) {
+#ifdef __RBTREE_DEBUG__
             std::cout << "pop red: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
             if (root->left == nullptr && root->right == nullptr) {
+#ifdef __RBTREE_DEBUG__
                 std::cout << "pop red leaf\n";
+#endif  // __RBTREE_DEBUG__
                 pop_node(root, nullptr);
             } else if (root->left == nullptr) {
                 // pop_node(root, root->right);  // is it possible?
+#ifdef __RBTREE_DEBUG__
                 std::cout << "a?\n";
+#endif  // __RBTREE_DEBUG__
             } else if (root->right == nullptr) {
                 // pop_node(root, root->left);  // is it possible?
+#ifdef __RBTREE_DEBUG__
                 std::cout << "b?\n";
+#endif  // __RBTREE_DEBUG__
             } else {  // has both children
+#ifdef __RBTREE_DEBUG__
                 std::cout << "pop red inner node\n";
+#endif  // __RBTREE_DEBUG__
                 node* next = get_successor(root);
                 root->val = next->val;
                 pop(next);  // remains the structure and pop successor
             }
         } else {  // root is black 
             // TODO: can we conclude these into uxy?
+#ifdef __RBTREE_DEBUG__
             std::cout << "pop black: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
             if (root->left == nullptr && root->right == nullptr) {
+#ifdef __RBTREE_DEBUG__
                 std::cout << "pop black leaf\n";
+#endif  // __RBTREE_DEBUG__
                 bbb(root, nullptr, nullptr);
             } else if (root->left == nullptr) {
+#ifdef __RBTREE_DEBUG__
                 std::cout << "pop black node 1r\n";
+#endif  // __RBTREE_DEBUG__
                 // 必是右边单走一个红
                 root->val = root->right->val;
                 // = pop_node(root->right, nullptr)
                 delete root->right;
                 root->right = nullptr;
             } else if (root->right == nullptr) {
+#ifdef __RBTREE_DEBUG__
                 std::cout << "pop black node 1l\n";
+#endif  // __RBTREE_DEBUG__
                 root->val = root->left->val;
                 delete root->left;
                 root->left = nullptr;
             } else {
+#ifdef __RBTREE_DEBUG__
                 std::cout << "pop black node 2\n";
+#endif  // __RBTREE_DEBUG__
                 node* next = get_successor(root);
                 node* nnext = get_successor(next);
                 if (color(next) == black && color(nnext) == black) {
@@ -314,7 +345,9 @@ private:
     }
     void maintain(node* root) {
         if (root == nullptr) { 
+#ifdef __RBTREE_DEBUG__
             std::cout << "啊？\n"; 
+#endif  // __RBTREE_DEBUG__
         } else if (root->parent == nullptr) { 
             root->color = black;
             return ;
@@ -434,12 +467,16 @@ private:
     void brb(node* root, node* next, node* nnext) {
         // 'r' must be a leaf
         // last 'b' must be nullptr
+#ifdef __RBTREE_DEBUG__
         std::cout << "brb: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         root->val = next->val;
         pop_node(next, nullptr);  // or pop(next), whatever
     }
     void bbr(node* root, node* next, node* nnext) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "bbr: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         // 'r' must be a leaf
         root->val = next->val;
         next->val = nnext->val;
@@ -451,7 +488,9 @@ private:
         // nnext->color = black;
     }
     void bbb(node* root, node* next, node* nnext) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "bbb: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         // last 'b' must be nullptr
         if (next == nullptr) {
             // root is leaf
@@ -482,7 +521,9 @@ private:
         
     }
     void Lr(node* brother) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "Lr: " << brother->val << "\n";
+#endif  // __RBTREE_DEBUG__
         node* parent = brother->parent;
         brother->color = black;
         parent->color = red;
@@ -490,7 +531,9 @@ private:
         Lb(parent->right);
     }  // sym
     void Lb(node* brother) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "Lb: " << brother->val << "\n";
+#endif  // __RBTREE_DEBUG__
         node* parent = brother->parent;
         if (color(brother->left) == black && color(brother->right) == black) {
             // in this senario, brother should be a leaf
@@ -518,7 +561,9 @@ private:
         }
     }  // sym
     void Rr(node* brother) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "Rr: " << brother->val << "\n";
+#endif  // __RBTREE_DEBUG__
         node* parent = brother->parent;  // TODO: root_
         brother->color = black;
         parent->color = red;
@@ -526,7 +571,9 @@ private:
         Rb(parent->left);  // !
     }
     void Rb(node* brother) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "Rb: " << brother->val << "\n";
+#endif  // __RBTREE_DEBUG__
         node* parent = brother->parent;  // TODO: root_
         if (color(brother->left) == black && color(brother->right) == black) {
             // Rb0
@@ -554,7 +601,9 @@ private:
         }
     }
     void maintain_up(node* parent) {
+#ifdef __RBTREE_DEBUG__
         std::cout << "maintain_up: " << parent->val << "\n";
+#endif  // __RBTREE_DEBUG__
         node* gparent = parent->parent;
         node* brother = nullptr;
         if (gparent != nullptr) {
