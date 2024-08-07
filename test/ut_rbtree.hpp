@@ -11,7 +11,7 @@ public:
     bool use_rbtree_push();
     bool use_rbtree_pop();
     bool use_cmp_functor();
-    
+
 private:
     template <typename T, typename CmpFunctor>
     void print_basic_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
@@ -33,6 +33,7 @@ private:
         // print_color_info(rbt);
         // print_tree_struct(rbt.root_);
         print_colored_struct(rbt.root_);
+        is_valid_rbtree(rbt.root_);
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
     template <typename Node>
@@ -102,6 +103,85 @@ private:
         print_rbtree_heap_struct(tree2node(root));
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
+
+    template <typename Node>
+    bool is_valid_rbtree(Node* root) {
+        try {
+            root->color;
+            root->val;
+            root->parent;
+            root->left;
+            root->right;
+        } catch(...) {
+            std::cout << "invalid rbtree\n";
+            return false;
+        }
+        if (root == nullptr) {
+            std::cout << "empty tree\n";
+            return true; 
+        }
+        if (root->color == red) {
+            std::cout << "invalid rbtree\n";
+            return false; 
+        }
+        auto mm = is_valid_rbtree_aux(root);
+#ifndef __UNIT_TEST_RBTREE_BRIEF__
+        if (mm.is_rbtree) {
+            std::cout << "rbtree validated\n";
+            std::cout << "info: \n";
+            std::cout << "min: " << mm.min << "\n";
+            std::cout << "max: " << mm.max << "\n";
+            std::cout << "black cnt in each path: " << mm.black_cnt << "\n";
+            return true;
+        } else {
+            std::cout << "invalid rbtree\n";
+            return false;
+        }
+#endif  // __UNIT_TEST_RBTREE_BRIEF__
+    }
+    template <typename value_type>
+    struct minmax {
+        bool mm_valid = false;
+        bool is_rbtree = true;
+        value_type min;
+        value_type max;
+        int black_cnt = 1;
+    };  // endof class minmax
+    template <typename Node>
+    minmax<decltype(Node::val)> is_valid_rbtree_aux(Node* root) {
+        using return_type = minmax<decltype(Node::val)>;
+        return_type mm = {};
+        if (root == nullptr) { return mm; }
+        if (root->color == red && 
+            (color(root->left) == red || color(root->right) == red)) {
+            mm.is_rbtree = false; return mm;
+        }
+        return_type mm_left = is_valid_rbtree_aux(root->left);
+        return_type mm_right = is_valid_rbtree_aux(root->right);
+        if (mm_left.is_rbtree == false || mm_right.is_rbtree == false
+            || mm_left.black_cnt != mm_right.black_cnt) {
+            mm.is_rbtree = false; return mm;
+        }
+        if (!mm_left.mm_valid) { mm_left.min = mm_left.max = root->val; }
+        if (!mm_right.mm_valid) { mm_right.min = mm_right.max = root->val; }
+        if (root->val < mm_left.max || root->val > mm_right.min) {
+            mm.is_rbtree = false; return mm;
+        }
+        mm.mm_valid = true;
+        mm.is_rbtree = true;
+        mm.min = mm_left.min;
+        mm.max = mm_right.max;
+        mm.black_cnt = mm_left.black_cnt + (root->color);
+        return mm;
+    }
+    template <typename Node>
+    bool color(Node* root) {
+        if (root == nullptr) { return 1; }
+        return root->color;
+    }
+
+    constexpr static bool red = 0;
+    constexpr static bool black = 1;
 
     mfwu::rbtree<int> rbt_;
 
