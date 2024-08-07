@@ -126,7 +126,7 @@ void print_rbtree_heap_struct(const Sequence& seq) {
         print_space(max_width / col_num);
         auto node = seq[i];
         if (node == nullptr) {
-            std::cout << "\033[0;35m" << "." << "\033[0m";
+            std::cout << "\033[0;32m" << "." << "\033[0m";
         } else if (node->color) {
             std::cout << "\033[0;32m" << seq[i]->val << "\033[0m";
         } else {

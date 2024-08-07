@@ -1,9 +1,6 @@
 #ifndef __RBTREE_HPP__
 #define __RBTREE_HPP__
 
-// default
-// #deine __RBTREE_DEBUG__
-
 #ifdef __GLOBAL_DEBUG__
 #   define __RBTREE_DEBUG__
 #else
@@ -11,6 +8,13 @@
 #       undef __RBTREE_DEBUG__
 #   endif  // __UNIT_TEST_RBTREE_BRIEF__
 #endif // __GLOBAL_DEBUG__
+
+// rbtree is complicated and i am not confident
+// i leave some debug output ive used
+// ---- X-H2 24.08.07
+
+// debug rbtree
+// #define __RBTREE_DEBUG__
 
 #include "common.hpp"
 #include "algorithm.hpp"
@@ -258,8 +262,14 @@ private:
         root_->color = black;
     }
     node* push(node* root, const value_type& val) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "push: " << val << "\n";
+#endif  // __RBTREE_DEBUG__
         if (root == nullptr) {
             node* cur = new node(val);
+#ifdef __RBTREE_DEBUG__
+            std::cout << "create new node: " << val << "\n";
+#endif  // __RBTREE_DEBUG__
             return cur;
         }
         node* parent = root->parent;
@@ -312,38 +322,65 @@ private:
     }
     void llr(node* root) {
         // TODO: detect nullptr
+#ifdef __RBTREE_DEBUG__
+        std::cout << "llr: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         root->color = red;
         root->left->color = root->right->color = black;
         maintain(root);
     }
     void rrr(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "rrr: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         llr(root);
     }
     void lrr(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "lrr: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         llr(root);
     }
     void rlr(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "rlr: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         llr(root);
     }
     void llb(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "llb: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         root->color = red;
         root->left->color = black;
         rotate_right(root);
     }
     void rrb(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "rrb: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         root->color = red;
         root->right->color = black;
         rotate_left(root);
     }
     void lrb(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "lrb: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         rotate_left(root->left);
         llb(root);
     }
     void rlb(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "rlb: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         rotate_right(root->right);
         rrb(root);
     }
     void maintain(node* root) {
+#ifdef __RBTREE_DEBUG__
+        std::cout << "maintain: " << root->val << "\n";
+#endif  // __RBTREE_DEBUG__
         if (root == nullptr) { 
 #ifdef __RBTREE_DEBUG__
             std::cout << "啊？\n"; 
@@ -367,7 +404,7 @@ private:
                         llb(gparent);
                     }
                 } else {  // lrx
-                    if (color(gparent->left) == red) {
+                    if (color(gparent->right) == red) {
                         lrr(gparent);
                     } else {  // black
                         lrb(gparent);
@@ -375,7 +412,7 @@ private:
                 }
             } else {  // rxx
                 if (parent->left == root) {
-                    if (color(gparent->right) == red) {
+                    if (color(gparent->left) == red) {
                         rlr(gparent);
                     } else {  // black
                         rlb(gparent);

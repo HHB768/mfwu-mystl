@@ -113,15 +113,21 @@ private:
             root->left;
             root->right;
         } catch(...) {
+#ifndef __UNIT_TEST_RBTREE_BRIEF__
             std::cout << "invalid rbtree\n";
+#endif  // __UNIT_TEST_RBTREE_BRIEF__
             return false;
         }
         if (root == nullptr) {
+#ifndef __UNIT_TEST_RBTREE_BRIEF__
             std::cout << "empty tree\n";
+#endif  // __UNIT_TEST_RBTREE_BRIEF__
             return true; 
         }
         if (root->color == red) {
+#ifndef __UNIT_TEST_RBTREE_BRIEF__
             std::cout << "invalid rbtree\n";
+#endif  // __UNIT_TEST_RBTREE_BRIEF__
             return false; 
         }
         auto mm = is_valid_rbtree_aux(root);
@@ -222,8 +228,13 @@ bool unit_test_rbtree::use_rbtree_push() {
     print_detailed_info(rbt6);
 
     std::cout << "random pushing test: part 2\n";
-    rbt6 = {2, 8, 8, 6, 1, 4, 7, 8, 3, 4, 1,
+    mfwu::vector<int> temp = {2, 8, 8, 6, 1, 4, 7, 8, 3, 4, 1,
             8, 5, 9, 3, 5, 7, 6, 4, 0, 2, 6};
+    rbt6 = mfwu::rbtree<int>{};
+    for (int& i : temp) {
+        rbt6.push(i);
+        print_detailed_info(rbt6);
+    }
     print_detailed_info(rbt6);
     rbt6.push(1);
     print_detailed_info(rbt6);
