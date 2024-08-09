@@ -133,6 +133,7 @@ constexpr std::initializer_list<unsigned long> primer_list = {
       805306457ul,  1610612741ul, 3221225473ul, 4294967291ul
 };
 
+class empty_type {};
 
 }  // endof namespace mfwu
 

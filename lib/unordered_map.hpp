@@ -5,6 +5,8 @@
 #include "iterator.hpp"
 #include "utils.hpp"
 #include <hashtable.h>
+#include <unordered_map>
+
 // TODO: stdby
 namespace mfwu {
 

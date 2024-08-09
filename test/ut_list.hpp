@@ -148,6 +148,9 @@ bool unit_test_list::use_list_iterator() {
                   // it++ is a rvalue
                   // warning! dont use ++/-- in << stream
                   // the computing order may be right2left
+                  
+                  // stl ensures that *it++ is valid
+                  // and returns reference type 24.08.09 
 #else  // __UNIT_TEST_LIST_BRIEF__
         mfwu::distance(lst.begin(), --++it);
         *it = 1;
