@@ -148,6 +148,7 @@ bool unit_test_list::use_list_iterator() {
                   // it++ is a rvalue
                   // warning! dont use ++/-- in << stream
                   // the computing order may be right2left
+                  // [unarchived-07.22] [0809]
                   
                   // stl ensures that *it++ is valid
                   // and returns reference type 24.08.09 

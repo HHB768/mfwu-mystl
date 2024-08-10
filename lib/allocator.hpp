@@ -164,6 +164,7 @@ public:
     // the namespace block is processed by the compiler in its entirety,
     // the compiler can resolve dependencies between classes without
     // the need for forward declarations within that namespace.
+    // X-Q3 24.06.21 [0809]
     
     static void* allocate(size_t n) {
         void* res = malloc(n);

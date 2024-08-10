@@ -17,7 +17,9 @@ class _hashtable_base {
 public:
     using key_type = Key;
     using value_type = Value;
-    using size_type = size_t;
+    using size_type = size_t;  // why we wont support longlong?
+    // bcz the max_primer is unsigned int_max
+    // it is meaningless to distinguish that bigger nums
 
     // we dont consider implement a complete list
     // just usable in hashtable  X-H2 24.08.08
@@ -202,7 +204,7 @@ private:
     }  
     void add_element_cnt(int num) {
         element_cnt += num;
-        if ((float)element_cnt / primer_list[primer_idx] > alpha) {  // constexpr
+        if ((float)element_cnt / primer_list[primer_idx] > alpha) {
             int incr = 1;
             while ((float)element_cnt / primer_list[primer_idx + incr] > alpha) {
                 incr++;
@@ -217,7 +219,7 @@ private:
 };  // endof class _hashtable_base
 
 template <typename Key, 
-          typename Value=mfwu::empty_type, 
+          typename Value/*=mfwu::empty_type*/,   // TODO
           typename Alloc=mfwu::DefaultAllocator<
                          void*, mfwu::malloc_alloc>>
 class hashtable {
@@ -229,53 +231,54 @@ public:
     using list = mfwu::_hashtable_base::_list;
     using node = mfwu::_hashtable_base::_list::node;
 
-    class hashtable_iterator {
-    public:
-        using value_type = Value;  // or Key in the uset?
-        using iterator_category = mfwu::forward_iterator_tag;
-        using pointer = value_type*;
-        using reference = value_type&;
-        using difference_type = mfwu::ptrdiff_t;
+//     class hashtable_iterator {
+//     public:
+//         using value_type = Value;  // or Key in the uset?
+//         using iterator_category = mfwu::forward_iterator_tag;
+//         using pointer = value_type*;
+//         using reference = value_type&;
+//         using difference_type = mfwu::ptrdiff_t;
 
-        hashtable_iterator() : buckets_(nullptr), cur_(nullptr) {}
-        hashtable_iterator(list* buckets, node* cur)
-            : buckets(buckets), cur_(cur) {}
+//         hashtable_iterator() : buckets_(nullptr), cur_(nullptr) {}
+//         hashtable_iterator(list* buckets, node* cur)
+//             : buckets(buckets), cur_(cur) {}
         
-        bool operaotr==(const hashtable_iterator& it) const {
-            return buckets_ == it.buckets_ && cur_ == it.cur_;
-        }
-        bool operator!=(const hashtable_iterator& it) const {
-            return !(*this == it);
-        }
+//         bool operaotr==(const hashtable_iterator& it) const {
+//             return buckets_ == it.buckets_ && cur_ == it.cur_;
+//         }
+//         bool operator!=(const hashtable_iterator& it) const {
+//             return !(*this == it);
+//         }
 
-        value_type& operator*() const {
-            return cur_->value;
-        }
-        value_type* operator->() const {
-            return & this->operator*();
-        }
+//         value_type& operator*() const {
+//             return cur_->value;
+//         }
+//         value_type* operator->() const {
+//             return & this->operator*();
+//         }
 
-        // TODO: BAD DESIGN, you shold make node->next
-        // can across buckets (legacy)
-        hashtable_iterator& operator++() {
-            cur_ = cur_->next;
-            while (cur_ == nullptr) {
-                ++buckets_;
-                cur_ = buckets_->front();
-            }
-            return *this;
-        }
-        hashtable_iterator operator++(int) {
-            hashtable_iterator tmp = *this;
-            this->operator++();
-            return mfwu::move(tmp);
-        }
+//         // TODO: BAD DESIGN, you should make node->next
+//         // can across buckets (LegacyForwardIterator ?)
+//         // or add a machenism that across the valid buckests 
+//         hashtable_iterator& operator++() {
+//             cur_ = cur_->next;
+//             while (cur_ == nullptr) {
+//                 ++buckets_;
+//                 cur_ = buckets_->front();
+//             }
+//             return *this;
+//         }
+//         hashtable_iterator operator++(int) {
+//             hashtable_iterator tmp = *this;
+//             this->operator++();
+//             return mfwu::move(tmp);
+//         }
         
-    private:
-        list* buckets_;
-        node* cur_;
-    }
-    using iterator = hashtable_iterator;
+//     private:
+//         list* buckets_;
+//         node* cur_;
+//     }
+//     using iterator = hashtable_iterator;
     
     hashtable() : table_() {}
     hashtable(const std::initialzied_list<
@@ -297,16 +300,16 @@ public:
 
     bool empty() const { return table_.empty(); }
     size_type size() const { return table_.size(); }
-    iterator begin() const { 
+    // iterator begin() const { 
         // i wonder how to define the begin, and more importantly,
         // the end of hashtable, but after i have seen the source
         // code of stl, i am reminded that i need to keep 2 nodes
         // that called "node_before_begin" and "node_after_end"
-        return before_first_->next;
-    }
-    iterator end() const {
-        return after_last_;
-    }
+        // return before_first_->next;
+    // }
+    // iterator end() const {
+    //     return after_last_;
+    // }
 
     void insert(const key_type& key, const value_type& value) {
         table_.insert(key, val);
@@ -318,10 +321,12 @@ public:
         return *(table_.operator[](key));
     }  // TODO: what if we have a empty value_type?
 private:
-    node* before_first_;  // TODO: i think we need to combime hash and its base
-                          // at least in an inheritance manner, these 2 nodes
-                          // should involve in list building
-    node* after_last_;
+    // node* before_first_;  // TODO: i think we need to combime hash and its base
+    //                       // at least in an inheritance manner, these 2 nodes
+    //                       // should involve in list building
+    // node* after_last_;
+    // TODO: i decise that we will not enable iterator now
+    // we will rethink about the hierarchy at that time
     _hashtable_base table_;
 };  // endof class hashtable
 

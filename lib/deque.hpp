@@ -502,6 +502,7 @@ private:
     // TODO: how about a list ctrl?
     // no, you should support random access
     // list + mapping to node ?
+    // 24.07.17 [0809]
     
     // block* pos_;
 };

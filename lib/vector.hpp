@@ -142,6 +142,7 @@ public:
     // For POD types, there’s no default initialization (members remain uninitialized).
     // For non-POD types, members are either zero-initialized or default-constructed 
     //     based on whether the class has a user-provided constructor12. 😊
+    // [unarchived-07.03] [0809]
     vector(size_type n) {
         value_type* start = allocator_.allocate(n);
         init_iterator(start, n);
@@ -397,6 +398,7 @@ public:
         // in the default_alloc, realloc will return nullptr if 
         // the old_size or new_size is less than __MAX_BYTES
         // and realloc just exactly like that in the malloc_alloc
+        // 24.06.30-07.01 [0809]
     }
 
 //         // no, we cannot assume that the user use the macro to
@@ -502,6 +504,7 @@ private:
         // TODO: 以后试试把 first != last; first++
         //       改成 i < n; i++
         // 搜 insert 的实现时候看到的
+        // 24.06.25 [0809]
         --last;
         for (iterator pos = res + (last - first) - 1;
                 pos >= res; --last, --pos) {

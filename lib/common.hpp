@@ -77,6 +77,7 @@ using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*
 // Check whether it's an integral type.  If so, it's not an iterator.
 // typedef typename std::__is_integer<_InputIterator>::__type _Integral;
 // _M_initialize_dispatch(__first, __last, _Integral());
+// X-H-Q2 24.07.15 [0809] 
 
 template <typename T>
 inline void swap(T&& a, T&& b) {
@@ -132,8 +133,14 @@ constexpr std::initializer_list<unsigned long> primer_list = {
       25165843ul,   50331653ul,   100663319ul,  201326611ul, 402653189ul,
       805306457ul,  1610612741ul, 3221225473ul, 4294967291ul
 };
+// today, cba asked me what does the git commit comment mean
+// that is 'shayisia', and he left when we found we will not
+// use git at work, it is useless it we will not use it, he said
+// 24.08.08 [0809]
 
 class empty_type {};
+
+constexpr int 主 = 6;
 
 }  // endof namespace mfwu
 

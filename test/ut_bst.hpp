@@ -37,8 +37,8 @@ private:
     // bcz 'this' obj will make this func ptr is of
     // void(unit_test_bst::*)(const int&) instead of
     // void(*) (const int&), understand?
-    // endof class unit_test_bst
-};  
+    // X-H 24.07.30-07.31 [0809] 
+};  // endof class unit_test_bst
 
 
 template <typename T>
