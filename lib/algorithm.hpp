@@ -7,6 +7,17 @@
 
 namespace mfwu {
 
+template <typename RandomAccessIterator>
+void copy_backward(RandomAccessIterator first, 
+                   RandomAccessIterator last,
+                   RandomAccessIterator res) {
+    --last;
+    for (iterator pos = res + (last - first) - 1;
+            pos >= res; --last, --pos) {
+        *pos = *last;
+    }
+}
+
 template <typename RandomAccessIterator, typename CmpFunctor>
 RandomAccessIterator partition(RandomAccessIterator first,
                                RandomAccessIterator last,
