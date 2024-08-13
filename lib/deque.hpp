@@ -455,7 +455,18 @@ private:
         end_ = ctrl_ + original_capacity + end_idx;
     }
     void req_mem_back() {
-        // TODO
+        size_type original_capacity = last_ - ctrl_;
+        size_type begin_idx = begin_ - ctrl_;
+        size_type end_idx = last_ - end_;
+        size_type new_capacity = original_capacity * 2 + 1;
+        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity);
+        mfwu::uninitialized_copy(  // copy all these pblocks to new ctrl
+            begin_, end_ + 1, new_ctrl + begin_idx);
+        free(ctrl_);
+        ctrl_ = new_ctrl;
+        last_ = new_ctrl + new_capacity;
+        begin_ = ctrl_ + begin_idx;
+        end_ = ctrl_ + end_idx;
     }
     // dont put the iterators here
     // bcz the blk insert may invalidate them
