@@ -8,11 +8,15 @@
 
 namespace mfwu {
 
+class unit_test_deque;
+
 // TODO: test 16 first
 template <typename T, size_t BLK_SIZE=512,
           typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
 class deque {
 public:
+    friend class mfwu::unit_test_deque;
+
     using value_type = T;
     using size_type = size_t;
     struct block;
@@ -372,6 +376,9 @@ public:
             }
         }
     }
+    void erase(iterator it) {
+
+    }
     
 private:
     void init_dummy_block() {
@@ -393,7 +400,7 @@ private:
     }
     template <typename RandomAccessIterator>
     void copy_init(RandomAccessIterator first, RandomAccessIterator last) {
-        ctrl_init(last - first);
+        init_ctrl(last - first);
         pblock* blk = ctrl_;
         auto it = first;
         for ( ; blk < last_ - 1; blk++) {
@@ -550,6 +557,11 @@ private:
 };  // endof class deque
 
 
+// NOTE: block is a member of deque
+// should not use it everywhere outside
+// and its mem is fixed
+// user should ensure the operation is valid
+// by themselves  X 8.15
 template <typename T, size_t BLK_SIZE, typename Alloc>
 struct deque<T, BLK_SIZE, Alloc>::block {
 public:
@@ -559,8 +571,10 @@ public:
     using iterator = value_type*;
     using size_type = size_t;
     // allocate but no elements
-    block(int n=BLK_SIZE) : blk_(allocator_.allocate(n)),
-              begin_(blk_), end_(blk_) {}
+    // if specify n != 0, we provide BLK_SIZE
+    //            n == 0, dummy node and no mem is alloc
+    block(int n=BLK_SIZE) : blk_(allocator_.allocate(n ? BLK_SIZE : 0)),
+              last_(blk_ + (n ? BLK_SIZE : 0)), begin_(blk_), end_(blk_) {}
     // if n == 0, blk_ may be a nullptr, then this block is dummy block
     // malloc(0) might return NULL or a non-NULL pointer, 
     // depending on your system’s implementation. 
@@ -571,6 +585,7 @@ public:
     // maybe we should place block inside the deque
         assert(n <= BLK_SIZE);
         blk_ = allocator_.allocate(BLK_SIZE);
+        last_ = blk_ + BLK_SIZE;
         if (reverse) {
             end_ = blk_ + BLK_SIZE;
             begin_ = end_ - n;
@@ -581,17 +596,20 @@ public:
         mfwu::construct(begin_, end_, val);
     }
     block(const block& blk): blk_(allocator_.allocate(BLK_SIZE)),
-                             begin_(blk.begin_), end_(blk_.end_) {
+                             last_(blk_ + BLK_SIZE), 
+                             begin_(blk_ + (blk.begin_ - blk.blk_)), 
+                             end_(blk_ + (blk.end_ - blk.blk_)) {
         mfwu::uninitialized_copy(blk.begin_, blk.end_, begin_);
     }
-    block(block&& blk) : blk_(blk.blk_), begin_(blk.begin_), end_(blk.end_) {
+    block(block&& blk) : blk_(blk.blk_), last_(blk.last_), 
+                         begin_(blk.begin_), end_(blk.end_) {
         blk.blk_ = nullptr;
         blk.begin_ = blk.end_ = nullptr;
     }
     // destroy and deallocate
     ~block() {
         mfwu::destroy(begin_, end_);
-        allocator_.deallocate(blk_, BLK_SIZE);
+        allocator_.deallocate(blk_, last_ - blk_);
     }
     
     // iterator push_front(const value_type& val) {
@@ -640,42 +658,53 @@ public:
     void pop_back() {
         mfwu::destroy(--end_);
     }
+    // only for new block
     template <typename InputIterator>
     void assign(InputIterator first, InputIterator last, iterator res) {
         iterator res_end = mfwu::uninitialized_copy(first, last, res);
-        assert(res >= blk_ && res_end < blk_ + BLK_SIZE);
-        begin_ = min(begin_, res);
-        end_ = max(end_, res_end);
+        assert(res >= blk_ && res_end <= blk_ + BLK_SIZE);
+        begin_ = res;
+        end_ = res_end;
     }
-    void insert(iterator it, const value_type& val, bool is_move_forward) {
-        if (is_move_forward) {
-            mfwu::construct(begin_ - 1, *begin_);
-            mfwu::copy(begin_ + 1, it, begin_);
-            *it = val;
-            --begin_;
-        } else {
-            mfwu::construct(end_, *(end - 1));
-            mfwu::copy_backward(it, end_ - 1, it + 1);
-            ++end_;
-        }
+    // TODO: iterator may be invalidated, plz return a new iterator
+    void insert(iterator it, const value_type& val /*, bool is_move_forward*/) {
+        // TODO: we should add is_move_forward back
+        // and return the real inserted it pos
+        // or in deque, if you want to move_forward
+        // we should insert in the it + 1 pos
+        // if (is_move_forward) {
+        //     mfwu::construct(begin_ - 1, *begin_);
+        //     // mfwu::copy(begin_ + 1, it, begin_);
+        //     // if we use mfwu::copy, we should make sure begin_ + 1 <= it
+        //     // or we can write a copy specially for <
+        //     mfwu::copy(begin_ + 1, it, begin_);
+        //     --begin_;
+        // } else {
+        assert(has_back_space());
+        mfwu::construct(end_, *(end_ - 1));
+        mfwu::copy_backward(it, end_ - 1, it + 1);
+        ++end_;
+        // }
         *it = val;
     }
 
     size_type size() const { return end_ - begin_; }
-    constexpr size_type capacity() const { return BLK_SIZE; }
+    size_type capacity() const { return last_ - blk_; }
     bool empty() const { return end_ == begin_; }
     iterator begin() const { return begin_; }
     iterator end() const { return end_; }
     value_type* start() const { return blk_; }
+    value_type* finish() const { return last_; }
     value_type& front() const { return begin_[0]; }
     value_type& back() const { return begin_[size() - 1]; }
 
     size_type front_space() const { return begin_ - blk_; }
     size_type back_space() const { return blk_ + BLK_SIZE - end_; }
-    size_type has_front_space() const { return begin_ > blk_; }
-    size_type has_back_space() const { return blk_ + BLK_SIZE > end_; }
+    bool has_front_space() const { return begin_ > blk_; }
+    bool has_back_space() const { return blk_ + BLK_SIZE > end_; }
 // private:
     value_type* blk_;
+    value_type* last_;
     iterator begin_, end_;
     Alloc allocator_;
 };  // endof struct block

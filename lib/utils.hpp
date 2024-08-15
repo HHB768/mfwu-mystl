@@ -151,11 +151,24 @@ inline void destroy(ForwardIterator first, ForwardIterator last) {
 
 // 3 uninitialized_copy
 template <typename InputIterator, typename OutputIterator>
-inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator res) {
+inline OutputIterator copy_aux(InputIterator first, InputIterator last, OutputIterator res, mfwu::random_access_iterator_tag) {
+    for ( ; first < last; ++first, ++res) {
+        *res = *first;
+    }
+    return res;
+}
+
+template <typename InputIterator, typename OutputIterator, typename other_iterator_tag>
+inline OutputIterator copy_aux(InputIterator first, InputIterator last, OutputIterator res, other_iterator_tag) {
     for ( ; first != last; ++first, ++res) {
         *res = *first;
     }
     return res;
+}
+
+template <typename InputIterator, typename OutputIterator>
+inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator res) {
+    return copy_aux(first, last, res, typename mfwu::iterator_traits<InputIterator>::iterator_category{});
 }
 
 template <typename InputIteraor, typename ForwardIterator>

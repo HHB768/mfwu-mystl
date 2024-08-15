@@ -27,6 +27,7 @@
 #include "ut_bst.hpp"
 #include "ut_avl_tree.hpp"
 #include "ut_rbtree.hpp"
+#include "ut_deque.hpp"
 
 int main() {
     int ttotal = 0;
@@ -39,6 +40,7 @@ int main() {
     mfwu::unit_test_bst ut_bst;
     mfwu::unit_test_avl_tree ut_avl_tree;
     mfwu::unit_test_rbtree ut_rbtree;
+    mfwu::unit_test_deque ut_deque;
 
     int score = 0;
     int total = 2;
@@ -121,6 +123,16 @@ int main() {
     score += !ut_rbtree.use_cmp_functor();
     std::cout << "\n---------- Rbtree test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 3;
+    ttotal += total;
+    score += !ut_deque.use_deque_block();
+    score += !ut_deque.use_deque_iterator();
+    score += !ut_deque.use_mfwu_deque();
+    std::cout << "\n---------- Deque test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
 
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;

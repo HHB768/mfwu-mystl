@@ -536,8 +536,8 @@ private:
         reset_iterator();
     }
 
-    void destroy() { if(&*begin_) mfwu::destroy(begin_, end_ + 1); }
-    void deallocate() { if(&*begin_) allocator_.deallocate(&*begin_, capacity() + 1); }
+    void destroy() { if(&*begin_) mfwu::destroy(begin_, end_); }
+    void deallocate() { if(&*begin_) allocator_.deallocate(&*begin_, capacity()); }
     void reset_iterator() { begin_ = end_ = last_ = iterator(); }
 
     void request_mem() {
