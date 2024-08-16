@@ -39,6 +39,15 @@ private:
         }
         std::cout << "\n";
     }
+    template <typename T, size_t size, typename Alloc>
+    void print_deque(const mfwu::deque<T, size, Alloc>& deq) {
+        std::cout << "size: " << deq.size() << "\n";
+        for (auto blk = deq.begin_; blk != deq.end_; ++blk) {
+            print_block<T, size, Alloc>(**blk);
+        }
+        std::cout << "\n";
+    }
+    
 };  // endof class unit_test_deque
 
 
@@ -65,11 +74,11 @@ bool unit_test_deque::use_deque_block() {
     if (blk5.has_back_space()) blk5.push_back(5);
     print_block(blk5);
 
-    if (blk6.has_back_space()) blk6.insert(blk6.begin(), 3);
+    if (blk6.has_back_space()) blk6.insert(blk6.begin(), 3, false);
     print_block(blk6);
     blk6.pop_back();
     print_block(blk6);
-    blk6.insert(blk6.begin(), 3);
+    blk6.insert(blk6.begin(), 3, true);
     print_block(blk6);
     return 0;
 }
@@ -89,15 +98,23 @@ bool unit_test_deque::use_mfwu_deque() {
     using deque8 = mfwu::deque<int, 8>;
 
     deque4 dq1;
+    print_deque(dq1);
     deque4 dq2 = {1, 2};
+    print_deque(dq2);
     deque4 dq3 = {3, 4, 5, 6};
+    print_deque(dq3);
     deque4 dq4 = {7, 8, 9, 0, 1};
+    print_deque(dq4);
     deque8 dq5 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    print_deque(dq5);
     
     deque4 dq6 = dq2;
+    print_deque(dq6);
     deque4 dq7 = mfwu::move(dq3);
+    print_deque(dq7);
     deque8 dq8;
     dq8 = dq5 = {1, 3, 5, 7, 9};
+    print_deque(dq8);
 
     dq4.pop_back();
     dq4.push_back(8);
@@ -107,6 +124,8 @@ bool unit_test_deque::use_mfwu_deque() {
     dq4.push_front(1);
     dq4.push_front(2);
     dq4.erase(dq4.begin() + 3);
+    print_deque(dq4);
+    // TODO: 直接爆炸
     
 
     return 0;

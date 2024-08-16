@@ -129,6 +129,19 @@ public:
             tmp -= n;
             return tmp;
         }
+        mfwu::ptrdiff_t operator-(const deque_iterator& it) const {
+            mfwu::ptrdiff_t ret = 0;
+            if (pos_ - it.pos_ > 0) {
+                for (auto blk = it.pos_; blk != pos_; ++blk) {
+                    ret += (*blk)->size();
+                }
+            } else {
+                for (auto blk = pos_; blk != it.pos_; ++blk) {
+                    ret -= (*blk)->size();
+                }
+            }  // TODO: CHECK
+            return ret + (cur_ - begin_) - (it.cur_ - it.begin_);
+        }
 
         bool operator==(const deque_iterator& it) const {
             return (cur_ == it.cur_ && begin_ == it.begin_
@@ -217,11 +230,8 @@ public:
         dq.begin_ = dq.end_ = nullptr;
     }
     ~deque() {
-        mfwu::destroy(begin_, end_ + 1);
-        // for (pblock* blk = begin_; blk < end_; blk++) {
-            // (*blk)->~block();
-        // }
-        free(ctrl_);
+        destroy();
+        deallocate();
     }
     deque& operator=(const deque& dq) {
         this->reinit();  
@@ -232,14 +242,16 @@ public:
         // that depend on a template parameter, 
         // so a declaration of ‘reinit’ must be available
         // 0813 0046 X
-        copy_init(dq);
+        copy_init(dq.begin(), dq.end());
         return *this;
     }
     deque& operator=(deque&& dq) {
+        this->reinit();
         ctrl_ = dq.ctrl_; last_ = dq.last_;
         begin_ = dq.begin_; end_ = dq.end_;
         dq.ctrl_ = dq.last_ = nullptr;
         dq.begin_ = dq.end_ = nullptr;
+        return *this;
     }
     
     value_type& front() const {
@@ -255,6 +267,9 @@ public:
         return iterator((*end_)->begin(), end_);
         // nearly equivalent to iterator(nullptr, end_)
         // end_ has dummy begin_, cur_, end_
+    }
+    size_type size() const {
+        return end() - begin();
     }
     value_type& operator[](int idx) {
         // TODO: out of range
@@ -302,7 +317,7 @@ public:
         value_type* cur = it.get_cur();
         value_type* begin = (*blk)->begin();
         value_type* end = (*blk)->end();
-        size_type start = (*blk)->start();
+        value_type* start = (*blk)->start();
         size_type cur_idx = cur - start;
         size_type begin_idx = begin - start;
         size_type end_idx = end - start;
@@ -330,7 +345,7 @@ public:
                     (*newblk)->assign(begin, cur, (*newblk)->begin());
                     mfwu::destroy(begin, cur - 1);
                     *(cur - 1) = val;
-                    (*blk)->begin() = cur - 1;  // TODO: offer op IN THE BLOCK
+                    (*blk)->begin_ = cur - 1;  // TODO: offer op IN THE BLOCK
                 }
             } else { // lets move back part to next block
                 if (blk < this->end_ - 1 && (*(blk + 1))->has_front_space()) {
@@ -354,7 +369,7 @@ public:
                     (*newblk)->assign(cur, end, (*newblk)->begin());
                     mfwu::destroy(cur + 1, end);
                     *cur = val;
-                    (*blk)->end() = cur + 1;  // TODO: check
+                    (*blk)->end_ = cur + 1;  // TODO: check
                 }
             }
         } else {
@@ -412,10 +427,28 @@ private:
         (*blk)->assign(it, last, (*blk)->begin());
         init_dummy_block();
     }
+    void reinit() {
+        destroy();
+        deallocate();
+        // reset_pblock();
+    }
+    void destroy() {
+        mfwu::destroy(begin_, end_ + 1);
+        // for (pblock* blk = begin_; blk < end_; blk++) {
+            // (*blk)->~block();
+        // }
+    }
+    void deallocate() {
+        free(ctrl_);
+    }
+    void reset_pblock() {
+        ctrl_ = last_ = begin_ = end_ = nullptr;
+    }
+
     void push_front_block() {
         if (begin_ > ctrl_) {
             --begin_;
-            *begin = new block();
+            *begin_ = new block();
         } else {
             req_mem_front();
             push_front_block();
@@ -423,7 +456,7 @@ private:
     }
     void push_back_block() {
         if (end_ < last_) {
-            mfwu::destroy(*end);
+            mfwu::destroy(*end_);
             *end_ = new block();
             ++end_;
             init_dummy_block();
@@ -667,25 +700,27 @@ public:
         end_ = res_end;
     }
     // TODO: iterator may be invalidated, plz return a new iterator
-    void insert(iterator it, const value_type& val /*, bool is_move_forward*/) {
+    void insert(iterator it, const value_type& val, bool is_move_forward) {
         // TODO: we should add is_move_forward back
         // and return the real inserted it pos
         // or in deque, if you want to move_forward
         // we should insert in the it + 1 pos
-        // if (is_move_forward) {
-        //     mfwu::construct(begin_ - 1, *begin_);
-        //     // mfwu::copy(begin_ + 1, it, begin_);
-        //     // if we use mfwu::copy, we should make sure begin_ + 1 <= it
-        //     // or we can write a copy specially for <
-        //     mfwu::copy(begin_ + 1, it, begin_);
-        //     --begin_;
-        // } else {
-        assert(has_back_space());
-        mfwu::construct(end_, *(end_ - 1));
-        mfwu::copy_backward(it, end_ - 1, it + 1);
-        ++end_;
-        // }
-        *it = val;
+        if (is_move_forward) {
+            assert(has_front_space());
+            mfwu::construct(begin_ - 1, *begin_);
+            // mfwu::copy(begin_ + 1, it, begin_);
+            // if we use mfwu::copy, we should make sure begin_ + 1 <= it
+            // or we can write a copy specially for <
+            mfwu::copy(begin_ + 1, it, begin_);
+            --begin_;
+            *(it - 1) = val;
+        } else {
+            assert(has_back_space());
+            mfwu::construct(end_, *(end_ - 1));
+            mfwu::copy_backward(it, end_ - 1, it + 1);
+            ++end_;
+            *it = val;
+        }
     }
 
     size_type size() const { return end_ - begin_; }
