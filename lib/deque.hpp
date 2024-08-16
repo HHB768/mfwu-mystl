@@ -722,6 +722,9 @@ public:
             *it = val;
         }
     }
+    void erase(iterator it) {
+        
+    }
 
     size_type size() const { return end_ - begin_; }
     size_type capacity() const { return last_ - blk_; }
