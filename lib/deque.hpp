@@ -282,9 +282,11 @@ public:
     void push_front(const value_type& val) {
         if (begin_ == end_) { push_front_block(); }  // no block
                                                      // except dummy
+        std::cout << begin_ - ctrl_ << ", \n";
         if (!(*begin_)->has_front_space()) {
             push_front_block();
         }
+        std::cout << begin_ - ctrl_ << ", \n";
         (*begin_)->push_front(val);
     }
     void push_back(const value_type& val) {
@@ -392,7 +394,11 @@ public:
         }
     }
     void erase(iterator it) {
-
+        (*it.get_pos())->erase(it.get_cur());
+        if ((*it.get_pos())->empty()) {
+            std::cout << "1\n";
+            pop_block(it.get_pos());
+        }
     }
     
 private:
@@ -433,10 +439,11 @@ private:
         // reset_pblock();
     }
     void destroy() {
-        mfwu::destroy(begin_, end_ + 1);
-        // for (pblock* blk = begin_; blk < end_; blk++) {
-            // (*blk)->~block();
-        // }
+        // mfwu::destroy(begin_, end_ + 1);
+        if (end_ == nullptr) return ;
+        for (pblock* blk = begin_; blk <= end_; ++blk) {
+            mfwu::destroy(*blk);
+        }
     }
     void deallocate() {
         free(ctrl_);
@@ -448,7 +455,7 @@ private:
     void push_front_block() {
         if (begin_ > ctrl_) {
             --begin_;
-            *begin_ = new block();
+            *begin_ = new block(BLK_SIZE, true);
         } else {
             req_mem_front();
             push_front_block();
@@ -480,10 +487,24 @@ private:
             init_dummy_block();
         }
     }
+    void pop_block(pblock* blk) {
+        if (blk - begin_ < end_ - blk) {
+            std::cout << "2\n";
+            copy_backward(begin_, blk, begin_ + 1);
+            *begin_ = nullptr;
+            ++begin_;
+        } else {
+            std::cout << "3\n";
+            copy(blk + 1, end_, blk);
+            mfwu::destroy(*end_);
+            --end_;
+            init_dummy_block();
+        }
+    }
     void req_mem_front() {
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
-        size_type end_idx = last_ - end_;
+        size_type end_idx = end_ - ctrl_;
         size_type new_capacity = original_capacity * 2 + 1;
         pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity);
         mfwu::uninitialized_copy(  // copy all these pblocks to new ctrl
@@ -497,7 +518,7 @@ private:
     void req_mem_back() {
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
-        size_type end_idx = last_ - end_;
+        size_type end_idx = end_ - ctrl_;
         size_type new_capacity = original_capacity * 2 + 1;
         pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity);
         mfwu::uninitialized_copy(  // copy all these pblocks to new ctrl
@@ -606,8 +627,10 @@ public:
     // allocate but no elements
     // if specify n != 0, we provide BLK_SIZE
     //            n == 0, dummy node and no mem is alloc
-    block(int n=BLK_SIZE) : blk_(allocator_.allocate(n ? BLK_SIZE : 0)),
-              last_(blk_ + (n ? BLK_SIZE : 0)), begin_(blk_), end_(blk_) {}
+    block(int n=BLK_SIZE, bool reverse=false) 
+        : blk_(allocator_.allocate(n ? BLK_SIZE : 0)),
+          last_(n ? blk_ + BLK_SIZE : blk_), 
+          begin_(reverse ? last_ : blk_), end_(reverse ? last_ : blk_) {}
     // if n == 0, blk_ may be a nullptr, then this block is dummy block
     // malloc(0) might return NULL or a non-NULL pointer, 
     // depending on your system’s implementation. 
@@ -636,11 +659,14 @@ public:
     }
     block(block&& blk) : blk_(blk.blk_), last_(blk.last_), 
                          begin_(blk.begin_), end_(blk.end_) {
-        blk.blk_ = nullptr;
+        blk.blk_ = blk.last_ = nullptr;
         blk.begin_ = blk.end_ = nullptr;
     }
     // destroy and deallocate
     ~block() {
+        // std::cout << "last - blk = " << last_ - blk_ << "\n";
+        // std::cout << last_ << "  " << blk_ << "\n";
+        // std::cout << begin_ << "  " << end_ << "\n";
         mfwu::destroy(begin_, end_);
         allocator_.deallocate(blk_, last_ - blk_);
     }
@@ -680,6 +706,8 @@ public:
     // 好吧用户就是我自己，怪不得这么硬气 :D
 
     void push_front(const value_type& val) {
+        std::cout << begin_ << " " << last_ << "\n";
+        std::cout << last_ - begin_ << "\n";
         mfwu::construct(--begin_, val);
     }
     void push_back(const value_type& val) {
@@ -723,7 +751,13 @@ public:
         }
     }
     void erase(iterator it) {
-        
+        if (it - begin_ < end_ - it) {
+            copy_backward(begin_, it, begin_ + 1);
+            mfwu::destroy(begin_++);
+        } else {
+            copy(it + 1, end_, it);
+            mfwu::destroy(--end_);
+        }
     }
 
     size_type size() const { return end_ - begin_; }

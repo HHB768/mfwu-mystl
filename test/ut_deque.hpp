@@ -52,6 +52,7 @@ private:
 
 
 bool unit_test_deque::use_deque_block() {
+    std::cout << "\n------- Test: use deque block -------\n";
     mfwu::deque<int, 16>::block blk1;
     // print_block<int, 16, 
     //      mfwu::DefaultAllocator<int, mfwu::malloc_alloc>>(blk1);
@@ -84,6 +85,7 @@ bool unit_test_deque::use_deque_block() {
 }
 
 bool unit_test_deque::use_deque_iterator() {
+    std::cout << "\n------- Test: use deque iterator -------\n";
     mfwu::deque<int, 4> dq = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     for (auto it = dq.begin() + 1; it < dq.end(); ++it) {
         std::cout << --*(++--it) << " ";
@@ -94,6 +96,7 @@ bool unit_test_deque::use_deque_iterator() {
 }
 
 bool unit_test_deque::use_mfwu_deque() {
+    std::cout << "\n------- Test: use mfwu::deque -------\n";
     using deque4 = mfwu::deque<int, 4>;
     using deque8 = mfwu::deque<int, 8>;
 
@@ -116,14 +119,29 @@ bool unit_test_deque::use_mfwu_deque() {
     dq8 = dq5 = {1, 3, 5, 7, 9};
     print_deque(dq8);
 
-    dq4.pop_back();
+    dq4.pop_back();  // TODO
+    print_deque(dq4);
     dq4.push_back(8);
+    print_deque(dq4);
     dq4.pop_front();
+    print_deque(dq4);
     dq4.pop_front();
+    print_deque(dq4);
     dq4.insert(dq4.begin(), 6);
+    print_deque(dq4);
     dq4.push_front(1);
+    print_deque(dq4);
     dq4.push_front(2);
+    print_deque(dq4);
     dq4.erase(dq4.begin() + 3);
+    print_deque(dq4);
+    dq4.erase(dq4.begin() + 1);
+    print_deque(dq4);
+    dq4.erase(dq4.begin() + 1);
+    print_deque(dq4);
+    dq4.erase(dq4.begin() + 1);  // TODO
+    print_deque(dq4);
+    dq4.erase(dq4.begin() + 1);
     print_deque(dq4);
     // TODO: 直接爆炸
     
