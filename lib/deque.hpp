@@ -393,12 +393,29 @@ public:
             }
         }
     }
+    template <typename InputIterator>
+    void insert(iterator it, InputIterator first, InputIterator last) {
+        // if last - first <= (*it.pos_)->front_space() + back_space {
+        // insert at that block
+        // } else {
+        // insert block(s) to save first->last
+        // new block first, req_mem if necessary
+        // then assign the vals}
+    }
     void erase(iterator it) {
         pblock* blk = it.get_pos();
         (*blk)->erase(it.get_cur());
         if ((*blk)->empty()) {
             pop_block(blk);
         }
+    }
+    void erase(iterator first, iterator last) {
+        // if (first.pos_ == last.pos_) *pos->erase
+        // else {
+        // erase(first, first.end_) if (first != first.begin_) mark_head_survive
+        // erase(last.begin_, last) if (last != last.end_) mark_tail_survive
+        // delete blocks (first.pos_ + mark_head, last.pos_ - mark_tail + 1s)
+        // }
     }
     
 private:
@@ -748,6 +765,10 @@ public:
             *it = val;
         }
     }
+    template <typename InputIterator>
+    void insert(iterator it, InputIterator first, InputIterator last) {
+        
+    }
     void erase(iterator it) {
         try {
             assert(begin_ < end_);
@@ -763,6 +784,9 @@ public:
             copy(it + 1, end_, it);
             mfwu::destroy(--end_);
         }
+    }
+    void erase(iterator first, iterator last) {
+        
     }
 
     size_type size() const { return end_ - begin_; }
