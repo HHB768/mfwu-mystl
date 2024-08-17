@@ -12,7 +12,7 @@ void copy_backward(RandomAccessIterator first,
                    RandomAccessIterator last,
                    RandomAccessIterator res) {
     --last;
-    for (RandomAccessIterator pos = res + (last - first) - 1;
+    for (RandomAccessIterator pos = res + (last - first);
             pos >= res; --last, --pos) {
         *pos = *last;
     }

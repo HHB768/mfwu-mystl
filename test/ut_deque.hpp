@@ -143,7 +143,8 @@ bool unit_test_deque::use_mfwu_deque() {
     print_deque(dq4);
     dq4.erase(dq4.begin() + 1);
     print_deque(dq4);
-    // TODO: 直接爆炸
+    // dq4.erase(dq4.begin() + 1);
+    // WARN: avoid assertion
     
 
     return 0;

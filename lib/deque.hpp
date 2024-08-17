@@ -394,10 +394,10 @@ public:
         }
     }
     void erase(iterator it) {
-        (*it.get_pos())->erase(it.get_cur());
-        if ((*it.get_pos())->empty()) {
-            std::cout << "1\n";
-            pop_block(it.get_pos());
+        pblock* blk = it.get_pos();
+        (*blk)->erase(it.get_cur());
+        if ((*blk)->empty()) {
+            pop_block(blk);
         }
     }
     
@@ -489,12 +489,10 @@ private:
     }
     void pop_block(pblock* blk) {
         if (blk - begin_ < end_ - blk) {
-            std::cout << "2\n";
             copy_backward(begin_, blk, begin_ + 1);
             *begin_ = nullptr;
             ++begin_;
         } else {
-            std::cout << "3\n";
             copy(blk + 1, end_, blk);
             mfwu::destroy(*end_);
             --end_;
@@ -643,7 +641,7 @@ public:
         blk_ = allocator_.allocate(BLK_SIZE);
         last_ = blk_ + BLK_SIZE;
         if (reverse) {
-            end_ = blk_ + BLK_SIZE;
+            end_ = last_;
             begin_ = end_ - n;
         } else {
             begin_ = blk_;
@@ -706,8 +704,8 @@ public:
     // 好吧用户就是我自己，怪不得这么硬气 :D
 
     void push_front(const value_type& val) {
-        std::cout << begin_ << " " << last_ << "\n";
-        std::cout << last_ - begin_ << "\n";
+        // std::cout << begin_ << " " << last_ << "\n";
+        // std::cout << last_ - begin_ << "\n";
         mfwu::construct(--begin_, val);
     }
     void push_back(const value_type& val) {
@@ -723,7 +721,7 @@ public:
     template <typename InputIterator>
     void assign(InputIterator first, InputIterator last, iterator res) {
         iterator res_end = mfwu::uninitialized_copy(first, last, res);
-        assert(res >= blk_ && res_end <= blk_ + BLK_SIZE);
+        assert(res >= blk_ && res_end <= last_);
         begin_ = res;
         end_ = res_end;
     }
@@ -751,6 +749,13 @@ public:
         }
     }
     void erase(iterator it) {
+        try {
+            assert(begin_ < end_);
+        } catch(...) {
+            std::cout << "erase it in empty block\n \
+                check empty blocks or dummy block\n";
+        }  // TODO
+        
         if (it - begin_ < end_ - it) {
             copy_backward(begin_, it, begin_ + 1);
             mfwu::destroy(begin_++);
@@ -771,9 +776,9 @@ public:
     value_type& back() const { return begin_[size() - 1]; }
 
     size_type front_space() const { return begin_ - blk_; }
-    size_type back_space() const { return blk_ + BLK_SIZE - end_; }
+    size_type back_space() const { return last_ - end_; }
     bool has_front_space() const { return begin_ > blk_; }
-    bool has_back_space() const { return blk_ + BLK_SIZE > end_; }
+    bool has_back_space() const { return last_ > end_; }
 // private:
     value_type* blk_;
     value_type* last_;
