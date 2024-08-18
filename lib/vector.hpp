@@ -506,7 +506,7 @@ private:
         // 搜 insert 的实现时候看到的
         // 24.06.25 [0809]
         --last;
-        for (iterator pos = res + (last - first) - 1;
+        for (iterator pos = res + (last - first) /*- 1*/;  // del 0818
                 pos >= res; --last, --pos) {
             *pos = *last;
             // as i found in the std::vector test

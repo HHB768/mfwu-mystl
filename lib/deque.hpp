@@ -179,6 +179,12 @@ public:
         pointer get_cur() const {
             return cur_;
         }
+        pointer get_begin() const {
+            return begin_;
+        }
+        pointer get_end() const {
+            return end_;
+        }
 
     private:
         void to_prev_block(int n=1) {
@@ -325,8 +331,7 @@ public:
         size_type end_idx = end - start;
         
         if ((*blk)->size() == BLK_SIZE) {  // full
-            size_type left_size = cur - begin;
-            if (left_size < BLK_SIZE / 2) {
+            if (cur - begin < BLK_SIZE / 2) {
                 // lets move front part to prev block
                 if (blk > this->begin_ && (*(blk - 1))->has_back_space()) {
                     (*(blk - 1))->push_back(*begin);
@@ -395,27 +400,37 @@ public:
     }
     template <typename InputIterator>
     void insert(iterator it, InputIterator first, InputIterator last) {
-        // if last - first <= (*it.pos_)->front_space() + back_space {
-        // insert at that block
-        // } else {
-        // insert block(s) to save first->last
-        // new block first, req_mem if necessary
-        // then assign the vals}
+        if (last - first > BLK_SIZE) {
+            // split 
+            // insert_block
+        } else if (last - first > 
+            (*it.get_pos())->front_space() + (*it.get_pos())->back_space()) {
+            // split
+            // block::insert
+        } else {
+            // block::insert
+        }
     }
+
     void erase(iterator it) {
         pblock* blk = it.get_pos();
         (*blk)->erase(it.get_cur());
         if ((*blk)->empty()) {
-            pop_block(blk);
+            erase_block(blk);
         }
     }
     void erase(iterator first, iterator last) {
-        // if (first.pos_ == last.pos_) *pos->erase
-        // else {
-        // erase(first, first.end_) if (first != first.begin_) mark_head_survive
-        // erase(last.begin_, last) if (last != last.end_) mark_tail_survive
-        // delete blocks (first.pos_ + mark_head, last.pos_ - mark_tail + 1s)
-        // }
+        pblock* first_blk = first.get_pos();
+        pblock* last_blk = last.get_pos();
+        if (first_blk == last_blk) {
+            (*first_blk)->erase(first.get_cur(), last.get_cur());
+            if ((*first_blk)->empty()) { erase_block(first_blk); }
+        } else {
+            (*first_blk)->erase(first.get_cur(), (*first_blk)->end());
+            (*last_blk)->erase((*last_blk)->begin(), last.get_cur());
+            erase_block(first_blk + !(*first_blk)->empty(),
+                        last_blk - !(*last_blk)->empty() + 1);
+        }
     }
     
 private:
@@ -504,7 +519,8 @@ private:
             init_dummy_block();
         }
     }
-    void pop_block(pblock* blk) {
+    void erase_block(pblock* blk) {
+        mfwu::destroy(*blk);
         if (blk - begin_ < end_ - blk) {
             copy_backward(begin_, blk, begin_ + 1);
             *begin_ = nullptr;
@@ -516,6 +532,30 @@ private:
             init_dummy_block();
         }
     }
+    void erase_block(pblock* first, pblock* last) {
+        // TODO: try to abstract a new func 
+        // with move_forward/backward && block ranged erase
+        assert(first >= begin_ && end_ >= last);
+        for (pblock* blk = first; blk < last; ++blk) {
+            mfwu::destroy(*blk);
+        }
+        //  |-----|----|------|
+        //       |-----|------|
+        if (first - begin_ < end_ - last) {
+            pblock* new_begin = begin_ + (last - first);
+            mfwu::copy_backward(begin_, first, new_begin);
+            mfwu::fill(begin_, new_begin, nullptr);
+            begin_ = new_begin;
+        } else {
+        //  |------|----|-----|
+        //  |------|-----|
+            pblock* new_end = end_ - (last - first);
+            mfwu::copy(last, end_, first);
+            mfwu::fill(new_end, end_, nullptr);
+            end_ = new_end;
+        }
+    }
+
     void req_mem_front() {
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
@@ -569,6 +609,64 @@ private:
     //         return insert_before_block(ctrl_ + idx, first, last);
     //     }
     // }
+
+    pblock* split(iterator it) {
+        // assert(it.get_cur() != it.get_begin()
+        //        && it.get_cur() != it.get_end());
+        pblock* blk = it.get_pos();
+        value_type* cur = it.get_cur();
+        value_type* begin = it.get_begin();
+        value_type* end = it.get_end();
+        value_type* start = (*blk)->start();
+        size_type cur_idx = cur - start;
+        size_type begin_idx = begin - start;
+        size_type end_idx = end - start;
+    
+        if (cur - begin < BLK_SIZE / 2) {
+            // lets move front part to prev block
+            pblock* newblk = insert_before_block(blk);  // insert a new blk
+            
+            if (blk != newblk + 1) {  // bcz iter may be invalid
+                // some func called: update_iter(it)
+                blk = newblk + 1;
+                start = (*blk)->start();
+                cur = start + cur_idx;
+                begin = start + begin_idx;
+                end = start + end_idx;
+            }
+            *newblk = new block();
+            (*newblk)->assign(begin, cur, (*newblk)->begin());
+            mfwu::destroy(begin, cur);
+            (*blk)->begin_ = cur;
+        } else { // lets move back part to next block
+            if (blk < this->end_ - 1 && (*(blk + 1))->has_front_space()) {
+                (*(blk + 1))->push_front(*(end - 1));
+                if (cur != end - 1) {
+                    // TODO: vector has its own backward copy, can we place them in algo?
+                    mfwu::copy_backward(cur, end - 2, cur + 1);
+                }
+                *cur = val;
+            } else {
+                // if blk + 1 == end should work
+                pblock* newblk = insert_before_block(blk + 1);
+                if (blk != newblk - 1) {
+                    blk = newblk - 1;
+                    start = (*blk)->start();
+                    cur = start + cur_idx;
+                    begin = start + begin_idx;
+                    end = start + end_idx;
+                }
+                *newblk = new block();
+                (*newblk)->assign(cur, end, (*newblk)->begin());
+                mfwu::destroy(cur + 1, end);
+                *cur = val;
+                (*blk)->end_ = cur + 1;  // TODO: check
+            }
+        }
+    }
+    void update_iter(iterator it, pblock* realloc_blk) {
+        
+    }
 
     // just insert a pblock before that blk
     // return the pblock* that point to new pblock
@@ -786,7 +884,25 @@ public:
         }
     }
     void erase(iterator first, iterator last) {
-        
+        assert(first >= begin_ && end_ >= last);
+        for (pblock* it = first; it < last; ++bit) {
+            mfwu::destroy(it);
+        }
+        //  |-----|----|------|
+        //       |-----|------|
+        if (first - begin_ < end_ - last) {
+            pblock* new_begin = begin_ + (last - first);
+            mfwu::copy_backward(begin_, first, new_begin);
+            mfwu::destroy(begin_, new_begin);
+            begin_ = new_begin;
+        } else {
+        //  |------|----|-----|
+        //  |------|-----|
+            pblock* new_end = end_ - (last - first);
+            mfwu::copy(last, end_, first);
+            mfwu::destroy(new_end, end_);
+            end_ = new_end;
+        }
     }
 
     size_type size() const { return end_ - begin_; }
