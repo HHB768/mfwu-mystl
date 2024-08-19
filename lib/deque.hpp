@@ -332,10 +332,10 @@ public:
         
         if ((*blk)->size() == BLK_SIZE) {  // full
             if (cur - begin < BLK_SIZE / 2) {
-                // lets move front part to prev block
+                // move front part to prev block
                 if (blk > this->begin_ && (*(blk - 1))->has_back_space()) {
                     (*(blk - 1))->push_back(*begin);
-                    mfwu::copy(begin + 1, cur, begin);
+                    mfwu::copy(begin + 1, cur, begin);   
                     *cur = val;
                 } else {  // previous block has no back space
                     pblock* newblk = insert_before_block(blk);
@@ -380,18 +380,16 @@ public:
                 }
             }
         } else {
-            bool is_head_free = (*blk)->has_front_space();
-            bool is_tail_free = (*blk)->has_back_space();
             value_type* cur = it.get_cur();
-            if (is_head_free && is_tail_free) {
+            if ((*blk)->has_front_space() && (*blk)->has_back_space()) {
                 if (cur - (*blk)->begin() < (*blk)->size() / 2) {
                     (*blk)->insert(cur, val, true);
                 } else {
                     (*blk)->insert(cur, val, false);
                 }
-            } else if (is_head_free) {
+            } else if ((*blk)->has_front_space()) {
                 (*blk)->insert(cur, val, true);
-            } else if (is_tail_free) {
+            } else if ((*blk)->has_back_space()) {
                 (*blk)->insert(cur, val, false);
             } else {
                 std::cout << "impossible to come here\n";  // TODO
@@ -613,59 +611,33 @@ private:
     pblock* split(iterator it) {
         // assert(it.get_cur() != it.get_begin()
         //        && it.get_cur() != it.get_end());
-        pblock* blk = it.get_pos();
-        value_type* cur = it.get_cur();
-        value_type* begin = it.get_begin();
-        value_type* end = it.get_end();
-        value_type* start = (*blk)->start();
-        size_type cur_idx = cur - start;
-        size_type begin_idx = begin - start;
-        size_type end_idx = end - start;
-    
-        if (cur - begin < BLK_SIZE / 2) {
-            // lets move front part to prev block
-            pblock* newblk = insert_before_block(blk);  // insert a new blk
-            
-            if (blk != newblk + 1) {  // bcz iter may be invalid
-                // some func called: update_iter(it)
-                blk = newblk + 1;
-                start = (*blk)->start();
-                cur = start + cur_idx;
-                begin = start + begin_idx;
-                end = start + end_idx;
-            }
+        if (it.get_cur() - it.get_begin() < BLK_SIZE / 2) {
+            // move front part to prev block
+            pblock* newblk = insert_before_block(it.get_pos());  // insert a new blk
+            it = update_iter(it, newblk + 1);
             *newblk = new block();
-            (*newblk)->assign(begin, cur, (*newblk)->begin());
-            mfwu::destroy(begin, cur);
-            (*blk)->begin_ = cur;
-        } else { // lets move back part to next block
-            if (blk < this->end_ - 1 && (*(blk + 1))->has_front_space()) {
-                (*(blk + 1))->push_front(*(end - 1));
-                if (cur != end - 1) {
-                    // TODO: vector has its own backward copy, can we place them in algo?
-                    mfwu::copy_backward(cur, end - 2, cur + 1);
-                }
-                *cur = val;
-            } else {
-                // if blk + 1 == end should work
-                pblock* newblk = insert_before_block(blk + 1);
-                if (blk != newblk - 1) {
-                    blk = newblk - 1;
-                    start = (*blk)->start();
-                    cur = start + cur_idx;
-                    begin = start + begin_idx;
-                    end = start + end_idx;
-                }
-                *newblk = new block();
-                (*newblk)->assign(cur, end, (*newblk)->begin());
-                mfwu::destroy(cur + 1, end);
-                *cur = val;
-                (*blk)->end_ = cur + 1;  // TODO: check
-            }
+            (*newblk)->assign(it.get_begin(), it.get_cur(), (*newblk)->begin());
+            mfwu::destroy(it.get_begin(), it.get_cur());
+            (*it.get_pos())->set_begin(it.get_cur());
+        } else { // move back part to next block
+            // blk + 1 == end should work
+            pblock* newblk = insert_before_block(it.get_pos() + 1);
+            it = update_iter(it, newblk - 1);
+            *newblk = new block();
+            (*newblk)->assign(it.get_cur(), it.get_end(), (*newblk)->begin());
+            mfwu::destroy(it.get_cur(), it.get_end());
+            (*it.get_pos())->set_end(it.get_cur());  // TODO: check
         }
     }
-    void update_iter(iterator it, pblock* realloc_blk) {
-        
+    iterator update_iter(iterator it, pblock* realloc_blk) {
+        pblock* original_blk = it.get_pos();
+        value_type* original_start = (*original_blk)->start();
+        value_type* realloc_start = (*realloc_blk)->start();
+        if (original_blk == realloc_blk) return ;  // not changed
+        return iterator(realloc_start + (it.get_cur() - original_start),
+                        realloc_start + (it.get_begin() - original_start),
+                        realloc_start + (it.get_end() - original_start),
+                        realloc_blk);
     }
 
     // just insert a pblock before that blk
@@ -837,7 +809,7 @@ public:
     void assign(InputIterator first, InputIterator last, iterator res) {
         iterator res_end = mfwu::uninitialized_copy(first, last, res);
         assert(res >= blk_ && res_end <= last_);
-        begin_ = res;
+        begin_ = res;  // dangerous
         end_ = res_end;
     }
     // TODO: iterator may be invalidated, plz return a new iterator
@@ -904,6 +876,9 @@ public:
             end_ = new_end;
         }
     }
+
+    void set_begin(iterator b) { begin_ = b; }
+    void set_end(iterator e) { end_ = e; }
 
     size_type size() const { return end_ - begin_; }
     size_type capacity() const { return last_ - blk_; }
