@@ -928,10 +928,14 @@ private:
         }
     }
     template <typename InputIterator>
-    value_type* move_backward(iterator it, 
+    value_type* move_both(iterator it, 
                              InputIterator first,
                              InputIterator last) {
-        // TODO
+        size_type n = last - first;
+        size_type front_space = front_space();
+        move_forward(it, first, first + front_space);
+        move_backward(it, first + front_space, last);
+        // TODO: ?
     }
     value_type* blk_;
     value_type* last_;
