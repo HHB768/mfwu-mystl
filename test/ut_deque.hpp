@@ -9,6 +9,8 @@ public:
     bool use_deque_block();
     bool use_deque_iterator();
     bool use_mfwu_deque();
+    bool use_ranged_insert();
+    bool use_ranged_erase();
 private:
     template <typename T, size_t size, typename Alloc>
     void print_block(const typename mfwu::deque<T, size, Alloc>::block& blk) {
@@ -100,6 +102,7 @@ bool unit_test_deque::use_mfwu_deque() {
     using deque4 = mfwu::deque<int, 4>;
     using deque8 = mfwu::deque<int, 8>;
 
+    std::cout << "constructing\n";
     deque4 dq1;
     print_deque(dq1);
     deque4 dq2 = {1, 2};
@@ -119,6 +122,7 @@ bool unit_test_deque::use_mfwu_deque() {
     dq8 = dq5 = {1, 3, 5, 7, 9};
     print_deque(dq8);
 
+    std::cout << "push/pop/insert/erasing\n";
     dq4.pop_back();  // TODO
     print_deque(dq4);
     dq4.push_back(8);
@@ -143,14 +147,22 @@ bool unit_test_deque::use_mfwu_deque() {
     print_deque(dq4);
     dq4.erase(dq4.begin() + 1);
     print_deque(dq4);
-    // dq4.erase(dq4.begin() + 1);
-    // WARN: avoid assertion
-
-    // TODO: more test
-    
 
     return 0;
 }
+
+bool unit_test_deque::use_ranged_insert() {
+    std::cout << "\n------- Test: use deque ranged insert -------\n";
+    using deque4 = mfwu::deque<int, 4>;
+    using deque8 = mfwu::deque<int, 8>;
+}
+bool unit_test_deque::use_ranged_erase() {
+    std::cout << "\n------- Test: use deque ranged erase -------\n";
+    using deque4 = mfwu::deque<int, 4>;
+    using deque8 = mfwu::deque<int, 8>;
+}
+
+
 
 }  // endof namespace mfwu
 

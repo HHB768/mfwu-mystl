@@ -327,6 +327,7 @@ private:
     // node* after_last_;
     // TODO: i decise that we will not enable iterator now
     // we will rethink about the hierarchy at that time
+    // TODO: lets come back to design hashtable iterator 8.23/24
     _hashtable_base table_;
 };  // endof class hashtable
 
