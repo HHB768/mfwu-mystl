@@ -156,6 +156,79 @@ void print_rbtree_heap_struct(const Sequence& seq) {
     if (col_idx) { std::cout << "\n"; }
 }
 
+
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,  
+          typename Compare>
+ForwardIt lower_bound(ForwardIt first, ForwardIt last,
+                      const T& val, Compare comp) {
+    // using value_type = 
+    //     typename mfwu::iterator_traits<ForwardIt>::value_type;
+    using difference_type = 
+        typename mfwu::iterator_traits<ForwardIt>::difference_type;
+    ForwardIt it;
+    difference_type count, step;
+    count = mfwu::distance(first, last);
+
+    while (count > 0) {
+        it = first;
+        step = count / 2;
+        mfwu::advance(it, step);
+
+        if (comp(*it, value)) {
+            first = ++it;
+            count -= step + 1;
+        } else {
+            count = step;
+        }
+    }
+    return first;
+}
+
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& val) {
+    return mfwu::lower_bound(first, last, val, mfwu::less<T>{});
+}
+
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,  
+          typename Compare>
+ForwardIt upper_bound(ForwardIt first, ForwardIt last,
+                      const T& val, Compare comp) {
+    // using value_type = 
+    //     typename mfwu::iterator_traits<ForwardIt>::value_type;
+    using difference_type = 
+        typename mfwu::iterator_traits<ForwardIt>::difference_type;
+    ForwardIt it;
+    difference_type count, step;
+    count = mfwu::distance(first, last);
+
+    while (count > 0) {
+        it = first;
+        step = count / 2;
+        mfwu::advance(it, step);
+
+        if (!comp(value, *it)) {
+            first = ++it;
+            count -= step + 1;
+        } else {
+            count = step;
+        }
+    }
+    return first;
+}
+
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val) {
+    return mfwu::upper_bound(first, last, val, mfwu::less<T>{});
+}
+
+inline size_t get_next_primer(size_t size) {
+    auto it = mfwu::lower_bound(primer_list.begin(), primer_list.end(), size);
+}
+
 }  // endof namespace mfwu
 
 #endif  // __ALGORITHM_HPP__

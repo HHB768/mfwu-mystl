@@ -17,6 +17,9 @@ class deque {
 public:
     friend class mfwu::unit_test_deque;
 
+    // you can declare a alloc for pblock here and replace malloc
+    // using Allocator = mfwu::DefaultAllocator<void*, mfwu::malloc_alloc>;
+
     using value_type = T;
     using size_type = size_t;
     struct block;
@@ -626,7 +629,7 @@ public:
     // if specify n != 0, we provide BLK_SIZE
     //            n == 0, dummy node and no mem is alloc
     block(int n=BLK_SIZE, bool reverse=false) 
-        : blk_(allocator_.allocate(n ? BLK_SIZE : 0)),
+        : blk_(Alloc::allocate(n ? BLK_SIZE : 0)),
           last_(n ? blk_ + BLK_SIZE : blk_), 
           begin_(reverse ? last_ : blk_), end_(reverse ? last_ : blk_) {}
     // if n == 0, blk_ may be a nullptr, then this block is dummy block
@@ -638,7 +641,7 @@ public:
     // we disable val default value to support dummy block init
     // maybe we should place block inside the deque
         assert(n <= BLK_SIZE);
-        blk_ = allocator_.allocate(BLK_SIZE);
+        blk_ = Alloc::allocate(BLK_SIZE);
         last_ = blk_ + BLK_SIZE;
         if (reverse) {
             end_ = last_;
@@ -649,7 +652,7 @@ public:
         }
         mfwu::construct(begin_, end_, val);
     }
-    block(const block& blk): blk_(allocator_.allocate(BLK_SIZE)),
+    block(const block& blk): blk_(Alloc::allocate(BLK_SIZE)),
                              last_(blk_ + BLK_SIZE), 
                              begin_(blk_ + (blk.begin_ - blk.blk_)), 
                              end_(blk_ + (blk.end_ - blk.blk_)) {
@@ -666,7 +669,7 @@ public:
         // std::cout << last_ << "  " << blk_ << "\n";
         // std::cout << begin_ << "  " << end_ << "\n";
         mfwu::destroy(begin_, end_);
-        allocator_.deallocate(blk_, last_ - blk_);
+        Alloc::deallocate(blk_, last_ - blk_);
     }
     
     // iterator push_front(const value_type& val) {
@@ -783,7 +786,6 @@ public:
     value_type* blk_;
     value_type* last_;
     iterator begin_, end_;
-    Alloc allocator_;
 };  // endof struct block
 
 }  // endof namespace mfwu
