@@ -21,8 +21,7 @@ public:
     // bcz the max_primer is unsigned int_max
     // it is meaningless to distinguish that bigger nums
 
-    // we dont consider implement a complete list
-    // just usable in hashtable  X-H2 24.08.08
+
     // TODO: you may try a tree or another hashtable
     // to replace this list
     class _list {
