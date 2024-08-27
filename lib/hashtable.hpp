@@ -50,7 +50,7 @@ public:
                 value(mfwu::move(nd.value)), next(nd.next) {
                 nd.next = nullptr;
             }
-        };  // endof struct node
+        };  // endof struct bucket_node
         using node = bucket_node;
 
         bucket() : head_(new node(主)) {}
@@ -154,6 +154,7 @@ public:
 
         node* head_;
     };  // endof class bucket
+    using bucket = bucket;
     using node = bucket::node;
 
     class hashtable_iterator {
@@ -213,7 +214,7 @@ public:
     using iterator = hashtable_iterator;
 
     hashtable(): capacity_(mfwu::get_next_primer(0)), size_(0),
-        buckets_(Alloc::allocate(capacity_)) {
+        buckets_(Alloc::allocate(capacity_ + 1)) {
         init_dummy_node();
     }
     hashtable(size_type capacity) 
@@ -223,6 +224,7 @@ public:
     }
     hashtable(const std::initializer_list<
               mfwu::pair<key_type, value_type>>& vals)
+        : capacity_(mfwu::get_next_primer(
         : capacity_(mfwu::get_next_primer(
                     std::ceil((float)vals.size() / alpha))),
           size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
@@ -234,7 +236,7 @@ public:
     hashtable(const hashtable& tbl) 
         : capacity_(tbl.capacity_), size_(tbl.size_),
           buckets_(Alloc::allocate(capacity_ + 1)) {
-        mfwu::construct(tbl.buckets_,
+        mfwu::copy(tbl.buckets_,
             tbl.buckets_ + capacity_ + 1, buckets_);
     }
     hashtable(hashtable&& tbl) : capacity_(tbl.capacity_),
@@ -250,7 +252,7 @@ public:
         capacity_ = tbl.capacity_;
         size_ = tbl.size_;
         buckets_ = Alloc::allocate(capacity_ + 1);
-        mfwu::construct(tbl.buckets_, 
+        mfwu::copy(tbl.buckets_, 
             tbl.buckets_ + capacity_ + 1, buckets_);
         return *this;
     }
@@ -284,7 +286,7 @@ public:
     iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
 private:
     void init_dummy_node() {
-        buckets_[capacity_].insert(key_type{}, value_type());
+        buckets_[capacity_].insert(key_type{}, value_type{});
     }
     size_type hash(const key_type& key) const {
         return hashfunc_(key) % capacity_;
@@ -303,6 +305,7 @@ private:
         *this = mfwu::move(newtable);
     }
     void add_cnt(int num) {
+        if (!num) return ;
         size_ += num;
         while ((float)size_ / capacity_ > alpha) {
             req_mem();
