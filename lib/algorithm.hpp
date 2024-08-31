@@ -229,6 +229,32 @@ inline size_t get_next_primer(size_t size) {
     auto it = mfwu::lower_bound(primer_list.begin(), primer_list.end(), size);
 }
 
+
+// other stl algos
+/**
+ * fill fill_n generate generate_n
+ * for_each transform
+ * max min max_element min_element
+ * sort partition stable_sort stable_partition 
+ *  partial_sort partial sort_copy nth_element
+ * reverse reverse_copy rotate rotate_copy
+ * random_shuffle
+ * count count_if find find_if find_first_of find_end adjacent_find
+ * search search_n binary_search
+ * lower_bound upper_bound equal_range
+ * copy copy_backward remove remove_if remove_copy remove_copy_if
+ *  replace replace_copy replace_if replace_copy_if
+ * unique unique_copy
+ * swap swap_range iter_swap
+ * accumulate partial_sum adjacent_difference inner_product
+ * equal includes lexicographical_compare mismatch
+ * merge inplace_merge set_union set_intersection 
+ *  set_difference set_symmetric_difference
+ * next_permutation prev_permutation
+ * make_heap push_heap pop_heap sort_heap
+ */
+
+
 }  // endof namespace mfwu
 
 #endif  // __ALGORITHM_HPP__

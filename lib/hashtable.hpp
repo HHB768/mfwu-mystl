@@ -53,11 +53,13 @@ public:
         };  // endof struct bucket_node
         using node = bucket_node;
 
-        bucket() : head_(new node(主)) {}
+        bucket() : head_(new node(主)),
+            next(nullptr), enable_next_(nullptr) {}
         bucket(const bucket& bkt) {
             bucket_copy(bkt);
         }
-        bucket(bucket&& bkt) : head_(bkt.head_) {
+        bucket(bucket&& bkt) : head_(bkt.head_),
+            next_(bkt.next_), enable_next_(bkt.enable_next_) {
             bkt.head_ = nullptr;
         }
         ~bucket() {
@@ -135,6 +137,8 @@ public:
                 src = src->next;
                 dst = dst->next;
             }
+            next_ = bkt.next_;
+            enable_next_ = bkt.enable_next_;
         }
         void bucket_destroy() {
             clear();
@@ -153,6 +157,9 @@ public:
         }
 
         node* head_;
+        bucket* next_;  // TODO: faster ++iterator? 
+                       // but where to set the 'enable' attribute
+        bool* enable_next_;
     };  // endof class bucket
     using bucket = bucket;
     using node = bucket::node;
@@ -215,19 +222,21 @@ public:
 
     hashtable(): capacity_(mfwu::get_next_primer(0)), size_(0),
         buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
         init_dummy_node();
     }
     hashtable(size_type capacity) 
         : capacity_(mfwu::get_next_primer(capacity)),
           size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
         init_dummy_node();
     }
     hashtable(const std::initializer_list<
               mfwu::pair<key_type, value_type>>& vals)
         : capacity_(mfwu::get_next_primer(
-        : capacity_(mfwu::get_next_primer(
                     std::ceil((float)vals.size() / alpha))),
           size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
         for (auto&& [k, v] : vals) {
             this->insert(k, v);
         }
@@ -236,7 +245,7 @@ public:
     hashtable(const hashtable& tbl) 
         : capacity_(tbl.capacity_), size_(tbl.size_),
           buckets_(Alloc::allocate(capacity_ + 1)) {
-        mfwu::copy(tbl.buckets_,
+        mfwu::uninitialized_copy(tbl.buckets_,
             tbl.buckets_ + capacity_ + 1, buckets_);
     }
     hashtable(hashtable&& tbl) : capacity_(tbl.capacity_),
@@ -244,11 +253,11 @@ public:
         tbl.buckets_ = nullptr;
     }
     ~hashtable() {
-        mfwu::destroy(buckets_, buckets_ + capacity_ + 1);
+        destroy();
         Alloc::deallocate(buckets_, capacity_ + 1);
     }
     hashtable& operator=(const hashtable& tbl) {
-        mfwu::destroy(buckets_, buckets_ + capacity_ + 1);
+        destroy();
         capacity_ = tbl.capacity_;
         size_ = tbl.size_;
         buckets_ = Alloc::allocate(capacity_ + 1);
@@ -285,11 +294,19 @@ public:
     iterator begin() { iterator(get_first_node(), get_first_bucket()); }
     iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
 private:
+    void construct() { mfwu::construct(buckets_, buckets_ + capacity_ + 1, {}); }
+    // TODO: let me think, construct dummy bucket first, then construct others with
+    //       enable = dummy.enable (which is new bool(f) swhere)
+    //       when req_mem, keep the same bool*
+    void destroy() { mfwu::destroy(buckets_, buckets_ + capacity_ + 1); }
     void init_dummy_node() {
         buckets_[capacity_].insert(key_type{}, value_type{});
     }
     size_type hash(const key_type& key) const {
         return hashfunc_(key) % capacity_;
+    }
+    void enable(bool command) {
+        buckets_[0].enbale_next_ = command;
     }
     void req_mem() {
         hashtable newtable = hashtable(mfwu::get_next_primer(capacity_ + 1));
