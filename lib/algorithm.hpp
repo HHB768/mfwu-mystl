@@ -423,6 +423,8 @@ void sort(RandomAccessIterator first,
 // std::sort partial_sort (heap_sort) etc.
 // check books
 
+// 05.  reverse reverse_copy rotate rotate_copy
+
 }  // endof namespace mfwu
 
 #endif  // __ALGORITHM_HPP__
