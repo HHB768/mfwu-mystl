@@ -424,6 +424,97 @@ void sort(RandomAccessIterator first,
 // check books
 
 // 05.  reverse reverse_copy rotate rotate_copy
+template <typename Iterator1, typename Iterator2>
+void iter_swap(Iterator1 it1, Iterator2 it2) {
+    mfwu::swap(*it1, *it2);
+}
+
+template <typename BidirectionalIterator>
+void reverse(BidirectionalIterator first, BidirectionalIterator last) {
+    using iter_cat = typename mfwu::iterator_traits<
+        BidirectionalIterator>::iterator_category;
+    if (std::is_base_of_v<mfwu::random_access_iterator_tag, iter_cat>) {
+        if (first == last) { return ; }
+        for (--last; first < last; (void)++first, --last) {
+            mfwu::iter_swap(first, last);
+        }
+    } else {
+        while (first != last && first != --last) {
+            mfwu::iter_swap(first++, last);
+        }
+    }
+}
+
+template <typename BidirectionalIterator, typename OutputIterator>
+OutputIterator reverse_copy(BidirectionalIterator first,
+                            BidirectionalIterator last,
+                            OutputIterator res) {
+    for (; first != last; ++res) {
+        *res = *(--last);
+    }
+    return res;
+}
+
+template <typename ForwardIterator>
+ForwardIterator rotate(ForwardIterator first,
+                       ForwardIterator middle,
+                       ForwardIterator last) {
+    if (first == middle) return last;
+    if (middle == last) return first;
+
+    ForwardIterator write = first;
+    ForwardIterator next_read = first;
+    for (ForwardIterator read = middle; read != last; ++write, ++read) {
+        if (write == next_read) {
+            next_read = read;  // track the "first"
+            // TODO: thick if we can break here
+        }
+        mfwu::iter_swap(write, read);
+    }
+    rotate(write, next_read, last);  // remaining part
+    return write;
+}
+
+template <typename ForwardIterator, typename OutputIterator>
+OutputIterator rotate_copy(ForwardIterator first, ForwardIterator middle,
+                           ForwardIterator last, OutputIterator res) {
+    res = mfwu::copy(middle, last, res);
+    return mfwu::copy(first, middle, res);
+}
+
+// 06.  random_shuffle
+template <typename RandomAccessIterator>
+void random_shuffle(RandomAccessIterator first, RandomAccessIterator last) {
+    for (typename mfwu::iterator_traits<RandomAccessIterator>::difference_type
+         i = last - first - 1; i > 0; --i) {
+        mfwu::swap(first[i], first[std::rand() % (i + 1)]);
+        // TODO: use std::uniform_int_distribution
+    }
+}
+
+template <typename RandomAccessIterator, typename RandomFunc>
+void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
+                    RandomFunc&& r) {
+    for (typename mfwu::iterator_traits<RandomAccessIterator>::difference_type
+         i = last - first - 1; i > 0; --i) {
+        mfwu::swap(first[i], first[r(i + 1)]);
+        // TODO: use std::uniform_int_distribution
+    }
+}
+
+template <typename RandomAccessIterator, typename UniformRandomBitGenerator>
+void shuffle(RandomAccessIterator first, RandomAccessIterator last,
+             UniformRandomBitGenerator&& g) {
+    using diff_t = typename mfwu::iterator_traits<
+                   RandomAccessIterator>::difference_type;
+    using distr_t = std::uniform_int_distribution<diff_t>;
+    using param_t = typename distr_t::param_type;
+
+    distr_t D;
+    for (diff_t i = last - first - 1; i > 0; --i) {
+        mfwu::swap(first[i], first[D(g, param_t(0, i))]);
+    }
+}
 
 }  // endof namespace mfwu
 
