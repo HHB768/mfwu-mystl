@@ -516,6 +516,59 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last,
     }
 }
 
+// 07.  count count_if find find_if find_first_of find_end adjacent_find
+template <typename InputIterator, typename T = 
+              typename mfwu::iterator_traits<InputIterator>::value_type>
+typename mfwu::iterator_traits<InputIterator>::difference_type
+count(InputIterator first, InputIterator last, const T& val) {
+    typename mfwu::iterator_traits<InputIterator>::difference_type ret = 0;
+    for ( ; first != last; ++first) {
+        ret += (*first == val);
+    }
+    return ret;
+}
+
+template <typename InputIterator, typename UnaryPred>
+typename mfwu::iterator_traits<InputIterator>::difference_type
+count_if(InputIterator first, InputIterator last, UnaryPred&& p) {
+    typename mfwu::iterator_traits<InputIterator>::difference_type ret = 0;
+    for ( ; first != last; ++first) {
+        ret += (!!p(*first));
+    }
+    return ret;
+}
+
+template <typename InputIterator, typename T = 
+            typename mfwu::iterator_traits<InputIterator>::value_type>
+InputIterator find(InputIterator first, InputIterator last, const T& val) {
+    for (; first != last; ++first) {
+        if (*first == val) return first;
+    }
+    return last;
+}
+
+template <typename InputIterator, typename UnaryPred>
+InputIterator find_if(InputIterator first, InputIterator last, UnaryPred&& p) {
+    for ( ; first != last; ++first) {
+        if (p(*first)) return first;
+    }
+    return last;
+}
+
+template <typename InputIterator, typename UnaryPred>
+InputIterator find_if_not(InputIterator first, 
+                          InputIterator last, UnaryPred&& p) {
+    for ( ; first != last; ++first) {
+        if (!p(*first)) return first;
+    }
+    return last;
+
+    // < C++11
+    // use thhis:
+    // return std::find_if(first, last, std::not1(q));
+    // not1(q) returns !p(x) (logical complement of pred(x)) 
+}
+
 }  // endof namespace mfwu
 
 #endif  // __ALGORITHM_HPP__
