@@ -712,6 +712,7 @@ public:
     }
     size_type size() const {
         return mfwu::distance(begin(), end());
+        // TODO: C++11 asks list implementation should size() within O(1)
     }
 
     void resize(size_type ref_size) {

@@ -55,34 +55,39 @@ pair<T1, T2> make_pair(T1&& f, T2&& s) {
 }
 
 template <size_t idx, typename T1, typename T2>
-typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&
+// typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&
+void
 get(mfwu::pair<T1, T2>& p) {
 
 }
 template <size_t idx, typename T1, typename T2>
-const typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&
+// const typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&
+void
 get(const mfwu::pair<T1, T2>& p) {
 
 }
 template <size_t idx, typename T1, typename T2>
-typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&&
+// typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&&
+void
 get(mfwu::pair<T1, T2>&& p) {
 
 }
 template <size_t idx, typename T1, typename T2>
-const typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&&
+// const typename mfwu::tuple_element<idx, mfwu::pair<T1, T2>>::type&&
+void
 get(const mfwu::pair<T1, T2>&& p) {
     
 }
 
-template <typename T1, typename T2>
-T1& get(const mfwu::pair<T1, T2>& vals) {
-    return vals.first;
-}
+// template <typename T1, typename T2>
+// T1& get(const mfwu::pair<T1, T2>& vals) {
+//     return vals.first;
+// }
 
-template <1, typename T1, typename T2>
-T2& get(const mfwu::pair<T1, T2>& vals) {
-    return vals.second;
+// template <1, typename T1, typename T2>
+// T2& get(const mfwu::pair<T1, T2>& vals) {
+//     return vals.second;
+// }
 
 }  // endof namespace mfwu
 

@@ -4,13 +4,14 @@
 #include "common.hpp"
 #include "iterator.hpp"
 #include "utils.hpp"
+#include "pair.hpp"
 
 namespace mfwu {
 
 template <typename RandomAccessIterator>
-void copy_backward(RandomAccessIterator first, 
-                   RandomAccessIterator last,
-                   RandomAccessIterator res) {
+inline void copy_backward(RandomAccessIterator first, 
+                          RandomAccessIterator last,
+                          RandomAccessIterator res) {
     --last;
     for (RandomAccessIterator pos = res + (last - first);
             pos >= res; --last, --pos) {
@@ -19,9 +20,9 @@ void copy_backward(RandomAccessIterator first,
 }
 
 template <typename RandomAccessIterator, typename CmpFunctor>
-RandomAccessIterator partition(RandomAccessIterator first,
-                               RandomAccessIterator last,
-                               CmpFunctor cmp) {
+inline RandomAccessIterator partition(RandomAccessIterator first,
+                                      RandomAccessIterator last,
+                                      CmpFunctor cmp) {
     // typename mfwu::iterator_traits<RandomAccessIterator>::value_type 
     auto pivot = *first;
     RandomAccessIterator left = first, right = last - 1;
@@ -39,9 +40,9 @@ RandomAccessIterator partition(RandomAccessIterator first,
 }
 
 template <typename RandomAccessIterator, typename CmpFunctor>
-void sort(RandomAccessIterator first, 
-          RandomAccessIterator last, 
-          CmpFunctor cmp) {
+inline void sort(RandomAccessIterator first, 
+                 RandomAccessIterator last, 
+                 CmpFunctor cmp) {
     if (last - first <= 1) return ;
 
     RandomAccessIterator it = first + rand() % (last - first);
@@ -53,8 +54,8 @@ void sort(RandomAccessIterator first,
 }
 
 template <typename RandomAccessIterator>
-void sort(RandomAccessIterator first, 
-          RandomAccessIterator last) {
+inline void sort(RandomAccessIterator first, 
+                 RandomAccessIterator last) {
     using CmpFunctor = mfwu::less<
         typename mfwu::iterator_traits<RandomAccessIterator>::value_type>;
     CmpFunctor cmp;
@@ -104,7 +105,7 @@ inline void print_space(int n) {
     } 
 }
 template <typename Sequence>
-void print_heap_struct(const Sequence& seq) {
+inline void print_heap_struct(const Sequence& seq) {
     int rounded_size = roundup22(seq.size());
     int max_width = rounded_size;
     int line_idx = 0;
@@ -126,7 +127,7 @@ void print_heap_struct(const Sequence& seq) {
     if (col_idx) { std::cout << "\n"; }
 }
 template <typename Sequence>
-void print_rbtree_heap_struct(const Sequence& seq) {
+inline void print_rbtree_heap_struct(const Sequence& seq) {
     int rounded_size = roundup22(seq.size());
     int max_width = rounded_size;
     int line_idx = 0;
@@ -160,8 +161,8 @@ void print_rbtree_heap_struct(const Sequence& seq) {
 template <typename ForwardIt, 
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,  
           typename Compare>
-ForwardIt lower_bound(ForwardIt first, ForwardIt last,
-                      const T& val, Compare comp) {
+inline ForwardIt lower_bound(ForwardIt first, ForwardIt last,
+                             const T& val, Compare comp) {
     // using value_type = 
     //     typename mfwu::iterator_traits<ForwardIt>::value_type;
     using difference_type = 
@@ -187,15 +188,15 @@ ForwardIt lower_bound(ForwardIt first, ForwardIt last,
 
 template <typename ForwardIt, 
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
-ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& val) {
+inline ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& val) {
     return mfwu::lower_bound(first, last, val, mfwu::less<T>{});
 }
 
 template <typename ForwardIt, 
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,  
           typename Compare>
-ForwardIt upper_bound(ForwardIt first, ForwardIt last,
-                      const T& val, Compare comp) {
+inline ForwardIt upper_bound(ForwardIt first, ForwardIt last,
+                             const T& val, Compare comp) {
     // using value_type = 
     //     typename mfwu::iterator_traits<ForwardIt>::value_type;
     using difference_type = 
@@ -221,7 +222,7 @@ ForwardIt upper_bound(ForwardIt first, ForwardIt last,
 
 template <typename ForwardIt, 
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
-ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val) {
+inline ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val) {
     return mfwu::upper_bound(first, last, val, mfwu::less<T>{});
 }
 
@@ -232,16 +233,16 @@ inline size_t get_next_primer(size_t size) {
 
 // other stl algos
 /**
- * 01.  fill fill_n generate generate_n
- * 02.  for_each transform
- * 03.  max min max_element min_element
- * 04.  sort partition stable_sort stable_partition 
- *      partial_sort partial sort_copy nth_element
- * 05.  reverse reverse_copy rotate rotate_copy
- * 06.  random_shuffle
- * 07.  count count_if find find_if find_first_of find_end adjacent_find
- * 08.  search search_n binary_search
- * 09.  lower_bound upper_bound equal_range
+ * 01. fill fill_n generate generate_n
+ * 02. for_each transform
+ * 03. max min max_element min_element
+ * 04. sort partition stable_sort stable_partition 
+ *     partial_sort partial sort_copy nth_element
+ * 05. reverse reverse_copy rotate rotate_copy
+ * 06. random_shuffle
+ * 07. count count_if find find_if find_first_of find_end adjacent_find
+ * 08. search search_n binary_search
+ * 09. lower_bound upper_bound equal_range
  * 10. copy copy_backward remove remove_if remove_copy remove_copy_if
  *     replace replace_copy replace_if replace_copy_if
  * 11. unique unique_copy
@@ -255,25 +256,25 @@ inline size_t get_next_primer(size_t size) {
  */
 // TODO: check books
 
-// 01.  fill fill_n generate generate_n
+// 01. fill fill_n generate generate_n
 // defined in utils
-template <typename ForwardIterator, 
-          typename T=typename mfwu::iterator_traits<ForwardIterator>::value_type> 
-inline void fill(ForwardIterator first, ForwardIterator last , const T& value);
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type> 
+void fill(ForwardIt first, ForwardIt last , const T& value);
 
-template <typename ForwardIterator, typename Size,
-          typename T=typename mfwu::iterator_traits<ForwardIterator>::value_type>
-inline ForwardIterator fill_n(ForwardIterator first, Size count, const T& value);
+template <typename ForwardIt, typename Size,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+ForwardIt fill_n(ForwardIt first, Size count, const T& value);
 
-template <typename ForwardIterator, typename Generator>
-inline void generate(ForwardIterator first, ForwardIterator last, Generator g) {
+template <typename ForwardIt, typename Generator>
+inline void generate(ForwardIt first, ForwardIt last, Generator g) {
     for ( ; first != last; ++first) {
         *first = g();
     }
 }
 
-template <typename ForwardIterator, typename Size, typename Generator>
-inline ForwardIterator generate(ForwardIterator first, Size n, Generator g) {
+template <typename ForwardIt, typename Size, typename Generator>
+inline ForwardIt generate(ForwardIt first, Size n, Generator g) {
     for (Size i = 0; i < n; ++i, ++first) {
         *first = g();
     }
@@ -281,30 +282,30 @@ inline ForwardIterator generate(ForwardIterator first, Size n, Generator g) {
 }
 
 
-// 02.  for_each transform
-template <typename InputIterator, typename UnaryFunc>
-UnaryFunc for_each(InputIterator first, InputIterator last, UnaryFunc f) {
+// 02. for_each transform
+template <typename InputIt, typename UnaryFunc>
+inline UnaryFunc for_each(InputIt first, InputIt last, UnaryFunc f) {
     for ( ; first != last; ++first) {
         f(*first);  // UB: if UnaryFunc is not MoveConstructible
     }
     return f;
 }
 
-template <typename InputIterator, typename OutputIterator, typename UnaryOp>
-OutputIterator transform(InputIterator first, InputIterator last,
-                         OutputIterator res, UnaryOp unary_op) {
+template <typename InputIt, typename OutputIt, typename UnaryOp>
+inline OutputIt transform(InputIt first, InputIt last,
+                          OutputIt res, UnaryOp unary_op) {
     for ( ; first != last; ++res, ++first) {
         *res = unary_op(*first);
     }
     return res;
 }
 
-// 03.  max min max_element min_element
-template <typename ForwardIterator>
-inline ForwardIterator max_element(ForwardIterator first,
-                                   ForwardIterator last) {
+// 03. max min max_element min_element
+template <typename ForwardIt>
+inline ForwardIt max_element(ForwardIt first,
+                             ForwardIt last) {
     if (first == last) { return last; }
-    ForwardIterator largest = first;
+    ForwardIt largest = first;
     while (++first != last) {
         if (*largest < *first) {
             largest = first;
@@ -313,12 +314,12 @@ inline ForwardIterator max_element(ForwardIterator first,
     return largest;
 }
 
-template <typename ForwardIterator, typename Compare>
-inline ForwardIterator max_element(ForwardIterator first,
-                                   ForwardIterator last,
-                                   Compare cmp) {
+template <typename ForwardIt, typename Compare>
+inline ForwardIt max_element(ForwardIt first,
+                             ForwardIt last,
+                             Compare cmp) {
     if (first == last) { return last; }
-    ForwardIterator largest = first;
+    ForwardIt largest = first;
     while (++first != last) {
         if (cmp(*largest, *first)) {
             largest = first;
@@ -345,11 +346,11 @@ inline T max(const std::initializer_list<T>& vals, Compare cmp) {
     return *mfwu::max_element(vals.begin(), vals.end(), cmp);
 }
 
-template <typename ForwardIterator>
-inline ForwardIterator min_element(ForwardIterator first,
-                                   ForwardIterator last) {
+template <typename ForwardIt>
+inline ForwardIt min_element(ForwardIt first,
+                             ForwardIt last) {
     if (first == last) { return last; }
-    ForwardIterator largest = first;  // largest ? :D  090124
+    ForwardIt largest = first;  // largest ? :D  090124
     while (++first != last) {
         if (*largest > *first) {
             largest = first;
@@ -358,12 +359,12 @@ inline ForwardIterator min_element(ForwardIterator first,
     return largest;
 }
 
-template <typename ForwardIterator, typename Compare>
-inline ForwardIterator min_element(ForwardIterator first,
-                                   ForwardIterator last,
-                                   Compare cmp) {
+template <typename ForwardIt, typename Compare>
+inline ForwardIt min_element(ForwardIt first,
+                             ForwardIt last,
+                             Compare cmp) {
     if (first == last) { return last; }
-    ForwardIterator largest = first;
+    ForwardIt largest = first;
     while (++first != last) {
         if (cmp(*first, *largest)) {
             largest = first;
@@ -390,13 +391,13 @@ inline T min(const std::initializer_list<T>& vals, Compare cmp) {
     return *mfwu::min_element(vals.begin(), vals.end(), cmp);
 }
 
-// 04.  sort partition stable_sort stable_partition 
-//      partial_sort partial sort_copy nth_element
+// 04. sort partition stable_sort stable_partition 
+//     partial_sort partial sort_copy nth_element
 
-//      gcc libstdc++: https://github.com/gcc-mirror/gcc/
+//     gcc libstdc++: https://github.com/gcc-mirror/gcc/
 //                     blob/d9375e490072d1aae73a93949aa158fcd2a27018/
 //                     libstdc%2B%2B-v3/include/bits/stl_algo.h#L1950
-//      llvm libc++:   https://github.com/llvm/llvm-project/
+//     llvm libc++:   https://github.com/llvm/llvm-project/
 //                     blob/e7fc254875ca9e82b899d5354fae9b5b779ff485/
 //                     libcxx/include/__algorithm/sort.h#L264
 
@@ -423,14 +424,14 @@ void sort(RandomAccessIterator first,
 // std::sort partial_sort (heap_sort) etc.
 // check books
 
-// 05.  reverse reverse_copy rotate rotate_copy
+// 05. reverse reverse_copy rotate rotate_copy
 template <typename Iterator1, typename Iterator2>
-void iter_swap(Iterator1 it1, Iterator2 it2) {
+inline void iter_swap(Iterator1 it1, Iterator2 it2) {
     mfwu::swap(*it1, *it2);
 }
 
 template <typename BidirectionalIterator>
-void reverse(BidirectionalIterator first, BidirectionalIterator last) {
+inline void reverse(BidirectionalIterator first, BidirectionalIterator last) {
     using iter_cat = typename mfwu::iterator_traits<
         BidirectionalIterator>::iterator_category;
     if (std::is_base_of_v<mfwu::random_access_iterator_tag, iter_cat>) {
@@ -445,26 +446,26 @@ void reverse(BidirectionalIterator first, BidirectionalIterator last) {
     }
 }
 
-template <typename BidirectionalIterator, typename OutputIterator>
-OutputIterator reverse_copy(BidirectionalIterator first,
-                            BidirectionalIterator last,
-                            OutputIterator res) {
+template <typename BidirectionalIterator, typename OutputIt>
+inline OutputIt reverse_copy(BidirectionalIterator first,
+                             BidirectionalIterator last,
+                             OutputIt res) {
     for (; first != last; ++res) {
         *res = *(--last);
     }
     return res;
 }
 
-template <typename ForwardIterator>
-ForwardIterator rotate(ForwardIterator first,
-                       ForwardIterator middle,
-                       ForwardIterator last) {
+template <typename ForwardIt>
+inline ForwardIt rotate(ForwardIt first,
+                        ForwardIt middle,
+                        ForwardIt last) {
     if (first == middle) return last;
     if (middle == last) return first;
 
-    ForwardIterator write = first;
-    ForwardIterator next_read = first;
-    for (ForwardIterator read = middle; read != last; ++write, ++read) {
+    ForwardIt write = first;
+    ForwardIt next_read = first;
+    for (ForwardIt read = middle; read != last; ++write, ++read) {
         if (write == next_read) {
             next_read = read;  // track the "first"
             // TODO: thick if we can break here
@@ -475,16 +476,16 @@ ForwardIterator rotate(ForwardIterator first,
     return write;
 }
 
-template <typename ForwardIterator, typename OutputIterator>
-OutputIterator rotate_copy(ForwardIterator first, ForwardIterator middle,
-                           ForwardIterator last, OutputIterator res) {
+template <typename ForwardIt, typename OutputIt>
+inline OutputIt rotate_copy(ForwardIt first, ForwardIt middle,
+                            ForwardIt last, OutputIt res) {
     res = mfwu::copy(middle, last, res);
     return mfwu::copy(first, middle, res);
 }
 
-// 06.  random_shuffle
+// 06. random_shuffle
 template <typename RandomAccessIterator>
-void random_shuffle(RandomAccessIterator first, RandomAccessIterator last) {
+inline void random_shuffle(RandomAccessIterator first, RandomAccessIterator last) {
     for (typename mfwu::iterator_traits<RandomAccessIterator>::difference_type
          i = last - first - 1; i > 0; --i) {
         mfwu::swap(first[i], first[std::rand() % (i + 1)]);
@@ -492,9 +493,10 @@ void random_shuffle(RandomAccessIterator first, RandomAccessIterator last) {
     }
 }
 
+// RandomFunc may be complex, so it is passed by reference
 template <typename RandomAccessIterator, typename RandomFunc>
-void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
-                    RandomFunc&& r) {
+inline void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
+                           RandomFunc&& r) {
     for (typename mfwu::iterator_traits<RandomAccessIterator>::difference_type
          i = last - first - 1; i > 0; --i) {
         mfwu::swap(first[i], first[r(i + 1)]);
@@ -503,8 +505,8 @@ void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
 }
 
 template <typename RandomAccessIterator, typename UniformRandomBitGenerator>
-void shuffle(RandomAccessIterator first, RandomAccessIterator last,
-             UniformRandomBitGenerator&& g) {
+inline void shuffle(RandomAccessIterator first, RandomAccessIterator last,
+                    UniformRandomBitGenerator&& g) {
     using diff_t = typename mfwu::iterator_traits<
                    RandomAccessIterator>::difference_type;
     using distr_t = std::uniform_int_distribution<diff_t>;
@@ -516,48 +518,50 @@ void shuffle(RandomAccessIterator first, RandomAccessIterator last,
     }
 }
 
-// 07.  count count_if find find_if find_first_of find_end adjacent_find
-template <typename InputIterator, typename T = 
-              typename mfwu::iterator_traits<InputIterator>::value_type>
-typename mfwu::iterator_traits<InputIterator>::difference_type
-count(InputIterator first, InputIterator last, const T& val) {
-    typename mfwu::iterator_traits<InputIterator>::difference_type ret = 0;
+// 07. count count_if find find_if find_first_of find_end adjacent_find
+template <typename InputIt, 
+          typename T = typename mfwu::iterator_traits<InputIt>::value_type>
+inline typename mfwu::iterator_traits<InputIt>::difference_type
+count(InputIt first, InputIt last, const T& val) {
+    typename mfwu::iterator_traits<InputIt>::difference_type ret = 0;
     for ( ; first != last; ++first) {
         ret += (*first == val);
     }
     return ret;
 }
 
-template <typename InputIterator, typename UnaryPred>
-typename mfwu::iterator_traits<InputIterator>::difference_type
-count_if(InputIterator first, InputIterator last, UnaryPred&& p) {
-    typename mfwu::iterator_traits<InputIterator>::difference_type ret = 0;
+// Copilot 24.09.08
+// UnaryPred is usually small, so straightforward passing is recommended
+template <typename InputIt, typename UnaryPred>
+inline typename mfwu::iterator_traits<InputIt>::difference_type
+count_if(InputIt first, InputIt last, UnaryPred p) {
+    typename mfwu::iterator_traits<InputIt>::difference_type ret = 0;
     for ( ; first != last; ++first) {
         ret += (!!p(*first));
     }
     return ret;
 }
 
-template <typename InputIterator, typename T = 
-            typename mfwu::iterator_traits<InputIterator>::value_type>
-InputIterator find(InputIterator first, InputIterator last, const T& val) {
+template <typename InputIt, 
+          typename T = typename mfwu::iterator_traits<InputIt>::value_type>
+inline InputIt find(InputIt first, InputIt last, const T& val) {
     for (; first != last; ++first) {
         if (*first == val) return first;
     }
     return last;
 }
 
-template <typename InputIterator, typename UnaryPred>
-InputIterator find_if(InputIterator first, InputIterator last, UnaryPred&& p) {
+template <typename InputIt, typename UnaryPred>
+inline InputIt find_if(InputIt first, InputIt last, UnaryPred p) {
     for ( ; first != last; ++first) {
         if (p(*first)) return first;
     }
     return last;
 }
 
-template <typename InputIterator, typename UnaryPred>
-InputIterator find_if_not(InputIterator first, 
-                          InputIterator last, UnaryPred&& p) {
+template <typename InputIt, typename UnaryPred>
+inline InputIt find_if_not(InputIt first, 
+                           InputIt last, UnaryPred p) {
     for ( ; first != last; ++first) {
         if (!p(*first)) return first;
     }
@@ -567,6 +571,240 @@ InputIterator find_if_not(InputIterator first,
     // use thhis:
     // return std::find_if(first, last, std::not1(q));
     // not1(q) returns !p(x) (logical complement of pred(x)) 
+}
+
+template <typename ForwardIt1, typename ForwardIt2>
+inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
+                         ForwardIt2 s_first, ForwardIt2 s_last) {
+    while (true) {
+        ForwardIt1 it = first;
+        for (ForwardIt2 s_it = s_first;  ; ++it, ++s_it) {
+            if (s_it == s_last) return first;
+            if (it == last) return last;
+            if (!(*it == *s_it)) break;
+        }
+        ++first;
+    }
+}  // TODO: why do so ?
+
+template <typename ForwardIt1, typename ForwardIt2,
+          typename BinaryPred>
+inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
+                         ForwardIt2 s_first, ForwardIt2 s_last,
+                         BinaryPred p) {
+    while (true) {
+        ForwardIt1 it = first;
+        for (ForwardIt2 s_it = s_first;  ; ++it, ++s_it) {
+            if (s_it == s_last) return first;
+            if (it == last) return last;
+            if (!p(*it,*s_it)) break;
+        }
+        ++first;
+    }
+}
+
+template <typename ForwardIt1, typename ForwardIt2>
+inline ForwardIt1 find_end(ForwardIt1 first, ForwardIt1 last,
+                           ForwardIt2 s_first, ForwardIt2 s_last) {
+    if (s_first == s_last) return last;
+    ForwardIt1 res = last;
+    while (true) {
+        ForwardIt1 new_res = mfwu::search(first, last, s_first, s_last);
+        if (new_res == last) break;
+        else {
+            res = new_res;
+            first = res;
+            ++first;
+        }
+    }
+    return res;
+}
+
+template <typename ForwardIt>
+inline ForwardIt adjacent_find(ForwardIt first, ForwardIt last) {
+    if (first == last) return last;
+    ForwardIt next = first; ++next;
+    for (; next != last; ++next, ++first) {
+        if (*first == *next) { return first; }
+    }
+    return last;
+}
+
+template <typename ForwardIt, typename BinaryPred>
+inline ForwardIt adjacent_find(ForwardIt first, ForwardIt last,
+                               BinaryPred p) {
+    if (first == last) return last;
+    ForwardIt next = first; ++next;
+    for (; next != last; ++next, ++first) {
+        if (p(*first, *next)) { return first; }
+    }
+    return last;
+}
+
+// CPP x 24.09.07
+// BinaryPredicate is a set of requirements expected by some of the standard
+// library facilities from the user-provided arguments.
+// Given a BinaryPredicate bin_pred and a pair of iterators iter1 and iter2
+// or an iterator iter and a (possibly const)(since C++20) value value, 
+// the expression bin_pred(*iter1, *iter2) or, respectively,
+// bin_pred(*iter, value), must be contextually convertible to bool.
+// In addition, evaluation of that expression is not allowed to call
+// non-const member functions of the dereferenced iterators ; syntactically,
+// the predicate must accept const object arguments, with the same behavior
+// regardless of whether its arguments are const or non-const(since C++20).
+
+// 08. search search_n binary_search
+template <typename ForwardIt1, typename ForwardIt2>
+inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
+                         ForwardIt2 s_first, ForwardIt2 s_last);
+
+template <typename ForwardIt1, typename ForwardIt2,
+          typename BinaryPred>
+inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
+                         ForwardIt2 s_first, ForwardIt2 s_last,
+                         BinaryPred p);
+
+template <typename ForwardIt, typename Size, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+inline ForwardIt search_n(ForwardIt first, ForwardIt last,
+                          Size count, const T& val) {
+    if (count <= 0) return first;
+    for ( ; first != last; ++first) {
+        if (!(*first == val)) continue;
+        ForwardIt candidate = first;
+        for (Size cur_count = 1; true; ++cur_count) {
+            if (cur_count >= count) return candidate;
+            ++first;
+            if (first == last) return last;
+            if (!(*first == val)) break;
+        }
+    }
+    return last;
+}
+
+template <typename ForwardIt, typename Size, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,
+          typename BinaryPred>
+inline ForwardIt search_n(ForwardIt first, ForwardIt last,
+                          Size count, const T& val, BinaryPred p) {
+    if (count <= 0) return first;
+    for ( ; first != last; ++first) {
+        if (!(p(*first, val))) continue;
+        ForwardIt candidate = first;
+        for (Size cur_count = 1; true; ++cur_count) {
+            if (cur_count >+ count) retunr candidate;
+            ++first;
+            if (first == last) return last;
+            if (!p(*first, val)) break;
+        }
+    }
+    return last;
+}
+
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,
+          typename Compare>
+inline bool binary_search(ForwardIt first, ForwardIt last,
+                          const T& val, Compare comp) {
+    first = mfwu::lower_bound(first, last, val, comp);
+    return (!(first == last) and !(comp(value, *first)));
+}
+
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+inline bool binary_search(ForwardIt first, ForwardIt last, const T& val) {
+    return mfwu::binary_search(first, last, val, mfwu::less<T>{});
+}
+
+// 09. lower_bound upper_bound equal_range
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& val);
+
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,  
+          typename Compare>
+ForwardIt upper_bound(ForwardIt first, ForwardIt last,
+                      const T& val, Compare comp);
+
+template <typename ForwardIt, 
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val);
+
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,
+          typename Compare>
+inline mfwu::pair<ForwardIt, ForwardIt>
+equal_range(ForwardIt first, ForwardIt last, const T& val, Compare cmp) {
+    return mfwu::make_pair(mfwu::lower_bound(first, last, val, cmp),
+                           mfwu::upper_bound(first, last, val, cmp));
+}
+
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+inline mfwu::pair<ForwardIt, ForwardIt>
+equal_range(ForwardIt first, ForwardIt last, const T& val) {
+    return mfwu::equal_range(first, last, val, cmp);
+}
+
+// 10. copy copy_backward remove remove_if remove_copy remove_copy_if
+//     replace replace_copy replace_if replace_copy_if
+template <typename InputIt, typename OutputIt>
+OutputIt copy(InputIt first, InputIt last, OutputIt res);
+
+template <typename RandomAccessIterator>
+inline void copy_backward(RandomAccessIterator first, 
+                          RandomAccessIterator last,
+                          RandomAccessIterator res);
+
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+inline ForwardIt remove(ForwardIt first, ForwardIt last, const T& val) {
+    first = mfwu::find(first, last, val);
+    if (first != last) {
+        for (ForwardIt i = first; ++i != last; ) {
+            if (!(*i == val)) {
+                *first++ = mfwu::move(*i);
+            }
+        }
+    }
+    return first;
+}
+
+template <typename ForwardIt, typename UnaryPred>
+inline ForwardIt remove_if(ForwardIt first, ForwardIt last, UnaryPred p) {
+    first = mfwu::find_if(first, last, p);
+    if (first != last) {
+        for (ForwardIt i = first; ++i != last; ) {
+            if (!p(*i)) {
+                *first++ = mfwu::move(*i);
+            }
+        }
+    }
+    return first;
+}
+
+template <typename InputIt, typename OutputIt,
+          typename T = typename mfwu::iterator_traits<InputIt>::value_type>
+inline OutputIt remove_copy(InputIt first, InputIt last,
+                            OutputIt res, const T& val) {
+    for ( ; first != last; ++first) {
+        if (!(*first == val)) {
+            *res++ = *first;
+        }
+    }
+    return res;
+}
+
+template <typename InputIt, typename OutputIt, typename UnaryPred>
+inline OutputIt remove_copy_if(InputIt first, InputIt last,
+                               OutputIt res, UnaryPred p) {
+    for ( ; first != last; ++first) {
+        if (!p(*first)) {
+            *res++ = *first;
+        }
+    }
+    return res;
 }
 
 }  // endof namespace mfwu
