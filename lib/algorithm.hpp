@@ -807,6 +807,124 @@ inline OutputIt remove_copy_if(InputIt first, InputIt last,
     return res;
 }
 
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+inline void replace(ForwardIt first, ForwardIt last,
+                    const T& oldv, const T& newv) {
+    for ( ; first != last; ++first) {
+        if (*first == oldv) {
+            *first == newv;
+        }
+    }
+}
+
+template <typename ForwardIt,
+          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,
+          typename UnaryPred>  // TODO: can i ?
+inline void replace_if(ForwardIt first, ForwardIt last,
+                       UnaryPred p, const T& newv) {
+    for ( ; first != last; ++first) {
+        if (p(*first)) {
+            *first = newv;
+        }
+    }
+}
+
+template <typename InputIt, typename OutputIt, 
+          typename T = typename mfwu::iterator_traits<InputIt>::value_type>
+inline OutputIt replace_copy(InputIt first, InputIt last, OutputIt res,
+                             const T& oldv, const T& newv) {
+    for ( ; first != last; ++first) {
+        *res++ = (*first == oldv) ? newv : *first;
+    }
+    return res;
+}
+
+template <typename InputIt, typename OutputIt, typename UnaryPred,
+          typename T = typename mfwu::iterator_traits<InputIt>::value_type>
+inline OutputIt replace_copy_if(InputIt first, InputIt last, OutputIt res,
+                                UnaryPred p, const T& newv) {
+    for ( ; first != last; ++first) {
+        *res++ = p(*first) ? newv : *first;
+    }
+    return res;
+}
+
+// 11. unique unique_copy
+template <typename ForwardIt>
+inline ForwardIt unique(ForwardIt first, ForwardIt last) {
+    if (first == last) return last;
+    ForwardIt res = first;
+    while (++first != last) {
+        if (!(*res == *first) && ++res != first) {
+            *res = mfwu::move(*first);
+        }
+    }
+    return ++res;
+}
+
+template <typename ForwardIt, typename BinaryPredicate>
+inline ForwardIt unique(ForwardIt first, ForwardIt last, BinaryPredicate p) {
+    if (first == last) return last;
+    ForwardIt res = first;
+    while (++first != last) {
+        if (!p(*res, *first) && ++res != first) {
+            *res = mfwu::move(*first);
+        }
+    }
+    return ++res;
+}
+
+// know more in:
+// https://github.com/gcc-mirror/gcc
+// /blob/d9375e490072d1aae73a93949aa158fcd2a27018
+// /libstdc%2B%2B-v3/include/bits/stl_algo.h#L1046
+// template <typename InputIt, typename OutputIt, typename BinaryPred>
+// inline OutputIt unique_copy(InputIt first, InputIt last,
+//                             OutputIt res, BinaryPred p);
+// inline OutputIt unique_copy(ForwardIt first, ForwardIt last,
+//                             OutputIt res, BinaryPred p);
+
+template <typename InputIt, typename ForwardIt>
+inline ForwardIt unique_copy(InputIt first, InputIt last, ForwardIt res) {
+    *res = *first;
+    while (++first != last) {
+        if (!(*res == *first)) {
+            *++res = *first;
+        }
+    }
+    return ++res;
+}
+
+template <typename InputIt, typename ForwardIt, typename BinaryPred>
+inline ForwardIt unique_copy(InputIt first, InputIt last,
+                            ForwardIt res, BinaryPred p) {
+    *res = *first;
+    while (++first != last) {
+        if (!p(*res, *first)) {
+            *++res = *first;
+        }
+    }
+    return ++res;
+}
+
+// 12. swap swap_range iter_swap
+// swap defined in common.hpp
+// TODO: plz offer specialization for every mfwu-std object
+template <typename ForwardIt1, typename ForwardIt2>
+inline ForwardIt2 swap_ranges(ForwardIt1 first, ForwardIt1 last,
+                              ForwardIt2 res) {
+    for ( ; first != last; ++first, ++res) {
+        mfwu::iter_swap(first, res);
+    }
+    return res;
+}
+
+template <typename Iterator1, typename Iterator2>
+inline void iter_swap(Iterator1 it1, Iterator2 it2);
+// TODO: we should gather definitions here and leave
+//       declaration in the original positions
+
 }  // endof namespace mfwu
 
 #endif  // __ALGORITHM_HPP__
