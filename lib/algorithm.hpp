@@ -925,6 +925,99 @@ inline void iter_swap(Iterator1 it1, Iterator2 it2);
 // TODO: we should gather definitions here and leave
 //       declaration in the original positions
 
+// 13. accumulate partial_sum adjacent_difference inner_product
+template <typename InputIt, typename T>
+T accumulate(InputIt first, InputIt last, T init) {
+    for ( ; first != last; ++first) {
+        init = mfwu::move(init) + *first;
+    }
+    return init;
+}
+
+template <typename InputIt, typename T, typename BinaryOp>
+T accumulate(InputIt first, InputIt last, T init, BinaryOp op) {
+    for ( ; first != last; ++first) {
+        init = op(mfwu::move(init), *first);
+    }
+    return init;
+}
+
+template <typename InputIt, typename OutputIt>
+OutputIt partial_sum(InputIt first, InputIt last, OutputIt res) {
+    if (first == last) { return res; }
+    typename mfwu::iterator_traits<Input>::value_type sum = *first;
+    *res = sum;
+    while (++first != last) {
+        sum = mfwu::move(sum) + *first;
+        *++res = sum;
+    }
+    return ++res;
+}
+
+template <typename InputIt, typename OutputIt, typename BinaryOp>
+OutputIt partial_sum(InputIt first, InputIt last, OutputIt res, BinaryOp op) {
+    if (first == last) { return res; }
+    typename mfwu::iterator_traits<Input>::value_type sum = *first;
+    *res = sum;
+    while (++first != last) {
+        sum = op(mfwu::move(sum), *first);
+        *++res = sum;
+    }
+    return ++res;
+}
+
+template <typename InputIt, typename OutputIt>
+OutputIt adjacent_difference(InputIt first, InputIt last, OutputIt res) {
+    if (first == last) return res;
+    using value_type = typename mfwu::iterator_traits<InputIt>::value_type;
+    value_type acc = *first;
+    *res = acc;
+
+    while (++first != last) {
+        value_type val = *first;
+        *++res = val - mfwu::move(acc);
+        acc = mfwu::move(val);
+    }
+    return ++res;
+}
+
+template <typename InputIt, typename OutputIt, typename BinaryOp>
+OutputIt adjacent_difference(InputIt first, InputIt last,
+                             OutputIt res, BinaryOp op) {
+    if (first == last) return res;
+    using value_type = typename mfwu::iterator_traits<InputIt>::value_type;
+    value_type acc = *first;
+    *res = acc;
+
+    while (++first != last) {
+        value_type val = *first;
+        *++res = op(val, mfwu::move(acc));
+        acc = mfwu::move(val);
+    }
+    return ++res;
+}
+
+template <typename InputIt1, typename InputIt2, typename T>
+T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init) {
+    while (first1 != last1) {
+        init = mfwu::move(init) + (*first) * (*first2);
+        ++first1; ++first2;
+    }
+    return init;
+}
+
+template <typename InputIt1, typename InputIt2, typename T,
+          typename BinaryOp1, typename BinaryOp2>
+T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init,
+                BinaryOp1 op1, BinaryOp2 op2) {
+    while (first1 != last1) {
+        init = op1(mfwu::move(init), op2(*first, *first2));
+        ++first1; ++first2;
+    }
+    return init;
+}
+
+
 }  // endof namespace mfwu
 
 #endif  // __ALGORITHM_HPP__
