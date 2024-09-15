@@ -1011,11 +1011,75 @@ template <typename InputIt1, typename InputIt2, typename T,
 T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init,
                 BinaryOp1 op1, BinaryOp2 op2) {
     while (first1 != last1) {
-        init = op1(mfwu::move(init), op2(*first, *first2));
+        init = op1(mfwu::move(init), op2(*first, *first2) );
         ++first1; ++first2;
     }
     return init;
 }
+
+// 14. equal includes lexicographical_compare mismatch
+
+template <typename InputIt1, typename InputIt2>
+bool equal(InputIt1 first, InputIt1 last, InputIt2 other) {
+    for ( ; first != last; ++first, ++other) {
+        if (*first != *other) return false;
+    }
+    return true;
+}
+
+template <typename InputIt1, typename InputIt2, typename BinaryPred>
+bool euqal(InputIt1 first, InputIt1 last,
+           InputIt2 other, BinaryPred p) {
+    for ( ; first != last; ++first, ++other) {
+        if (!p(*first, *other)) return false;
+    }
+    return true;
+}
+
+// TODO: 2 is a subsequence of 1 (both are sorted)
+template <typename InputIt1, typename InputIt2>
+bool includes(InputIt1 first1, InputIt1 last1,
+              InputIt2 first2, InputIt2 last2) {
+    for ( ; first2 != last2; ++first1) {
+        if (first1 == last1 || *first2 < *first1) return false;
+        if (!(*first1 < *first2)) ++first2;
+    }
+    return true;
+}
+
+template <typename InputIt1, typename InputIt2, typename Compare>
+bool includes(InputIt1 first1, InputIt1 last1,
+              InputIt2 first2, InputIt2 last2, Compare cmp) {
+    for ( ; first2 != last2; ++first1) {
+        if (first1 == last1 || cmp(*first2 < *first1)) return false;
+        if (!cmp(*first1, *first2)) ++first2;
+    }
+    return true;
+}
+
+template <typename InputIt1, typename InputIt2>
+bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
+                             InputIt2 first2, InputIt2 last2) {
+    for ( ; (first1 != last1) && (first2 != last2);
+         ++first1, (void)++first2) {
+        if (*first1 < *first2) return true;
+        if (*first2 < *first1) return false;
+    }
+    return (first1 == last1) && (first2 != last2);
+}
+
+template <typename InputIt1, typename InputIt2>
+bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
+                             InputIt2 first2, InputIt2 last2, Compare cmp) {
+    for ( ; (first1 != last1) && (first2 != last2);
+         ++first1, (void)++first2) {
+        if (cmp(*first1, *first2)) return true;
+        if (cmp(*first2 < *first1)) return false;
+    }
+    return (first1 == last1) && (first2 != last2);
+}
+
+// mismatch
 
 
 }  // endof namespace mfwu
