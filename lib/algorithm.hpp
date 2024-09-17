@@ -8,24 +8,24 @@
 
 namespace mfwu {
 
-template <typename RandomAccessIterator>
-inline void copy_backward(RandomAccessIterator first, 
-                          RandomAccessIterator last,
-                          RandomAccessIterator res) {
+template <typename RandomAccessIt>
+inline void copy_backward(RandomAccessIt first, 
+                          RandomAccessIt last,
+                          RandomAccessIt res) {
     --last;
-    for (RandomAccessIterator pos = res + (last - first);
+    for (RandomAccessIt pos = res + (last - first);
             pos >= res; --last, --pos) {
         *pos = *last;
     }
 }
 
-template <typename RandomAccessIterator, typename CmpFunctor>
-inline RandomAccessIterator partition(RandomAccessIterator first,
-                                      RandomAccessIterator last,
+template <typename RandomAccessIt, typename CmpFunctor>
+inline RandomAccessIt partition(RandomAccessIt first,
+                                      RandomAccessIt last,
                                       CmpFunctor cmp) {
-    // typename mfwu::iterator_traits<RandomAccessIterator>::value_type 
+    // typename mfwu::iterator_traits<RandomAccessIt>::value_type 
     auto pivot = *first;
-    RandomAccessIterator left = first, right = last - 1;
+    RandomAccessIt left = first, right = last - 1;
 
     while (left != right) {
         while (left < right && (cmp(pivot, *right) || pivot == *right)) { right--; }
@@ -39,13 +39,13 @@ inline RandomAccessIterator partition(RandomAccessIterator first,
     return left;
 }
 
-template <typename RandomAccessIterator, typename CmpFunctor>
-inline void sort(RandomAccessIterator first, 
-                 RandomAccessIterator last, 
+template <typename RandomAccessIt, typename CmpFunctor>
+inline void sort(RandomAccessIt first, 
+                 RandomAccessIt last, 
                  CmpFunctor cmp) {
     if (last - first <= 1) return ;
 
-    RandomAccessIterator it = first + rand() % (last - first);
+    RandomAccessIt it = first + rand() % (last - first);
     mfwu::swap(*first, *it);
 
     it = partition(first, last, cmp);
@@ -53,11 +53,11 @@ inline void sort(RandomAccessIterator first,
     sort(it + 1, last, cmp);
 }
 
-template <typename RandomAccessIterator>
-inline void sort(RandomAccessIterator first, 
-                 RandomAccessIterator last) {
+template <typename RandomAccessIt>
+inline void sort(RandomAccessIt first, 
+                 RandomAccessIt last) {
     using CmpFunctor = mfwu::less<
-        typename mfwu::iterator_traits<RandomAccessIterator>::value_type>;
+        typename mfwu::iterator_traits<RandomAccessIt>::value_type>;
     CmpFunctor cmp;
     sort(first, last, cmp);
 }
@@ -90,14 +90,10 @@ inline void sort(RandomAccessIterator first,
 //     sort(vec, 0, vec.size());
 // }
 template <typename T>
-inline const T& max(const T& a, const T& b) {
-    return a < b ? b : a;
-}
+inline const T& max(const T& a, const T& b);
 
 template <typename T>
-inline const T& min(const T& a, const T& b) {
-    return a < b ? a : b;
-}
+inline const T& min(const T& a, const T& b);
 
 inline void print_space(int n) { 
     for (int i=0; i<n; i++) {
@@ -260,11 +256,20 @@ inline size_t get_next_primer(size_t size) {
 // defined in utils
 template <typename ForwardIt, 
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type> 
-void fill(ForwardIt first, ForwardIt last , const T& value);
+void fill(ForwardIt first, ForwardIt last , const T& value) {
+    for ( ; first != last; ++first) {
+        *first = value;
+    }
+}
 
 template <typename ForwardIt, typename Size,
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
-ForwardIt fill_n(ForwardIt first, Size count, const T& value);
+ForwardIt fill_n(ForwardIt first, Size count, const T& value) {
+    for (Size i = 0; i < count; i++, first++) {
+        *first = value;
+    }
+    return first;
+}
 
 template <typename ForwardIt, typename Generator>
 inline void generate(ForwardIt first, ForwardIt last, Generator g) {
@@ -329,7 +334,9 @@ inline ForwardIt max_element(ForwardIt first,
 }
 
 template <typename T>
-inline const T& max(const T& a, const T& b);
+inline const T& max(const T& a, const T& b) {
+    return a < b ? b : a;
+}
 
 template <typename T, typename Compare>
 inline const T& max(const T& a, const T& b, Compare cmp) {
@@ -374,7 +381,9 @@ inline ForwardIt min_element(ForwardIt first,
 }
 
 template <typename T>
-inline const T& min(const T& a, const T& b);
+inline const T& min(const T& a, const T& b) {
+    return a < b ? a : b;
+}
 
 template <typename T, typename Compare>
 inline const T& min(const T& a, const T& b, Compare cmp) {
@@ -406,19 +415,19 @@ inline T min(const std::initializer_list<T>& vals, Compare cmp) {
 // https://cloud.tencent.com/developer/ask/sof/102569819
 // https://killtimer0.github.io/2021/09/20/test-sort/
 
-template <typename RandomAccessIterator, typename CmpFunctor>
-RandomAccessIterator partition(RandomAccessIterator first,
-                               RandomAccessIterator last,
+template <typename RandomAccessIt, typename CmpFunctor>
+RandomAccessIt partition(RandomAccessIt first,
+                               RandomAccessIt last,
                                CmpFunctor cmp);
 
-template <typename RandomAccessIterator, typename CmpFunctor>
-void sort(RandomAccessIterator first, 
-          RandomAccessIterator last, 
+template <typename RandomAccessIt, typename CmpFunctor>
+void sort(RandomAccessIt first, 
+          RandomAccessIt last, 
           CmpFunctor cmp);
 // the order of equal elements is not guaranteed to be preserved
-template <typename RandomAccessIterator>
-void sort(RandomAccessIterator first, 
-          RandomAccessIterator last);
+template <typename RandomAccessIt>
+void sort(RandomAccessIt first, 
+          RandomAccessIt last);
 
 // TODO: insert_sort merge_sort (stable_sort) 
 // std::sort partial_sort (heap_sort) etc.
@@ -426,9 +435,7 @@ void sort(RandomAccessIterator first,
 
 // 05. reverse reverse_copy rotate rotate_copy
 template <typename Iterator1, typename Iterator2>
-inline void iter_swap(Iterator1 it1, Iterator2 it2) {
-    mfwu::swap(*it1, *it2);
-}
+inline void iter_swap(Iterator1 it1, Iterator2 it2);
 
 template <typename BidirectionalIterator>
 inline void reverse(BidirectionalIterator first, BidirectionalIterator last) {
@@ -484,9 +491,9 @@ inline OutputIt rotate_copy(ForwardIt first, ForwardIt middle,
 }
 
 // 06. random_shuffle
-template <typename RandomAccessIterator>
-inline void random_shuffle(RandomAccessIterator first, RandomAccessIterator last) {
-    for (typename mfwu::iterator_traits<RandomAccessIterator>::difference_type
+template <typename RandomAccessIt>
+inline void random_shuffle(RandomAccessIt first, RandomAccessIt last) {
+    for (typename mfwu::iterator_traits<RandomAccessIt>::difference_type
          i = last - first - 1; i > 0; --i) {
         mfwu::swap(first[i], first[std::rand() % (i + 1)]);
         // TODO: use std::uniform_int_distribution
@@ -494,21 +501,21 @@ inline void random_shuffle(RandomAccessIterator first, RandomAccessIterator last
 }
 
 // RandomFunc may be complex, so it is passed by reference
-template <typename RandomAccessIterator, typename RandomFunc>
-inline void random_shuffle(RandomAccessIterator first, RandomAccessIterator last,
+template <typename RandomAccessIt, typename RandomFunc>
+inline void random_shuffle(RandomAccessIt first, RandomAccessIt last,
                            RandomFunc&& r) {
-    for (typename mfwu::iterator_traits<RandomAccessIterator>::difference_type
+    for (typename mfwu::iterator_traits<RandomAccessIt>::difference_type
          i = last - first - 1; i > 0; --i) {
         mfwu::swap(first[i], first[r(i + 1)]);
         // TODO: use std::uniform_int_distribution
     }
 }
 
-template <typename RandomAccessIterator, typename UniformRandomBitGenerator>
-inline void shuffle(RandomAccessIterator first, RandomAccessIterator last,
+template <typename RandomAccessIt, typename UniformRandomBitGenerator>
+inline void shuffle(RandomAccessIt first, RandomAccessIt last,
                     UniformRandomBitGenerator&& g) {
     using diff_t = typename mfwu::iterator_traits<
-                   RandomAccessIterator>::difference_type;
+                   RandomAccessIt>::difference_type;
     using distr_t = std::uniform_int_distribution<diff_t>;
     using param_t = typename distr_t::param_type;
 
@@ -575,33 +582,13 @@ inline InputIt find_if_not(InputIt first,
 
 template <typename ForwardIt1, typename ForwardIt2>
 inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
-                         ForwardIt2 s_first, ForwardIt2 s_last) {
-    while (true) {
-        ForwardIt1 it = first;
-        for (ForwardIt2 s_it = s_first;  ; ++it, ++s_it) {
-            if (s_it == s_last) return first;
-            if (it == last) return last;
-            if (!(*it == *s_it)) break;
-        }
-        ++first;
-    }
-}  // TODO: why do so ?
+                         ForwardIt2 s_first, ForwardIt2 s_last);
 
 template <typename ForwardIt1, typename ForwardIt2,
           typename BinaryPred>
 inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
                          ForwardIt2 s_first, ForwardIt2 s_last,
-                         BinaryPred p) {
-    while (true) {
-        ForwardIt1 it = first;
-        for (ForwardIt2 s_it = s_first;  ; ++it, ++s_it) {
-            if (s_it == s_last) return first;
-            if (it == last) return last;
-            if (!p(*it,*s_it)) break;
-        }
-        ++first;
-    }
-}
+                         BinaryPred p);
 
 template <typename ForwardIt1, typename ForwardIt2>
 inline ForwardIt1 find_end(ForwardIt1 first, ForwardIt1 last,
@@ -656,13 +643,33 @@ inline ForwardIt adjacent_find(ForwardIt first, ForwardIt last,
 // 08. search search_n binary_search
 template <typename ForwardIt1, typename ForwardIt2>
 inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
-                         ForwardIt2 s_first, ForwardIt2 s_last);
+                         ForwardIt2 s_first, ForwardIt2 s_last) {
+    while (true) {
+        ForwardIt1 it = first;
+        for (ForwardIt2 s_it = s_first;  ; ++it, ++s_it) {
+            if (s_it == s_last) return first;
+            if (it == last) return last;
+            if (!(*it == *s_it)) break;
+        }
+        ++first;
+    }
+}  // TODO: why do so ?
 
 template <typename ForwardIt1, typename ForwardIt2,
           typename BinaryPred>
 inline ForwardIt1 search(ForwardIt1 first, ForwardIt1 last,
                          ForwardIt2 s_first, ForwardIt2 s_last,
-                         BinaryPred p);
+                         BinaryPred p) {
+    while (true) {
+        ForwardIt1 it = first;
+        for (ForwardIt2 s_it = s_first;  ; ++it, ++s_it) {
+            if (s_it == s_last) return first;
+            if (it == last) return last;
+            if (!p(*it,*s_it)) break;
+        }
+        ++first;
+    }
+}
 
 template <typename ForwardIt, typename Size, 
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
@@ -750,12 +757,15 @@ equal_range(ForwardIt first, ForwardIt last, const T& val) {
 // 10. copy copy_backward remove remove_if remove_copy remove_copy_if
 //     replace replace_copy replace_if replace_copy_if
 template <typename InputIt, typename OutputIt>
-OutputIt copy(InputIt first, InputIt last, OutputIt res);
+OutputIt copy(InputIt first, InputIt last, OutputIt res) {
+    return copy_aux(first, last, res, 
+        typename mfwu::iterator_traits<InputIterator>::iterator_category{});
+}
 
-template <typename RandomAccessIterator>
-inline void copy_backward(RandomAccessIterator first, 
-                          RandomAccessIterator last,
-                          RandomAccessIterator res);
+template <typename RandomAccessIt>
+inline void copy_backward(RandomAccessIt first, 
+                          RandomAccessIt last,
+                          RandomAccessIt res);
 
 template <typename ForwardIt,
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
@@ -921,13 +931,15 @@ inline ForwardIt2 swap_ranges(ForwardIt1 first, ForwardIt1 last,
 }
 
 template <typename Iterator1, typename Iterator2>
-inline void iter_swap(Iterator1 it1, Iterator2 it2);
+inline void iter_swap(Iterator1 it1, Iterator2 it2) {
+    mfwu::swap(*it1, *it2);
+}
 // TODO: we should gather definitions here and leave
 //       declaration in the original positions
 
 // 13. accumulate partial_sum adjacent_difference inner_product
 template <typename InputIt, typename T>
-T accumulate(InputIt first, InputIt last, T init) {
+inline T accumulate(InputIt first, InputIt last, T init) {
     for ( ; first != last; ++first) {
         init = mfwu::move(init) + *first;
     }
@@ -935,7 +947,7 @@ T accumulate(InputIt first, InputIt last, T init) {
 }
 
 template <typename InputIt, typename T, typename BinaryOp>
-T accumulate(InputIt first, InputIt last, T init, BinaryOp op) {
+inline T accumulate(InputIt first, InputIt last, T init, BinaryOp op) {
     for ( ; first != last; ++first) {
         init = op(mfwu::move(init), *first);
     }
@@ -943,7 +955,7 @@ T accumulate(InputIt first, InputIt last, T init, BinaryOp op) {
 }
 
 template <typename InputIt, typename OutputIt>
-OutputIt partial_sum(InputIt first, InputIt last, OutputIt res) {
+inline OutputIt partial_sum(InputIt first, InputIt last, OutputIt res) {
     if (first == last) { return res; }
     typename mfwu::iterator_traits<Input>::value_type sum = *first;
     *res = sum;
@@ -955,7 +967,8 @@ OutputIt partial_sum(InputIt first, InputIt last, OutputIt res) {
 }
 
 template <typename InputIt, typename OutputIt, typename BinaryOp>
-OutputIt partial_sum(InputIt first, InputIt last, OutputIt res, BinaryOp op) {
+inline OutputIt partial_sum(InputIt first, InputIt last,
+                            OutputIt res, BinaryOp op) {
     if (first == last) { return res; }
     typename mfwu::iterator_traits<Input>::value_type sum = *first;
     *res = sum;
@@ -967,7 +980,8 @@ OutputIt partial_sum(InputIt first, InputIt last, OutputIt res, BinaryOp op) {
 }
 
 template <typename InputIt, typename OutputIt>
-OutputIt adjacent_difference(InputIt first, InputIt last, OutputIt res) {
+inline OutputIt adjacent_difference(InputIt first, InputIt last, 
+                                    OutputIt res) {
     if (first == last) return res;
     using value_type = typename mfwu::iterator_traits<InputIt>::value_type;
     value_type acc = *first;
@@ -982,8 +996,8 @@ OutputIt adjacent_difference(InputIt first, InputIt last, OutputIt res) {
 }
 
 template <typename InputIt, typename OutputIt, typename BinaryOp>
-OutputIt adjacent_difference(InputIt first, InputIt last,
-                             OutputIt res, BinaryOp op) {
+inline OutputIt adjacent_difference(InputIt first, InputIt last,
+                                    OutputIt res, BinaryOp op) {
     if (first == last) return res;
     using value_type = typename mfwu::iterator_traits<InputIt>::value_type;
     value_type acc = *first;
@@ -998,7 +1012,8 @@ OutputIt adjacent_difference(InputIt first, InputIt last,
 }
 
 template <typename InputIt1, typename InputIt2, typename T>
-T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init) {
+inline T inner_product(InputIt1 first1, InputIt1 last1, 
+                       InputIt2 first2, T init) {
     while (first1 != last1) {
         init = mfwu::move(init) + (*first) * (*first2);
         ++first1; ++first2;
@@ -1008,8 +1023,8 @@ T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init) {
 
 template <typename InputIt1, typename InputIt2, typename T,
           typename BinaryOp1, typename BinaryOp2>
-T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init,
-                BinaryOp1 op1, BinaryOp2 op2) {
+inline T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init,
+                       BinaryOp1 op1, BinaryOp2 op2) {
     while (first1 != last1) {
         init = op1(mfwu::move(init), op2(*first, *first2) );
         ++first1; ++first2;
@@ -1020,7 +1035,7 @@ T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init,
 // 14. equal includes lexicographical_compare mismatch
 
 template <typename InputIt1, typename InputIt2>
-bool equal(InputIt1 first, InputIt1 last, InputIt2 other) {
+inline bool equal(InputIt1 first, InputIt1 last, InputIt2 other) {
     for ( ; first != last; ++first, ++other) {
         if (*first != *other) return false;
     }
@@ -1028,8 +1043,8 @@ bool equal(InputIt1 first, InputIt1 last, InputIt2 other) {
 }
 
 template <typename InputIt1, typename InputIt2, typename BinaryPred>
-bool euqal(InputIt1 first, InputIt1 last,
-           InputIt2 other, BinaryPred p) {
+inline bool euqal(InputIt1 first, InputIt1 last,
+                  InputIt2 other, BinaryPred p) {
     for ( ; first != last; ++first, ++other) {
         if (!p(*first, *other)) return false;
     }
@@ -1038,8 +1053,8 @@ bool euqal(InputIt1 first, InputIt1 last,
 
 // TODO: 2 is a subsequence of 1 (both are sorted)
 template <typename InputIt1, typename InputIt2>
-bool includes(InputIt1 first1, InputIt1 last1,
-              InputIt2 first2, InputIt2 last2) {
+inline bool includes(InputIt1 first1, InputIt1 last1,
+                     InputIt2 first2, InputIt2 last2) {
     for ( ; first2 != last2; ++first1) {
         if (first1 == last1 || *first2 < *first1) return false;
         if (!(*first1 < *first2)) ++first2;
@@ -1048,8 +1063,8 @@ bool includes(InputIt1 first1, InputIt1 last1,
 }
 
 template <typename InputIt1, typename InputIt2, typename Compare>
-bool includes(InputIt1 first1, InputIt1 last1,
-              InputIt2 first2, InputIt2 last2, Compare cmp) {
+inline bool includes(InputIt1 first1, InputIt1 last1,
+                     InputIt2 first2, InputIt2 last2, Compare cmp) {
     for ( ; first2 != last2; ++first1) {
         if (first1 == last1 || cmp(*first2 < *first1)) return false;
         if (!cmp(*first1, *first2)) ++first2;
@@ -1058,8 +1073,8 @@ bool includes(InputIt1 first1, InputIt1 last1,
 }
 
 template <typename InputIt1, typename InputIt2>
-bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
-                             InputIt2 first2, InputIt2 last2) {
+inline bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
+                                    InputIt2 first2, InputIt2 last2) {
     for ( ; (first1 != last1) && (first2 != last2);
          ++first1, (void)++first2) {
         if (*first1 < *first2) return true;
@@ -1068,9 +1083,10 @@ bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
     return (first1 == last1) && (first2 != last2);
 }
 
-template <typename InputIt1, typename InputIt2>
-bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
-                             InputIt2 first2, InputIt2 last2, Compare cmp) {
+template <typename InputIt1, typename InputIt2, typename Compare>
+inline bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
+                                    InputIt2 first2, InputIt2 last2,
+                                    Compare cmp) {
     for ( ; (first1 != last1) && (first2 != last2);
          ++first1, (void)++first2) {
         if (cmp(*first1, *first2)) return true;
@@ -1079,8 +1095,268 @@ bool lexicographical_compare(InputIt1 first1, InputIt1 last1,
     return (first1 == last1) && (first2 != last2);
 }
 
-// mismatch
+template <typename InputIt1, typename InputIt2>
+inline mfwu::pair<InputIt1, InputIt2> 
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2) {
+    while (first1 != last1 && *first1 == *first2) {
+        ++first1, ++first2;
+    }
+    return mfwu::make_pair(first1, first2);
+}
 
+template <typename InputIt1, typename InputIt2, typename BinaryPred>
+inline mfwu::pair<InputIt1, InputIt2> 
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2, BinaryPred p) {
+    while (first1 != last1 && p(*first1, *first2)) {
+        ++first1, ++first2;
+    }
+    return mfwu::make_pair(first1, first2);
+}
+
+template <typename InputIt1, typename InputIt2>
+inline mfwu::pair<InputIt1, InputIt2> 
+mismatch(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
+    while (first1 != last1 && first2 != last2 && *first1 == *first2) {
+        ++first1, ++first2;
+    }
+    return mfwu::make_pair(first1, first2);
+}
+
+template <typename InputIt1, typename InputIt2, typename BinaryPred>
+inline mfwu::pair<InputIt1, InputIt2> 
+mismatch(InputIt1 first1, InputIt1 last1, 
+         InputIt2 first2, InputIt2 last2, BinaryPred p) {
+    while (first1 != last1 && first2 != last2 && p(*first1, *first2)) {
+        ++first1, ++first2;
+    }
+    return mfwu::make_pair(first1, first2);
+}
+
+// 15. merge inplace_merge set_union set_intersection 
+//     set_difference set_symmetric_difference
+
+template <typename InputIt1, typename InputIt2, typename OutputIt>
+inline OutputIt merge(InputIt1 first1, InputIt1 last1,
+                      InputIt2 first2, InputIt2 last2, OutputIt res) {
+    for ( ; first1 != last1; ++res) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (*first2 < *first1) {
+            *res = *first2;
+            ++first2;
+        } else {
+            *res = *first1;
+            ++first1;
+        }
+    }
+    return mfwu::copy(first2, last2, res);
+}
+
+template <typename InputIt1, typename InputIt2, 
+          typename OutputIt, typename Compare>
+inline OutputIt merge(InputIt1 first1, InputIt1 last1,
+                      InputIt2 first2, InputIt2 last2,
+                      OutputIt res, Compare cmp) {
+    for ( ; first1 != last1; ++res) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (comp(*first2, *first1)) {
+            *res = *first2;
+            ++first2;
+        } else {
+            *res = *first1;
+            ++first1;
+        }
+    }
+    return mfwu::copy(first2, last2, res);
+}
+
+template <typename InputIt1, typename InputIt2, typename OutputIt>
+inline OutputIt set_union(InputIt1 first1, InputIt1 last1,
+                          InputIt2 first2, InputIt2 last2, OutputIt res) {
+    for ( ; first1 != last1; ++res) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (*first2 < *first1) {
+            *res = *first2;
+            ++first2;
+        } else {
+            *res = *first1;
+            if (!(*first1 < *first2)) {
+                ++first2;
+            }
+            ++first1;
+        }
+    }
+    return mfwu::copy(first2, last2, res);
+}
+
+template <typename InputIt1, typename InputIt2, 
+          typename OutputIt, typename Compare>
+inline OutputIt set_union(InputIt1 first1, InputIt1 last1,
+                          InputIt2 first2, InputIt2 last2,
+                          OutputIt res, Compare cmp) {
+    for ( ; first1 != last1; ++res) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (comp(*first2, *first1)) {
+            *res = *first2;
+            ++first2;
+        } else {
+            *res = *first1;
+            if (!cmp(*first1, *first2)) {
+                ++first2;
+            }
+            ++first1;
+        }
+    }
+    return mfwu::copy(first2, last2, res);
+}
+
+template <typename InputIt1, typename InputIt2, typename OutputIt>
+inline OutputIt set_intersection(InputIt1 first1, InputIt1 last1,
+                                 InputIt2 first2, InputIt2 last2, 
+                                 OutputIt res) {
+    while (first1 != last1 && first2 != last2) {
+        if (*first1 < *first2) {
+            ++first1;
+        } else {
+            if (!(*first2 < *first1)) {
+                *res++ = *first1++;
+            }
+            ++first2;
+        }
+    }
+    return res;
+}
+
+template <typename InputIt1, typename InputIt2, 
+          typename OutputIt, typename Compare>
+inline OutputIt set_intersection(InputIt1 first1, InputIt1 last1,
+                                 InputIt2 first2, InputIt2 last2,
+                                 OutputIt res, Compare cmp) {
+    while (first1 != last1 && first2 != last2) {
+        if (cmp(*first1, *first2)) {
+            ++first1;
+        } else {
+            if (!cmp(*first2, *first1)) {
+                *res++ = *first1++;
+            }
+            ++first2;
+        }
+    }
+    return res;
+}
+
+template <typename InputIt1, typename InputIt2, typename OutputIt>
+inline OutputIt set_difference(InputIt1 first1, InputIt1 last1,
+                               InputIt2 first2, InputIt2 last2, 
+                               OutputIt res) {
+    while (first1 != last1) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (*first1 < *first2) {
+            *res++ = *first1++;
+        } else {
+            if (!(*first2 < *first1)) {
+                ++first1;
+            }
+            ++first2;  // NOTE: not record first2
+        }
+    }
+    return res;
+}
+
+template <typename InputIt1, typename InputIt2, 
+          typename OutputIt, typename Compare>
+inline OutputIt set_difference(InputIt1 first1, InputIt1 last1,
+                               InputIt2 first2, InputIt2 last2,
+                               OutputIt res, Compare cmp) {
+    while (first1 != last1) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (cmp(*first1, *first2)) {
+            *res++ = *first1++;
+        } else {
+            if (!cmp(*first2, *first1)) {
+                ++first1;
+            }
+            ++first2;  // NOTE: not record first2
+        }
+    }
+    return res;
+}
+
+template <typename InputIt1, typename InputIt2, typename OutputIt>
+inline OutputIt set_symmetric_difference(InputIt1 first1, InputIt1 last1,
+                                         InputIt2 first2, InputIt2 last2, 
+                                         OutputIt res) {
+    while (first1 != last1) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (*first1 < *first2) {
+            *res++ = *first1++;
+        } else {
+            if (*first2 < *first1) {
+                *res++ = *first2;  // record both first1 & first2
+            } else {
+                ++first1;
+            }
+            ++first2;
+        }
+    }
+    return mfwu::copy(first2, last2, res);
+}
+
+template <typename InputIt1, typename InputIt2, 
+          typename OutputIt, typename Compare>
+inline OutputIt set_symmetric_difference(InputIt1 first1, InputIt1 last1,
+                                         InputIt2 first2, InputIt2 last2,
+                                         OutputIt res, Compare cmp) {
+    while (first1 != last1) {
+        if (first2 == last2) {
+            return mfwu::copy(first1, last1, res);
+        }
+        if (cmp(*first1, *first2)) {
+            *res++ = *first1++;
+        } else {
+            if (cmp(*first2, *first1)) {
+                *res++ = *first2;
+            } else {
+                ++first1;
+            }
+            ++first2;
+        }
+    }
+    return mfwu::copy(first2, last2, res);
+}
+
+// TODO: inplace_merge (note: in sort)
+
+// 16. next_permutation prev_permutation
+// TODO
+
+// 17. make_heap push_heap pop_heap sort_heap
+template <typename RandomAccessIt>
+inline void sort_heap(RandomAccessIt first, RandomAccessIt last) {
+    while (first != last) {
+        mfwu::pop_heap(first, last--);
+    }
+}
+
+template <typename RandomAccessIt, typename Compare>
+inline void sort_heap(RandomAccessIt first, RandomAccessIt last, Compare cmp) {
+    while (first != last) {
+        mfwu::pop_heap(first, last--, cmp);
+    }
+}
 
 }  // endof namespace mfwu
 
