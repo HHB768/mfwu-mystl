@@ -159,7 +159,8 @@ inline OutputIterator copy_aux(InputIterator first, InputIterator last, OutputIt
 }
 
 template <typename InputIterator, typename OutputIterator, typename other_iterator_tag>
-inline OutputIterator copy_aux(InputIterator first, InputIterator last, OutputIterator res, other_iterator_tag) {
+inline OutputIterator copy_aux(InputIterator first, InputIterator last,
+                               OutputIterator res, other_iterator_tag) {
     for ( ; first != last; ++first, ++res) {
         *res = *first;
     }
@@ -167,9 +168,7 @@ inline OutputIterator copy_aux(InputIterator first, InputIterator last, OutputIt
 }
 
 template <typename InputIterator, typename OutputIterator>
-inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator res) {
-    return copy_aux(first, last, res, typename mfwu::iterator_traits<InputIterator>::iterator_category{});
-}
+inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator res);
 
 template <typename InputIteraor, typename ForwardIterator>
 inline ForwardIterator uninitialized_copy_aux(
@@ -206,11 +205,7 @@ inline wchar_t* uninitialized_copy(const wchar_t* first, const wchar_t* last, wc
 // 4 uninitialized_fill
 template <typename ForwardIterator, 
           typename T=typename mfwu::iterator_traits<ForwardIterator>::value_type>  // how about this ?
-inline void fill(ForwardIterator first, ForwardIterator last , const T& value) {
-    for ( ; first != last; ++first) {
-        *first = value;
-    }
-}
+inline void fill(ForwardIterator first, ForwardIterator last , const T& value);
 
 template <typename ForwardIterator, typename T>
 inline void uninitialized_fill_aux(ForwardIterator first, ForwardIterator last, const T& x, std::true_type) {
@@ -243,12 +238,7 @@ inline void uninitialized_fill(ForwardIterator first, ForwardIterator last, cons
 // 5 fill_n
 template <typename ForwardIterator, typename Size,
           typename T=typename mfwu::iterator_traits<ForwardIterator>::value_type>
-inline ForwardIterator fill_n(ForwardIterator first, Size count, const T& value) {
-    for (Size i = 0; i < count; i++, first++) {
-        *first = value;
-    }
-    return first;
-}
+inline ForwardIterator fill_n(ForwardIterator first, Size count, const T& value);
 
 template <typename ForwardIterator, typename Size, typename T>
 inline ForwardIterator uninitialized_fill_n_aux(ForwardIterator first, Size n, const T& x, std::true_type) {
