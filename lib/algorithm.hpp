@@ -5,6 +5,9 @@
 #include "iterator.hpp"
 #include "utils.hpp"
 #include "pair.hpp"
+// TODO: place definition here
+// let them include this file
+// and leave the declaration
 
 namespace mfwu {
 
