@@ -133,6 +133,11 @@ int main() {
     std::cout << "\n---------- Deque test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
+    // hashtable
+    // stk queue pq
+    // (unordered_)set/map
+    // string
+
 
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;
