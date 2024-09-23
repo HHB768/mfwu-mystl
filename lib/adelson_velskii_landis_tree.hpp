@@ -21,7 +21,7 @@ public:
         avl_node* left;
         avl_node* right;
         avl_node() : val(), height(1), parent(nullptr),
-                    left(nullptr), right(nullptr) {}
+                     left(nullptr), right(nullptr) {}
         avl_node(const value_type& v) : val(v), height(1), parent(nullptr),
                                         left(nullptr), right(nullptr) {}
         avl_node(value_type&& v) : val(mfwu::move(v)), parent(nullptr),
