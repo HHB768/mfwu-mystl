@@ -170,9 +170,9 @@ public:
     }
     template <typename ForwardIterator>
     vector(ForwardIterator first, ForwardIterator last) {
-        // TODO: check this
-        typename mfwu::iterator_traits<ForwardIterator>::difference_type n
-            = mfwu::distance(first, last);
+        // TODO: check this, and add template base class
+        typename mfwu::iterator_traits<ForwardIterator>::difference_type 
+             n = mfwu::distance(first, last);
         value_type* start = allocator_.allocate(n);
         init_iterator(start, n);
         mfwu::uninitialized_copy(first, last, begin_);

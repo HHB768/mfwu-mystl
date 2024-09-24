@@ -403,9 +403,9 @@ public:
         connect(prev, tail_);
     }
     template <typename InputIterator,
-            typename = typename std::enable_if_t<is_base_of_template<
-            mfwu::iterator, InputIterator>::value>
-            >
+              typename = typename std::enable_if_t<is_base_of_template<
+                    mfwu::iterator, InputIterator>::value>
+             >
     DoubleLinkedList(InputIterator first, InputIterator last) 
         : head_(new node(42)), tail_(new node(6)) {
         node* prev = head_;

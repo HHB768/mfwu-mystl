@@ -79,6 +79,13 @@ using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*
 // _M_initialize_dispatch(__first, __last, _Integral());
 // X-H-Q2 24.07.15 [0809] 
 
+// maybe i can try this: 240924
+template <typename T>
+using is_input_iterator 
+    = is_base_of_template<mfwu::input_iterator_tag,
+                          mfwu::iterator_traits<T>::iterator_category>;
+//////////////////////////
+
 template <typename T>
 inline void swap(T&& a, T&& b) {
     T temp = mfwu::move(a);

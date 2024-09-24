@@ -90,6 +90,7 @@
         "format": "cpp",
         "stacktrace": "cpp",
         "spanstream": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "version": "cpp"
     }
 }
