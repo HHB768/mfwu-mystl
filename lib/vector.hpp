@@ -325,6 +325,8 @@ public:
         }
     }
     void insert(iterator it, iterator first, iterator last) {
+        // TODO: BUG RD TO FIX
+        // you cannot assume inputiterator is vector::iterator
         assert(begin_ <= it && it <= end_);
         int n = last - first;
         if (end_ + n <= last_) {
@@ -541,6 +543,7 @@ private:
     void reset_iterator() { begin_ = end_ = last_ = iterator(); }
 
     void request_mem() {
+        // TODO: refer to string::req_mem, is it too complicated? 0927
         vector tmp;
         size_type capacity = (this->capacity() ? 2 * this->capacity() : 1);
         value_type* start = tmp.allocator_.allocate(capacity);

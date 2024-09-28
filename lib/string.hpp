@@ -9,6 +9,9 @@
 
 namespace mfwu {
 
+// TODO: how about a string implementation
+//       based on deque/vector? 0927
+
 template <typename C=char, 
           typename Alloc=mfwu::DefaultAllocator<C, mfwu::malloc_alloc>>
 class string {
@@ -76,12 +79,14 @@ public:
     size_type capacity() const { return last_ - begin_; }
     bool empty() const { return end_ == begin_; }
 
+    // we dont support value_type(Args...) here
+    // bcz value_type is usually char
     void emplace_back(const value_type& val) {
         if (end_ != last_) {
             mfwu::construct(&*end_, val);
             ++end_;
         } else {
-            request_mem();
+            req_mem();
             emplace_back(val);
         }
     }
@@ -90,7 +95,7 @@ public:
             mfwu::construct(&*end_, mfwu::forward(val));
             ++end_;
         } else {
-            request_mem();
+            req_mem();
             emplace_back(mfwu::forward(val));
         }
     }
@@ -105,7 +110,49 @@ public:
         mfwu::destroy(&*end_);
         --end_;
     }
-    // void insert
+
+    void insert(size_type idx, const value_type& val) {
+        insert(begin_ + idx, val);
+    }
+    void insert(iterator it, const value_type& val) {
+        if (end_ < last_) {
+            mfwu::construct(&*end_, back());
+            ++end_;
+            reverse_copy(it, end_, it + 1);
+            *it = val;
+        } else {
+            typename mfwu::iterator_traits<InputIterator>::difference_type 
+            idx = it - begin_;
+            req_mem();
+            insert(begin_ + idx, val);
+        }
+    }
+    template <typename InputIterator>
+    void insert(size_type idx, InputIterator first, InputIterator last) {
+        insert(begin_ + idx, first, last);
+    }
+    template <typename InputIterator>
+    void insert(iterator it, InputIterator first, InputIterator last) {
+        typename mfwu::iterator_traits<InputIterator>::difference_type 
+        n = last - first;
+        if (end_ + n <= last_) {
+            if (it + n > end_) {
+                mfwu::uninitialized_copy(it, end_, it + n);
+                mfwu::copy(first, first + (end_ - it), it);
+                mfwu::uninitialized_copy(first + (end_ - it), last, end_);
+            } else {
+                mfwu::uninitialized_copy(end_ - n, end_, end_);
+                reverse_copy(it, end_ - n, it + n);
+                mfwu::copy(first, last, it);
+            }
+            end_ += n;  // TODO: check
+        } else {
+            typename mfwu::iterator_traits<InputIterator>::difference_type 
+            idx = it - begin_;
+            req_mem();
+            insert(begin_ + idx, first, last);
+        }
+    }
     // void erase
     string& append(const value_type& val) {
         emplace_back(val);
@@ -207,6 +254,18 @@ private:
         _destroy();
         _copy(std::move(str));
     }
+    void req_mem() {
+        size_type capacity = capacity();
+        size_type new_capacity = capacity ? 2 * capacity : 1;
+        
+        iterator new_begin = allocator_.allocate(new_capacity);
+        end_ = mfwu::uninitialized_copy(begin_, end_, new_begin);
+        allocator_.deallocate(begin_, capacity);
+        begin_ = new_begin;
+        last_ = new_begin + new_capacity;
+    }
+    // TODO: private funcs with commonly-used name
+    //       should start with '_'
     
 };  // endof class string
 
