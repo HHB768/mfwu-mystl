@@ -154,6 +154,21 @@ public:
         }
     }
     // void erase
+    void erase(size_type idx) {
+        erase(begin_ + idx);
+    }
+    void erase(iterator it) {
+        mfwu::copy(it + 1, end_, it);
+        --end_;
+        mfwu::destroy(&*end_);
+    }
+    void erase(iterator first, iterator last) {
+        typename mfwu::iterator_traits<iterator>::difference_type
+        n = last - first;
+        mfwu::copy(last, end_, first);
+        mfwu::destroy(first + (end_ - last), end_);
+        end_ -= n;
+    }
     string& append(const value_type& val) {
         emplace_back(val);
         return *this;

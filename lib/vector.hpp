@@ -369,7 +369,7 @@ public:
     void erase(iterator first, iterator last) {
         assert(begin_ <= first && first <= end_
             && begin_ <= last  && last  <= end_);
-        int n = last - first;
+        int n = last - first;  // may not be integer 0929
         mfwu::copy(last, end_, first);
         mfwu::destroy(first + (end_ - last), end_);
         end_ -= n;
