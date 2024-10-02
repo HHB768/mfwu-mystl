@@ -378,7 +378,7 @@ public:
     void shrink(const size_type& ref_size) {
         if (ref_size < size() || ref_size >= capacity()) { return ; }
         value_type* start = allocator_.reallocate(&*begin_, 
-                                                    capacity(), ref_size);
+                                                  capacity(), ref_size);
         if (nullptr == start) {
             // realloc failed, dont shrink
             return ;

@@ -50,8 +50,11 @@ public:
         begin_ = allocator_.allocate(n);
         last_ = end_ = mfwu::uninitialized_copy(first, last, begin_);
     }
-    string(const string& str) {
-        _copy(str);
+    string(const string& str, size_type start_idx=0) {
+        _copy(str, start_idx);
+    }
+    string(const string& str, size_type start_idx, size_type len) {
+        _copy(str, start_idx, len);
     }
     string(string&& str) 
         : begin_(str.begin_), end_(str.end_), last_(str.last_) {}
@@ -76,6 +79,7 @@ public:
     value_type& front() const { return begin_[0]; }
     value_type& back() const { return begin_[size() - 1]; }
     size_type size() const { return end_ - begin_; }
+    size_type length() const { return size(); }
     size_type capacity() const { return last_ - begin_; }
     bool empty() const { return end_ == begin_; }
 
@@ -169,6 +173,9 @@ public:
         mfwu::destroy(first + (end_ - last), end_);
         end_ -= n;
     }
+    void erase(size_type start_idx, size_type end_idx) {
+        erase(begin_ + start_idx, begin_ + end_idx);
+    }
     string& append(const value_type& val) {
         emplace_back(val);
         return *this;
@@ -184,10 +191,45 @@ public:
         insert(end(), first, end());
         return *this;
     }
-    value_type& operator[](size_type iddx) const {
+
+    void clear() {
+        mfwu::destroy(begin_, end_);
+        end_ = begin_;
+    }
+    void replace(const value_type& val, const value_type& new_val) {
+        mfwu::replace(begin_, end_, val, new_val);
+    }
+    void reserve(size_type cap) {
+        if (cap <= capacity()) return ;
+        value_type* start = allocator_.reallocate(&*begin_, capacity(), cap);
+        if (start == nullptr || start == &*begin_) return ;
+        mfwu::uninitialized_copy(begin_, end_, start);
+        begin_ = start; end_ = begin_ + size(); last_ = begin_ + cap;
+    }
+    string copy() const {
+        return string(*this);
+    }
+    value_type* c_str() const {
+        value_type* cstr = new value_type(size() + 1);
+        value_type* cstr_end = uninitialized_copy(begin_, end_, cstr);
+        mfwu::construct(cstr_end, '\0');
+        return cstr;
+    }
+    // is it const ?
+    value_type[] data() const {
+        return this->c_str();
+    }
+    string substr(size_type start_idx, size_type len) const {
+        return string(*this, start_idx, len);
+    }
+
+    value_type& at(sie_type idx) const {
         if (idx >= size()) {
             throw std::out_of_range("mfwu::string - Index out of range");
         }
+        return begin_[idx];
+    }  // TODO: do this in vector.hpp 0930
+    value_type& operator[](size_type idx) const {
         return begin_[idx];
     }
     string& operator+=(const value_type& val) {
@@ -203,12 +245,21 @@ public:
     string& operator+=(const string& str) {
         return append(str);
     }
+    string& operator+=(const value_type& val) {
+        return append(val);
+    }
     string operator+(const string& str) {
         string temp = *this;
         temp += str;
         return temp;
     }
+    string operator+(const value_type& val) {
+        string temp = *this;
+        temp += str;
+        return temp;
+    }
     bool operator!=(const string& str) const {
+        // TODO: use mfwu::equal
         if (size() != str.size()) { return true; }
         for (iterator it1 = begin_, it2 = str.begin_;
              it1 != end_/* && it2 != str.end_*/;
@@ -238,6 +289,8 @@ public:
         return !(*this > str);
     }
 
+    // operator<<>>
+
 private: 
     iterator begin_;
     iterator end_;
@@ -250,11 +303,17 @@ private:
             allocator_.deallocate(&*begin_, capacity());
         }
     }
-    void _copy(const string& str) {
-        size_type size = str.size();
-        begin_ = size == 0 ? nullptr : allocator_.allocate(n);
-        last_ = end_ = size == 0 ? nullptr : begin_ + n;
-        mfwu::uninitialized_copy(str.begin(), str.end(), begin_);
+    void _copy(const string& str, size_type start_idx=0) {
+        size_type size = str.size() - start_idx;
+        begin_ = size == 0 ? nullptr : allocator_.allocate(size);
+        last_ = end_ = size == 0 ? nullptr : begin_ + size;
+        mfwu::uninitialized_copy(str.begin() + start_idx, str.end(), begin_);
+    }
+    void _copy(const string& str, size_type start_idx, size_type len) {
+        size_type size = mfwu::min(str.size() - start_idx, len);
+        begin_ = size == 0 ? nullptr : allocator_.allocate(size);
+        last_ = end_ = size == 0 ? nullptr : begin_ + size;
+        mfwu::uninitialized_copy_n(str.begin() + start_idx, size, begin_);
     }
     void _copy(string&& str) {
         begin_ = str.begin_;
