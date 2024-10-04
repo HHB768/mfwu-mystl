@@ -47,7 +47,10 @@ public:
                    write_pos_(), read_pos_(), size_(0) {}
     RingBuffer(size_type n) 
         : start_(allocator_.allocate(n)), last_(start_ + n),
-          write_pos_(), read_pos_(), size(n) {}
+          write_pos_(), read_pos_(), size(n) {
+        // to ensure non-pod data, init for all the mem
+        mfwu::construct(start_, last_, {});
+    }
     RingBuffer(const RingBuffer& rbf)
         : start_(allocator_.allocate(rbf.size_)), last_(start_ + n),
           write_pos_(start_ + rbf.get_write_pos_idx()),
@@ -90,9 +93,15 @@ public:
     }
     void read_advance() {
         ++read_pos_;
+        if (&*read_pos_ == last_) {
+            read_pos_ = iterator(start_);
+        }
     }
     void write_advance() {
         ++write_pos_;
+        if (&*write_pos_ == last_) {
+            write_pos_ = iterator(start_);
+        }
     }
 private:
     void _destroy() {
@@ -101,7 +110,26 @@ private:
     }
     void reset_and_copy(const RingBuffer& rbf) {
         _destroy();
-        
+        _copy(rbf);
+    }
+    void _copy(const RingBuffer& rbf) {
+        start_ = allocator_.allocate(rbf.size_);
+        mfwu::uninitialized_copy(rbf.start_, rbf.last_, start_);
+        last_ = start_ + rbf.size_;
+        write_pos_ = start_ + rbf.get_write_pos_idx();
+        read_pos_ = start_ + rbf.get_read_pos_idx();
+        size_ = rbf.size_;
+    }
+    void reset_and_copy(RingBuffer&& rbf) {
+        _destroy();
+        _copy(mfwu::move(rbf));
+    }
+    void _copy(RingBuffer&& rbf) {
+        start_ = rbf.start_; rbf.start_ = nullptr;
+        last_ = rbf.last_; rbf.last_ = nullptr;
+        write_pos_ = rbf.write_pos_; rbf.write_pos_ = {};
+        read_pos_ = rbf.read_pos_; rbf.read_pos_ = {};
+        size_ = rbf.size_;  // we wont del this
     }
     size_type get_write_pos_idx() const {
         return &*(write_pos_ - start_);
@@ -113,7 +141,7 @@ private:
     block* last_;
     iterator write_pos_;
     iterator read_pos_;
-    const size_type size_;
+    size_type size_;
     // iterator end_;
     Alloc allocator_;
 };  // endof class RingBuffer
