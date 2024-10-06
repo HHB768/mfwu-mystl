@@ -175,7 +175,7 @@ inline ForwardIt lower_bound(ForwardIt first, ForwardIt last,
         step = count / 2;
         mfwu::advance(it, step);
 
-        if (comp(*it, value)) {
+        if (comp(*it, val)) {
             first = ++it;
             count -= step + 1;
         } else {
@@ -209,7 +209,7 @@ inline ForwardIt upper_bound(ForwardIt first, ForwardIt last,
         step = count / 2;
         mfwu::advance(it, step);
 
-        if (!comp(value, *it)) {
+        if (!comp(val, *it)) {
             first = ++it;
             count -= step + 1;
         } else {
@@ -225,9 +225,9 @@ inline ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val) {
     return mfwu::upper_bound(first, last, val, mfwu::less<T>{});
 }
 
-inline size_t get_next_primer(size_t size) {
-    auto it = mfwu::lower_bound(primer_list.begin(), primer_list.end(), size);
-}
+// inline size_t get_next_primer(size_t size) {
+//     auto it = mfwu::lower_bound(primer_list.begin(), primer_list.end(), size);
+// }
 
 
 // other stl algos
@@ -258,16 +258,16 @@ inline size_t get_next_primer(size_t size) {
 // 01. fill fill_n generate generate_n
 // defined in utils
 template <typename ForwardIt, 
-          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type> 
-void fill(ForwardIt first, ForwardIt last , const T& value) {
+          typename T/* = typename mfwu::iterator_traits<ForwardIt>::value_type*/> 
+inline void fill(ForwardIt first, ForwardIt last , const T& value) {
     for ( ; first != last; ++first) {
         *first = value;
     }
 }
 
 template <typename ForwardIt, typename Size,
-          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
-ForwardIt fill_n(ForwardIt first, Size count, const T& value) {
+          typename T/* = typename mfwu::iterator_traits<ForwardIt>::value_type*/>
+inline ForwardIt fill_n(ForwardIt first, Size count, const T& value) {
     for (Size i = 0; i < count; i++, first++) {
         *first = value;
     }
@@ -702,7 +702,7 @@ inline ForwardIt search_n(ForwardIt first, ForwardIt last,
         if (!(p(*first, val))) continue;
         ForwardIt candidate = first;
         for (Size cur_count = 1; true; ++cur_count) {
-            if (cur_count >+ count) retunr candidate;
+            if (cur_count >+ count) return candidate;
             ++first;
             if (first == last) return last;
             if (!p(*first, val)) break;
@@ -717,7 +717,7 @@ template <typename ForwardIt,
 inline bool binary_search(ForwardIt first, ForwardIt last,
                           const T& val, Compare comp) {
     first = mfwu::lower_bound(first, last, val, comp);
-    return (!(first == last) and !(comp(value, *first)));
+    return (!(first == last) and !(comp(val, *first)));
 }
 
 template <typename ForwardIt,
@@ -728,17 +728,17 @@ inline bool binary_search(ForwardIt first, ForwardIt last, const T& val) {
 
 // 09. lower_bound upper_bound equal_range
 template <typename ForwardIt, 
-          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+          typename T/* = typename mfwu::iterator_traits<ForwardIt>::value_type*/>
 ForwardIt lower_bound(ForwardIt first, ForwardIt last, const T& val);
 
 template <typename ForwardIt, 
-          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type,  
+          typename T/* = typename mfwu::iterator_traits<ForwardIt>::value_type*/,  
           typename Compare>
 ForwardIt upper_bound(ForwardIt first, ForwardIt last,
                       const T& val, Compare comp);
 
 template <typename ForwardIt, 
-          typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
+          typename T/* = typename mfwu::iterator_traits<ForwardIt>::value_type*/>
 ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val);
 
 template <typename ForwardIt,
@@ -754,7 +754,7 @@ template <typename ForwardIt,
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
 inline mfwu::pair<ForwardIt, ForwardIt>
 equal_range(ForwardIt first, ForwardIt last, const T& val) {
-    return mfwu::equal_range(first, last, val, cmp);
+    return mfwu::equal_range(first, last, val, mfwu::less<T>{});
 }
 
 // 10. copy copy_backward remove remove_if remove_copy remove_copy_if
@@ -762,7 +762,7 @@ equal_range(ForwardIt first, ForwardIt last, const T& val) {
 template <typename InputIt, typename OutputIt>
 OutputIt copy(InputIt first, InputIt last, OutputIt res) {
     return copy_aux(first, last, res, 
-        typename mfwu::iterator_traits<InputIterator>::iterator_category{});
+        typename mfwu::iterator_traits<InputIt>::iterator_category{});
 }
 
 template <typename RandomAccessIt>
@@ -960,7 +960,7 @@ inline T accumulate(InputIt first, InputIt last, T init, BinaryOp op) {
 template <typename InputIt, typename OutputIt>
 inline OutputIt partial_sum(InputIt first, InputIt last, OutputIt res) {
     if (first == last) { return res; }
-    typename mfwu::iterator_traits<Input>::value_type sum = *first;
+    typename mfwu::iterator_traits<InputIt>::value_type sum = *first;
     *res = sum;
     while (++first != last) {
         sum = mfwu::move(sum) + *first;
@@ -973,7 +973,7 @@ template <typename InputIt, typename OutputIt, typename BinaryOp>
 inline OutputIt partial_sum(InputIt first, InputIt last,
                             OutputIt res, BinaryOp op) {
     if (first == last) { return res; }
-    typename mfwu::iterator_traits<Input>::value_type sum = *first;
+    typename mfwu::iterator_traits<InputIt>::value_type sum = *first;
     *res = sum;
     while (++first != last) {
         sum = op(mfwu::move(sum), *first);
@@ -1018,7 +1018,7 @@ template <typename InputIt1, typename InputIt2, typename T>
 inline T inner_product(InputIt1 first1, InputIt1 last1, 
                        InputIt2 first2, T init) {
     while (first1 != last1) {
-        init = mfwu::move(init) + (*first) * (*first2);
+        init = mfwu::move(init) + (*first1) * (*first2);
         ++first1; ++first2;
     }
     return init;
@@ -1029,7 +1029,7 @@ template <typename InputIt1, typename InputIt2, typename T,
 inline T inner_product(InputIt1 first1, InputIt1 last1, InputIt2 first2, T init,
                        BinaryOp1 op1, BinaryOp2 op2) {
     while (first1 != last1) {
-        init = op1(mfwu::move(init), op2(*first, *first2) );
+        init = op1(mfwu::move(init), op2(*first1, *first2) );
         ++first1; ++first2;
     }
     return init;
@@ -1347,19 +1347,19 @@ inline OutputIt set_symmetric_difference(InputIt1 first1, InputIt1 last1,
 // TODO
 
 // 17. make_heap push_heap pop_heap sort_heap
-template <typename RandomAccessIt>
-inline void sort_heap(RandomAccessIt first, RandomAccessIt last) {
-    while (first != last) {
-        mfwu::pop_heap(first, last--);
-    }
-}
+// template <typename RandomAccessIt>
+// inline void sort_heap(RandomAccessIt first, RandomAccessIt last) {
+//     while (first != last) {
+//         mfwu::pop_heap(first, last--);
+//     }
+// }
 
-template <typename RandomAccessIt, typename Compare>
-inline void sort_heap(RandomAccessIt first, RandomAccessIt last, Compare cmp) {
-    while (first != last) {
-        mfwu::pop_heap(first, last--, cmp);
-    }
-}
+// template <typename RandomAccessIt, typename Compare>
+// inline void sort_heap(RandomAccessIt first, RandomAccessIt last, Compare cmp) {
+//     while (first != last) {
+//         mfwu::pop_heap(first, last--, cmp);
+//     }
+// }
 
 }  // endof namespace mfwu
 

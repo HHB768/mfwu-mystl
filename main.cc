@@ -27,7 +27,8 @@
 #include "ut_bst.hpp"
 #include "ut_avl_tree.hpp"
 #include "ut_rbtree.hpp"
-#include "ut_deque.hpp"
+// #include "ut_deque.hpp"
+#include "ut_rbf.hpp"
 
 int main() {
     int ttotal = 0;
@@ -40,7 +41,8 @@ int main() {
     mfwu::unit_test_bst ut_bst;
     mfwu::unit_test_avl_tree ut_avl_tree;
     mfwu::unit_test_rbtree ut_rbtree;
-    mfwu::unit_test_deque ut_deque;
+    // mfwu::unit_test_deque ut_deque;
+    mfwu::unit_test_rbf ut_rbf;
 
     int score = 0;
     int total = 2;
@@ -124,20 +126,26 @@ int main() {
     std::cout << "\n---------- Rbtree test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_deque.use_deque_block();
-    score += !ut_deque.use_deque_iterator();
-    score += !ut_deque.use_mfwu_deque();
-    std::cout << "\n---------- Deque test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    // score = 0;
+    // total = 3;
+    // ttotal += total;
+    // score += !ut_deque.use_deque_block();
+    // score += !ut_deque.use_deque_iterator();
+    // score += !ut_deque.use_mfwu_deque();
+    // std::cout << "\n---------- Deque test result -----------\n";
+    // std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     // hashtable
     // stk queue pq
     // (unordered_)set/map
     // string
 
+    score = 0;
+    total = 1;
+    ttotal += total;
+    score += !ut_rbf.use_mfwu_rbf();
+    std::cout << "\n---------- Rbf test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;

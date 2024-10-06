@@ -1,64 +1,140 @@
 #ifndef __ringbuffer_HPP__
 #define __ringbuffer_HPP__
 
+#include "common.hpp"
 #include "allocator.hpp"
 #include "algorithm.hpp"
 
 namespace mfwu {
 
+template <typename value_type,
+          size_t blksz=128>
+struct rbf_block {
+    static constexpr size_t get_padding(size_t vtsz) {
+        return blksz * ((vtsz - 1) / blksz + 1) - vtsz;
+    }  // check: will it work? or we should deal with vtsz == 0? 24.10.5
+    value_type val;
+    char padding[get_padding(sizeof(value_type))];
+
+    rbf_block() : val() {}
+    rbf_block(const value_type& value) : val(value) {}
+    rbf_block(value_type&& value) : val(mfwu::move(value)) {}
+
+    std::string full_string(char sep=0x20) {
+        std::stringstream ss;
+        ss << val;
+        std::string str(get_padding(sizeof(value_type)), sep);
+        //              sizeof(padding) / sizeof(char)
+        ss << str;
+        return ss.str();
+    }
+};  // endof struct block with size of 128n(?)
+template <typename T, size_t sz>
+std::ostream& operator<<(std::ostream& os, 
+                         const mfwu::rbf_block<T, sz>& blk) {
+    os << blk.val;
+    return os;
+}
 template <typename T,
           size_t blksz=128,
-          typename Alloc=mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>
+          typename Alloc=mfwu::DefaultAllocator<
+              mfwu::rbf_block<T, blksz>, mfwu::malloc_alloc>>
 class ringbuffer {
 public:
     using value_type = T;
     using size_type = size_t;
+    using block = mfwu::rbf_block<value_type, blksz>;
 
-    struct block {
-        static constexpr size_type get_padding(size_type vtsz) {
-            return blksz * ((vtsz - 1) / blksz + 1) - vtsz;
-        }  // check: will it work? or we should deal with vtsz == 0? 24.10.5
-        value_type val;
-        char[get_padding(sizeof(value_type))] patch;
-    };  // endof struct block with size of 128n
+    class iterator {
+    public:
+        using value_type = T;
+        using iterator_category = mfwu::random_access_iterator_tag;
+        using pointer = value_type*;
+        using reference = value_type&;
+        using difference_type = mfwu::ptrdiff_t;
+        iterator() : ptr_(nullptr) {}
+        iterator(block* ptr) : ptr_(ptr) {}
+        iterator(const iterator& it) : ptr_(it.ptr_) {}
+        iterator(iterator&& it) : ptr_(it.ptr_) {
+            it.ptr_ = nullptr;
+        }
+        ~iterator() {}
 
-    using iterator = block*;
+        block* get_ptr() const {
+            return ptr_;
+        }
 
-    // class iterator {
-    // public:
-    //     iterator() : ptr_(nullptr) {}
-    //     iterator(T* ptr) ptr_(ptr) {}
-    //     iterator(const iterator& it) : ptr_(it.ptr_) {}
-    //     iterator(iterator&& it) : ptr_(it.ptr_) {
-    //         it.ptr_ = nullptr;
-    //     }
-    //     ~iterator() {}
-    //     iterator& operator=(const iterator& it) {
-    //         ptr_ = it.ptr_;
-    //         return *this;
-    //     }
-    //     iterator& operator=(iterator&& it) {
-    //         ptr_ = it.ptr_;
-    //         it.ptr_ = nullptr;
-    //         return *this;
-    //     }
-    //     iterator& operator++
+        iterator& operator=(const iterator& it) {
+            ptr_ = it.ptr_;
+            return *this;
+        }
+        iterator& operator=(iterator&& it) {
+            ptr_ = it.ptr_;
+            it.ptr_ = nullptr;
+            return *this;
+        }
+        iterator& operator++() {
+            ++ptr_;
+            return *this;
+        }
+        iterator operator++(int) {
+            iterator temp = *this;
+            ++ptr_;
+            return temp;
+        }
+        iterator& operator--() {
+            --ptr_;
+            return *this;
+        }
+        iterator operator--(int) {
+            iterator temp = *this;
+            --ptr_;
+            return temp;
+        }
+        iterator operator+(int n) {
+            iterator temp = *this;
+            temp.ptr_ += n;
+            return temp;
+        }
+        iterator operator-(int n) {
+            iterator temp = *this;
+            temp.ptr_ -= n;
+            return temp;
+        }
+        difference_type operator-(const iterator& it) const {
+            return ptr_ - it.ptr_;
+        }
 
-    // private:
-    //     T* ptr_;
-    // }
+        value_type& operator*() const {
+            return ptr_->val;
+        }
+        value_type* operator->() const {
+            return & this->operator*();
+        }
+
+        bool operator==(const iterator& it) const {
+            return ptr_ == it.ptr_;
+        }
+        bool operator!=(const iterator& it) const {
+            return !(*this == it);
+        }
+        // TODO: other op
+    private:
+        block* ptr_;
+    };  // endof class iterator
+
     ringbuffer() : start_(nullptr), last_(nullptr), 
                    write_pos_(), read_pos_(), size_(0) {}
     ringbuffer(size_type n) 
         : start_(allocator_.allocate(n)), last_(start_ + n),
-          write_pos_(), read_pos_(), size(n) {
+          write_pos_(start_), read_pos_(start_), size_(n) {
         // to ensure non-pod data, init for all the mem
-        mfwu::construct(start_, last_, {});
+        mfwu::construct(start_, last_, value_type{});
     }
     ringbuffer(const ringbuffer& rbf)
-        : start_(allocator_.allocate(rbf.size_)), last_(start_ + n),
+        : start_(allocator_.allocate(rbf.size_)), last_(start_ + rbf.size_),
           write_pos_(start_ + rbf.get_write_pos_idx()),
-          read_pos_(start_ + rbf.get_read_pos_idx()), size(rbf.size_) {
+          read_pos_(start_ + rbf.get_read_pos_idx()), size_(rbf.size_) {
         mfwu::uninitialized_copy(rbf.start_, rbf.last_, start_);
     }
     ringbuffer(ringbuffer&& rbf) 
@@ -70,6 +146,13 @@ public:
     }
     ~ringbuffer() {
         _destroy();
+    }
+
+    iterator begin() const { return read_pos_; }
+    iterator end() const { return write_pos_; }
+    size_type size() const { 
+        assert(last_ - start_ == size_);
+        return size_; 
     }
 
     ringbuffer& operator=(const ringbuffer& rbf) {
@@ -86,31 +169,29 @@ public:
         return *ret;
     }
     void write(const value_type& val) {
-        block blk{val};
-        *write_pos_ = mfwu::move(blk);
+        *write_pos_ = val;
         write_advance();
     }
     void write(value_type&& val) {
-        block blk(mfwu::move(val));
-        *write_pos_ = mfwu::move(blk);
+        *write_pos_ = mfwu::move(val);
         write_advance();
     }
     void read_advance() {
         ++read_pos_;
-        if (&*read_pos_ == last_) {
+        if (read_pos_ == last_) {
             read_pos_ = iterator(start_);
         }
     }
     void write_advance() {
         ++write_pos_;
-        if (&*write_pos_ == last_) {
+        if (write_pos_ == last_) {
             write_pos_ = iterator(start_);
         }
     }
 private:
     void _destroy() {
         mfwu::destroy(start_, last_);
-        allocator_.deallocate(size_);
+        allocator_.deallocate(start_.get_ptr(), size_);
     }
     void reset_and_copy(const ringbuffer& rbf) {
         _destroy();
@@ -142,8 +223,8 @@ private:
         return &*(read_pos_ - start_);
     }
 
-    block* start_;
-    block* last_;
+    iterator start_;
+    iterator last_;
     iterator write_pos_;
     iterator read_pos_;
     size_type size_;
