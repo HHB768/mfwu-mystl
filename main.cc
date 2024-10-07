@@ -10,6 +10,7 @@
 #   define __UNIT_TEST_BST_BRIEF__
 #   define __UNIT_TEST_AVL_TREE_BRIEF__
 #   define __UNIT_TEST_RBTREE_BRIEF__
+#   define __UNIT_TEST_RBF_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__

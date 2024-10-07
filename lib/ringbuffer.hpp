@@ -118,6 +118,9 @@ public:
         bool operator!=(const iterator& it) const {
             return !(*this == it);
         }
+        bool operator<(const iterator& it) const {
+            return ptr_ != it.ptr_;  // TODO: ! TEMP
+        }
         // TODO: other op
     private:
         block* ptr_;
@@ -164,17 +167,21 @@ public:
         return *this;
     }
     value_type& read() {
+        while (read_pos_ == write_pos_) {}
         iterator ret = read_pos_;
         read_advance();
         return *ret;
     }
     void write(const value_type& val) {
+
         *write_pos_ = val;
         write_advance();
     }
     void write(value_type&& val) {
-        *write_pos_ = mfwu::move(val);
+        iterator ori = write_pos_;
         write_advance();
+        while (write_pos_ == read_pos_) {}
+        *ori = mfwu::move(val);
     }
     void read_advance() {
         ++read_pos_;
@@ -217,10 +224,10 @@ private:
         size_ = rbf.size_;  // we wont del this
     }
     size_type get_write_pos_idx() const {
-        return &*(write_pos_ - start_);
+        return write_pos_ - start_;
     }
     size_type get_read_pos_idx() const {
-        return &*(read_pos_ - start_);
+        return read_pos_ - start_;
     }
 
     iterator start_;
