@@ -30,6 +30,7 @@
 #include "ut_rbtree.hpp"
 // #include "ut_deque.hpp"
 #include "ut_rbf.hpp"
+#include "ut_hashtable.hpp"
 
 int main() {
     int ttotal = 0;
@@ -44,6 +45,7 @@ int main() {
     mfwu::unit_test_rbtree ut_rbtree;
     // mfwu::unit_test_deque ut_deque;
     mfwu::unit_test_rbf ut_rbf;
+    mfwu::unit_test_hashtable ut_htbl;
 
     int score = 0;
     int total = 2;
@@ -146,6 +148,13 @@ int main() {
     ttotal += total;
     score += !ut_rbf.use_mfwu_rbf();
     std::cout << "\n---------- Rbf test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 1;
+    ttotal += total;
+    score += !ut_htbl.use_mfwu_hashtable();
+    std::cout << "\n---------- Hashtable test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     std::cout << "\n---------- test result -----------\n";

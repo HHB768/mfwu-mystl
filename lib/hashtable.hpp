@@ -11,13 +11,149 @@
 
 namespace mfwu {
 
+template <typename key_type, typename value_type>
+class bucket {
+public:
+    struct bucket_node {
+        key_type key;
+        value_type value;
+        bucket_node* next;
+
+        // TODO: i found many class lacks one or more
+        // rvalue constructor
+        bucket_node() : key(), value(), next(nullptr) {}
+        bucket_node(const key_type& k, const value_type& v)
+            : key(k), value(v), next(nullptr) {}
+        bucket_node(const key_type& k, const value_type& v, bucket_node* n)
+            : key(k), value(v), next(n) {}
+        bucket_node(const bucket_node& nd)
+            : key(nd.key), value(nd.value), next(nd.next) {}
+        bucket_node(bucket_node&& nd) : key(mfwu::move(nd.key)),
+            value(mfwu::move(nd.value)), next(nd.next) {
+            nd.next = nullptr;
+        }
+    };  // endof struct bucket_node
+    using node = bucket_node;
+
+    bucket() : head_(new node(key_type{主}, 6)),
+        next_(nullptr), enable_next_(nullptr) {}
+    bucket(const bucket& bkt) {
+        bucket_copy(bkt);
+    }
+    bucket(bucket&& bkt) : head_(bkt.head_),
+        next_(bkt.next_), enable_next_(bkt.enable_next_) {
+        bkt.head_ = nullptr;
+    }
+    ~bucket() {
+        bucket_destroy();
+    }
+
+    bucket& operator=(const bucket& bkt) {
+        clear();
+        bucket_copy(bkt);
+        return *this;
+    }
+    bucket& operator=(bucket&& bkt) {
+        clear();
+        head_ = bkt.head_;
+        bkt.head_ = nullptr;
+    }
+    
+    bool empty() { return head_->next == nullptr; }
+    size_t size() {
+        node* cur = head_->next;
+        size_t cnt = 0;
+        while (cur) {
+            cnt++;
+            cur = cur->next;
+        }
+        return cnt;
+    }
+    node* front() { return head_->next; }
+    mfwu::pair<node*, bool> push(const key_type& key, 
+                                    const value_type& value) {
+        node* ret = search(key);
+        if (ret != nullptr) {
+            ret->value = value;
+            return {ret, false};
+        }
+        node* next = head_->next;
+        node* cur = new node(key, value, next);
+        head_->next = cur;
+        return {cur, true};
+    }
+    void pop() {
+        node* next = head_->next;
+        head_->next = next->next;
+        delete next;
+    }
+    bool pop(const key_type& key) {
+        node* prev = head_;
+        while (prev->next) {
+            if (prev->next->key == key) {
+                node* next = prev->next;
+                prev->next = next->next;
+                delete next;
+                return true;
+            }
+            prev = prev->next;
+        }
+        return false;
+    }
+    mfwu::pair<value_type&, bool> get(const key_type& key) {
+        node* ret = search(key);
+        bool is_new_node = false;
+        if (ret == nullptr) {
+            ret = push(key, value_type{}).first;
+            is_new_node = true;
+        }
+        return {ret->value, is_new_node};
+    }
+private:
+    void bucket_copy(const bucket& bkt) {
+        head_ = new node(*bkt.head_);
+        node* src = bkt.head_;
+        node* dst = head_;
+        while (src != nullptr) {
+            dst->next = new node(*src->next);
+            src = src->next;
+            dst = dst->next;
+        }
+        next_ = bkt.next_;
+        enable_next_ = bkt.enable_next_;
+    }
+    void bucket_destroy() {
+        clear();
+        delete head_;
+    }
+    void clear() { while (head_->next) { pop(); } }
+    node* search(const key_type& key) {
+        node* cur = head_->next;
+        while (cur) {
+            if (cur->key == key) {
+                return cur;
+            }
+            cur = cur->next;
+        }
+        return nullptr;
+    }
+
+    node* head_;
+    bucket* next_;  // TODO: faster ++iterator? 
+                    // but where to set the 'enable' attribute
+    bool* enable_next_;
+};  // endof class bucket
+
+class unit_test_hashtable;
+
 template <typename Key,
           typename Value,
           typename Hash=mfwu::hash_functor<Key>,
           typename Alloc=mfwu::DefaultAllocator<
-                         void*, mfwu::malloc_alloc>>
+                         mfwu::bucket<Key, Value>, mfwu::malloc_alloc>>
 class hashtable {
 public:
+    friend class mfwu::unit_test_hashtable;
     using key_type = Key;
     using value_type = Value;
     using size_type = size_t;
@@ -30,139 +166,9 @@ public:
     // to explain api
     // just usable in hashtable  X-H2 24.08.08
     // tree/list/hashtable
-    class bucket {
-    public:
-        struct bucket_node {
-            key_type key;
-            value_type value;
-            node* next;
-
-            // TODO: i found many class lacks one or more
-            // rvalue constructor
-            node() : key(), value(), next(nullptr) {}
-            node(const key_type& k, const value_type& v)
-                : key(k), value(v), next(nullptr) {}
-            node(const key_type& k, const value_type& v, node* n)
-                : key(k), value(v), next(n) {}
-            node(const node& nd)
-                : key(nd.key), value(nd.value), next(nd.next) {}
-            node(node&& nd) : key(mfwu::move(nd.key)),
-                value(mfwu::move(nd.value)), next(nd.next) {
-                nd.next = nullptr;
-            }
-        };  // endof struct bucket_node
-        using node = bucket_node;
-
-        bucket() : head_(new node(主)),
-            next(nullptr), enable_next_(nullptr) {}
-        bucket(const bucket& bkt) {
-            bucket_copy(bkt);
-        }
-        bucket(bucket&& bkt) : head_(bkt.head_),
-            next_(bkt.next_), enable_next_(bkt.enable_next_) {
-            bkt.head_ = nullptr;
-        }
-        ~bucket() {
-            bucket_destroy();
-        }
-
-        bucket& operator=(const bucket& bkt) {
-            clear();
-            bucket_copy(bkt);
-            return *this;
-        }
-        bucket& operator=(bucket&& bkt) {
-            clear();
-            head_ = bkt.head_;
-            bkt.head_ = nullptr;
-        }
-        
-        bool empty() { return head_->next == nullptr; }
-        size_type size() {
-            node* cur = head_->next;
-            size_type cnt = 0;
-            while (cur) {
-                cnt++;
-                cur = cur->next;
-            }
-            return cnt;
-        }
-        node* front() { return head_->next; }
-        mfwu::pair<node*, bool> push(const key_type& key, 
-                                     const value_type& value) {
-            node* ret = search(key);
-            if (ret != nullptr) {
-                ret->value = value;
-                return {ret, false};
-            }
-            node* next = head_->next;
-            node* cur = new node(key, value, next);
-            head_->next = cur;
-            return {cur, true};
-        }
-        void pop() {
-            node* next - head_->next;
-            head_->next = next->next;
-            delete next;
-        }
-        bool pop(const key_type& key) {
-            node* prev = head_;
-            while (prev->next) {
-                if (prev->next->key == key) {
-                    node* next = prev->next;
-                    prev->next = next->next;
-                    delete next;
-                    return true;
-                }
-                prev = prev->next;
-            }
-            return false;
-        }
-        mfwu::pair<value_type&, bool> get(const key_type& key) {
-            node* ret = search(key);
-            bool is_new_node = false;
-            if (ret == nullptr) {
-                ret = push(key, value_type{}).first;
-                is_new_node = true;
-            }
-            return {ret->value, is_new_node};
-        }
-    private:
-        void bucket_copy(const bucket& bkt) {
-            head_ = new node(bkt.head_);
-            node* src = bkt.head_;
-            node* dst = head_;
-            while (src != nullptr) {
-                dst->next = new node(src->next);
-                src = src->next;
-                dst = dst->next;
-            }
-            next_ = bkt.next_;
-            enable_next_ = bkt.enable_next_;
-        }
-        void bucket_destroy() {
-            clear();
-            delete head_;
-        }
-        void clear() { while (head_->next) { pop(); } }
-        node* search(const key_type& key) {
-            node* cur = head_->next;
-            while (cur) {
-                if (cur->key == key) {
-                    return cur;
-                }
-                cur = cur->next;
-            }
-            return nullptr;
-        }
-
-        node* head_;
-        bucket* next_;  // TODO: faster ++iterator? 
-                       // but where to set the 'enable' attribute
-        bool* enable_next_;
-    };  // endof class bucket
-    using bucket = bucket;
-    using node = bucket::node;
+    
+    using bucket = mfwu::bucket<key_type, value_type>;
+    using node = typename bucket::node;
 
     class hashtable_iterator {
     public:
@@ -177,10 +183,10 @@ public:
 
         hashtable_iterator() : cur_(nullptr), buckets_(nullptr) {}
         hashtable_iterator(node* cur, bucket* buckets)
-            : cur_(cur), buckets_(bucket) {}
+            : cur_(cur), buckets_(buckets) {}
         hashtable_iterator(const hashtable_iterator& it)
             : cur_(it.cur), buckets_(it.buckets_) {}
-        ~hashtable() {}
+        ~hashtable_iterator() {}
         hashtable_iterator& operator=(const hashtable_iterator& it) {
             cur_ = it.cur; buckets_ = it.buckets_;
             return *this;
@@ -249,7 +255,7 @@ public:
             tbl.buckets_ + capacity_ + 1, buckets_);
     }
     hashtable(hashtable&& tbl) : capacity_(tbl.capacity_),
-        size_(tbl.size_), bucket_(tbl.buckets_) {
+        size_(tbl.size_), buckets_(tbl.buckets_) {
         tbl.buckets_ = nullptr;
     }
     ~hashtable() {
@@ -285,7 +291,7 @@ public:
     value_type& operator[](const key_type& key) {
         // assert
         size_type hashed_key = hash(key);
-        auto& [val, is_new_node] = buckets_[hashed_key].get(key);
+        auto&& [val, is_new_node] = buckets_[hashed_key].get(key);
         add_cnt(is_new_node);
         return val;
     }
@@ -294,13 +300,13 @@ public:
     iterator begin() { iterator(get_first_node(), get_first_bucket()); }
     iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
 private:
-    void construct() { mfwu::construct(buckets_, buckets_ + capacity_ + 1, {}); }
+    void construct() { mfwu::construct(buckets_, buckets_ + capacity_ + 1, bucket{}); }
     // TODO: let me think, construct dummy bucket first, then construct others with
     //       enable = dummy.enable (which is new bool(f) swhere)
     //       when req_mem, keep the same bool*
     void destroy() { mfwu::destroy(buckets_, buckets_ + capacity_ + 1); }
     void init_dummy_node() {
-        buckets_[capacity_].insert(key_type{}, value_type{});
+        buckets_[capacity_].push(key_type{}, value_type{});
     }
     size_type hash(const key_type& key) const {
         return hashfunc_(key) % capacity_;
@@ -313,8 +319,8 @@ private:
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket cur = buckets_[idx];
             while (!cur.empty()) {
-                bucket::node& node = cur.front();
-                newtable.insert(cur->key, cur->value);
+                node* nd = cur.front();
+                newtable.insert(nd->key, nd->value);
                 cur.pop();
             }
         }
@@ -333,16 +339,16 @@ private:
         for (size_type idx = 0; idx < capacity_; ++idx) {
             if (!buckets_[idx].empty()) return buckets_[idx];
         }
-        return get_dummy_bucket;
+        return get_dummy_bucket();
     }
     node* get_first_node() const {
-        return get_first_bucket.front();
+        return get_first_bucket().front();
     }
     bucket& get_dummy_bucket() const {
         return buckets_[capacity_];
     }
     node* get_dummy_node() const {
-        return get_dummy_bucket.front();
+        return get_dummy_bucket().front();
     }
 
     size_type capacity_;

@@ -7,14 +7,15 @@ namespace mfwu {
 // std::pair<int, int> q;
 
 template <typename T1, typename T2>
-class pair {
+struct pair {
     // TODO: stl has soooo many enable_if restrictions here
     pair() : first(), second() {}
     pair(const T1& f, const T2& s) : first(f), second(s) {}
-    pair(const T1& f, T2&& s) 
-        : first(f), second(mfwu::move(s)) {}
-    pair(T1&& f, const T2& s) 
-        : first(mfwu::move(f)), second(s) {}
+    // pair(const T1& f, T2&& s) 
+    //     : first(f), second(mfwu::move(s)) {}
+    // pair(T1&& f, const T2& s) 
+    //     : first(mfwu::move(f)), second(s) {}
+    // you cannot overload like this 10.10/24
     pair(T1&& f, T2&& s) 
         : first(mfwu::move(f)), second(mfwu::move(s)) {}
     pair(const pair& p) 
@@ -35,7 +36,7 @@ class pair {
 
     T1 first;
     T2 second;
-};  // endof class pair
+};  // endof struct pair
 
 template <typename T1, typename T2>
 pair<T1, T2> make_pair(const T1& f, const T2& s) {

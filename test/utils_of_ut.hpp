@@ -41,6 +41,20 @@ void print_tree_struct(Node* root) {
     print_heap_struct(tree2vec(root));
 }
 
+void print_rect(const mfwu::vector<mfwu::vector<int>>& cache) {
+    for (size_t i = 0; i < cache.size(); ++i) {
+        std::stringstream ss; 
+        ss << "|\t";
+        bool flag = false;
+        for (size_t j = 0; j < cache[0].size(); ++j) {
+            ss << cache[i][j] << "\t|\t";
+            if (cache[i][j] != -1) { flag = true; }
+        }
+        if (flag) std::cout << ss.str() << "\n";
+    }
+    std::cout << "\n";
+}
+
 }  // endof namespace mfwu
 
 #endif  // __UTILS_OF_UT__
