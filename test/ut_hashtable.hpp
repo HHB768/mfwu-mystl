@@ -26,14 +26,16 @@ private:
     static hash_func hash_;
     void print_hashtable(const hashtable<data, int, data_hash>& htbl) {
         mfwu::vector<mfwu::vector<int>> 
-            cache(htbl.capacity_, mfwu::vector<int>(htbl.size_, -1));
+            cache(htbl.size_, mfwu::vector<int>(htbl.capacity_, -主));
+        std::cout << "capacity: " << htbl.capacity_ << "\t"
+                  << "size: " << htbl.size_ << "\n";
         for (size_t idx = 0; idx < htbl.capacity_; ++idx) {
             if (!htbl.buckets_[idx].empty()) {
                 size_t depth = 0;
                 auto cur = htbl.buckets_[idx].front();
                 while (cur) {
-                    cache[idx][depth] = cur->value;
-                    ++depth; ++cur;
+                    cache[depth][idx] = cur->value;
+                    ++depth; cur = cur->next;
                 }
             }
         }
@@ -61,13 +63,15 @@ std::ostream& operator<<(std::ostream& os,
 
 bool unit_test_hashtable::use_mfwu_hashtable() {
     std::cout << "\n------- Test: use mfwu::hashtable -------\n";
-    mfwu::hashtable<data, int, data_hash> htbl1(10);
-    std::cout << "1\n";
+    mfwu::hashtable<data, int, data_hash> htbl1(5);
     htbl1[data{1}] = 1;
-    std::cout << "2\n";
     htbl1.insert(data{2}, 2);
-    std::cout << "3\n";
     htbl1.insert(mfwu::make_pair<data, int>(data{3}, 3));
+    htbl1[data{6}] = 6;
+    htbl1[data{5}] = 5;
+    htbl1[data{26}] = 11;
+    print_hashtable(htbl1);
+    // TODO: DEBUG REQ_MEM
 
     return 0;
 }

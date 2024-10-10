@@ -101,6 +101,10 @@ inline void construct(ForwardIterator first, ForwardIterator last, const T& valu
 */
 
 // 1 construct from-to
+// warning: you wont wanna pass a Ty&& as Args
+//          bcz the first iter will steal the content and
+//          the rest iter will place this ub object
+// 24.10.11 X 
 template <typename ForwardIterator, typename... Args>
 inline void construct(ForwardIterator first, ForwardIterator last, Args&&... args) {
     using Ty = typename mfwu::iterator_traits<ForwardIterator>::value_type;

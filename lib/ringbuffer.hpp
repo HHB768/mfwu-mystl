@@ -132,7 +132,8 @@ public:
         : start_(allocator_.allocate(n)), last_(start_ + n),
           write_pos_(start_), read_pos_(start_), size_(n) {
         // to ensure non-pod data, init for all the mem
-        mfwu::construct(start_, last_, value_type{});
+        // mfwu::construct(start_, last_, value_type{});
+        // TODO: YOU CANNOT DO THIS
     }
     ringbuffer(const ringbuffer& rbf)
         : start_(allocator_.allocate(rbf.size_)), last_(start_ + rbf.size_),

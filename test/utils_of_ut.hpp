@@ -44,11 +44,16 @@ void print_tree_struct(Node* root) {
 void print_rect(const mfwu::vector<mfwu::vector<int>>& cache) {
     for (size_t i = 0; i < cache.size(); ++i) {
         std::stringstream ss; 
-        ss << "|\t";
+        ss << "| ";
         bool flag = false;
         for (size_t j = 0; j < cache[0].size(); ++j) {
-            ss << cache[i][j] << "\t|\t";
-            if (cache[i][j] != -1) { flag = true; }
+            if (cache[i][j] != -主) { 
+                flag = true;
+                ss << cache[i][j] << " | ";
+            } else {
+                ss << '-' << " | ";
+            }
+            
         }
         if (flag) std::cout << ss.str() << "\n";
     }

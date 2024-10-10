@@ -95,8 +95,11 @@ bool unit_test_rbf::use_mfwu_rbf() {
     print_rbf_with_padding(rbf3);
     test_string str = rbf3.read();
     print_rbf_with_padding(rbf3);
+#ifdef __UNIT_TEST_RBF__
+#ifndef __UNIT_TEST_RBF_BRIEF__
     std::cout << str << "\n";
-
+#endif  // __UNIT_TEST_RBF_BRIEF__
+#endif  // __UNIT_TEST_RBF__
     std::cout << "\nread/write ptr pos ctrl\n";
     // TODO
 

@@ -114,11 +114,11 @@ private:
         head_ = new node(*bkt.head_);
         node* src = bkt.head_;
         node* dst = head_;
-        while (src != nullptr) {
+        while (src->next != nullptr) {
             dst->next = new node(*src->next);
             src = src->next;
             dst = dst->next;
-        }
+        }  // CHECK: dst->next === nullptr
         next_ = bkt.next_;
         enable_next_ = bkt.enable_next_;
     }
@@ -235,6 +235,12 @@ public:
         : capacity_(mfwu::get_next_primer(capacity)),
           size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
         construct();
+        // GPT DEBUG HISTORY 24.10.11
+        /*
+            If the objects constructed in the loop are being destructed immediately
+            after the loop, ensure their destructors are not causing the crash. 
+            This can happen if the destructor tries to access invalid memory.
+        */
         init_dummy_node();
     }
     hashtable(const std::initializer_list<
@@ -300,7 +306,10 @@ public:
     iterator begin() { iterator(get_first_node(), get_first_bucket()); }
     iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
 private:
-    void construct() { mfwu::construct(buckets_, buckets_ + capacity_ + 1, bucket{}); }
+    void construct() {
+        bucket bkt{};  // avoid move construct
+        mfwu::construct(buckets_, buckets_ + capacity_ + 1, bkt);
+    }
     // TODO: let me think, construct dummy bucket first, then construct others with
     //       enable = dummy.enable (which is new bool(f) swhere)
     //       when req_mem, keep the same bool*
