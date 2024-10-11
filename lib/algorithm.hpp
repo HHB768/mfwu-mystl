@@ -226,7 +226,7 @@ inline ForwardIt upper_bound(ForwardIt first, ForwardIt last, const T& val) {
 }
 
 inline unsigned long get_next_primer(unsigned long num) {
-    return *mfwu::upper_bound(primer_list.begin(), primer_list.end(), num);
+    return *mfwu::lower_bound(primer_list.begin(), primer_list.end(), num);
 }
 
 // other stl algos

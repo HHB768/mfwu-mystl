@@ -135,8 +135,8 @@ class bst_node;
 template <typename T>
 using tree_node = bst_node<T>;
 
-constexpr std::array<unsigned long, 29> primer_list = {
-      5ul,          53ul,         97ul,         193ul,       389ul,
+constexpr std::array<unsigned long, 30> primer_list = {
+      5ul,  11ul/*test*/,  53ul,  97ul,         193ul,       389ul,
       769ul,        1543ul,       3079ul,       6151ul,      12289ul,
       24593ul,      49157ul,      98317ul,      196613ul,    393241ul,
       786433ul,     1572869ul,    3145739ul,    6291469ul,   12582917ul,

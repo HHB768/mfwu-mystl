@@ -34,7 +34,9 @@ private:
                 size_t depth = 0;
                 auto cur = htbl.buckets_[idx].front();
                 while (cur) {
+                    // std::cout << idx << ", " << depth << "\n";
                     cache[depth][idx] = cur->value;
+                    // std::cout << cur->next << "\n";
                     ++depth; cur = cur->next;
                 }
             }
@@ -65,13 +67,18 @@ bool unit_test_hashtable::use_mfwu_hashtable() {
     std::cout << "\n------- Test: use mfwu::hashtable -------\n";
     mfwu::hashtable<data, int, data_hash> htbl1(5);
     htbl1[data{1}] = 1;
-    htbl1.insert(data{2}, 2);
-    htbl1.insert(mfwu::make_pair<data, int>(data{3}, 3));
-    htbl1[data{6}] = 6;
     htbl1[data{5}] = 5;
-    htbl1[data{26}] = 11;
+    htbl1.insert(mfwu::make_pair<data, int>(data{3}, 3));
+    print_hashtable(htbl1);
+    htbl1[data{6}] = 主;
+    htbl1.insert(data{2}, 2);
+    htbl1.insert(data{5}, 主);
+    htbl1[data{12}] = 主;
+    print_hashtable(htbl1);
+    ++htbl1[data{主}];
     print_hashtable(htbl1);
     // TODO: DEBUG REQ_MEM
+    // TODO: ENABLE NEXT
 
     return 0;
 }

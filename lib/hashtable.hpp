@@ -265,22 +265,26 @@ public:
         tbl.buckets_ = nullptr;
     }
     ~hashtable() {
-        destroy();
-        Alloc::deallocate(buckets_, capacity_ + 1);
+        reset();
     }
     hashtable& operator=(const hashtable& tbl) {
-        destroy();
+        reset();
         capacity_ = tbl.capacity_;
         size_ = tbl.size_;
         buckets_ = Alloc::allocate(capacity_ + 1);
-        mfwu::copy(tbl.buckets_, 
+        mfwu::uninitialized_copy(tbl.buckets_, 
             tbl.buckets_ + capacity_ + 1, buckets_);
         return *this;
     }
     hashtable& operator=(hashtable&& tbl) {
+        reset();
         capacity_ = tbl.capacity_;
         size_ = tbl.size_;
         buckets_ = tbl.buckets_;
+        tbl.buckets_ = nullptr;
+        tbl.capacity_ = -1;  // nt!
+        // let deallocate() deallocate nothing
+        // 24.10.11
         return *this;
     }
     void insert(const key_type& key, const value_type& val) {
@@ -296,10 +300,10 @@ public:
     }
     value_type& operator[](const key_type& key) {
         // assert
-        size_type hashed_key = hash(key);
-        auto&& [val, is_new_node] = buckets_[hashed_key].get(key);
-        add_cnt(is_new_node);
-        return val;
+        add_cnt(buckets_[hash(key)].get(key).second);
+        // note: you must search again bcz add_cnt may
+        //       rehash the buckets 24.10.11 
+        return buckets_[hash(key)].get(key).first;
     }
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
@@ -314,6 +318,8 @@ private:
     //       enable = dummy.enable (which is new bool(f) swhere)
     //       when req_mem, keep the same bool*
     void destroy() { mfwu::destroy(buckets_, buckets_ + capacity_ + 1); }
+    void deallocate() { Alloc::deallocate(buckets_, capacity_ + 1); }
+    void reset() { destroy(); deallocate(); }
     void init_dummy_node() {
         buckets_[capacity_].push(key_type{}, value_type{});
     }
