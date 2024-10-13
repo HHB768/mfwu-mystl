@@ -35,13 +35,11 @@ public:
     };  // endof struct bucket_node
     using node = bucket_node;
 
-    bucket() : head_(new node(key_type{主}, 6)),
-        next_(nullptr), enable_next_(nullptr) {}
+    bucket() : head_(new node(key_type{主}, 6)) {}
     bucket(const bucket& bkt) {
         bucket_copy(bkt);
     }
-    bucket(bucket&& bkt) : head_(bkt.head_),
-        next_(bkt.next_), enable_next_(bkt.enable_next_) {
+    bucket(bucket&& bkt) : head_(bkt.head_) {
         bkt.head_ = nullptr;
     }
     ~bucket() {
@@ -119,8 +117,6 @@ private:
             src = src->next;
             dst = dst->next;
         }  // CHECK: dst->next === nullptr
-        next_ = bkt.next_;
-        enable_next_ = bkt.enable_next_;
     }
     void bucket_destroy() {
         clear();
@@ -139,9 +135,12 @@ private:
     }
 
     node* head_;
-    bucket* next_;  // TODO: faster ++iterator? 
-                    // but where to set the 'enable' attribute
-    bool* enable_next_;
+    // bucket* next_;  // TODO: faster ++iterator? 
+    //                 // but where to set the 'enable' attribute
+    // bool* enable_next_;
+    // ans on 10.13: put it in hashtable and all bkts ref to it
+    // but i finally discard this idea, see iterator::operator++
+
 };  // endof class bucket
 
 class unit_test_hashtable;
@@ -207,6 +206,14 @@ public:
         // TODO: BAD DESIGN, you should make node->next
         // can across buckets (LegacyForwardIterator ?)
         // or add a machenism that across the valid buckests 
+
+        // you know, i finally rollback my modification during the whole day
+        // bcz i realize hashtable itself will never regonize the moment that
+        // it can 'enable next", unless user traverse it and manually set it
+        // enable. meanwhile, the cost of 'while(...) ++buckets_' is not that
+        // high, bcz size_ is in the same magnitude with capacity_ according 
+        // to the req_mem policy. so it is affordable
+        // make operator++ affordable again... :P   24.10.13  X-He-Be
         hashtable_iterator& operator++() {
             cur_ = cur_->next;
             while (cur_ == nullptr) {
@@ -369,11 +376,13 @@ private:
     size_type capacity_;
     size_type size_;
     bucket* buckets_;
-    Hash hashfunc_;
+    static Hash hashfunc_;
     constexpr static float alpha = 0.7F;
 
 };  // endof class hashtable
 
+template <typename Key, typename Value, typename Hash, typename Alloc>
+Hash hashtable<Key, Value, Hash, Alloc>::hashfunc_ = {};
 
 }  // endof namespace mfwu
 
