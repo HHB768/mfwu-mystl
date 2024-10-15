@@ -384,7 +384,130 @@ private:
 template <typename Key, typename Value, typename Hash, typename Alloc>
 Hash hashtable<Key, Value, Hash, Alloc>::hashfunc_ = {};
 
+
+template <typename key_type>
+class sbucket {
+public:
+    struct bucket_node {
+        key_type key;
+        bucket_node* next;
+
+        bucket_node() : key(), next(nullptr) {}
+        bucket_node(const key_type& k)
+            : key(k), next(nullptr) {}
+        bucket_node(const key_type& k, bucket_node* n)
+            : key(k), next(nullptr) {}
+        bucket_node(const bucket_node& nd)
+            : key(nd.key), next(nd.next) {}
+        bucket_node(bucket_node&& nd) 
+            : key(mfwu::move(nd.key)), next(nd.next) {
+            nd.next = nullptr;
+        }
+    };  // endof struct bucket_node
+    using node = bucket_node;
+
+    sbucket() : head_(new node(key_type{})) {}
+    sbucket(const bucket* bkt) {
+        bucket_copy(bkt);
+    }
+    sbucket(bucket&& bkt) : head_(bkt.head_) {
+        bkt.head_ = nullptr;
+    }
+    ~bucket() {
+        bucket_destroy();
+    }
+
+    bucket& operator=(const bucket& bkt) {
+        clear();
+        bucket_copy(bkt);
+        return *this;
+    }
+    bucket& operator=(bucket&& bkt) {
+        clear();
+        head_ = bkt.head_;
+        bkt.head_ = nullptr;
+    }
+
+    bool empty() { return head_->next == nullptr; }
+    size_t size() const {
+        node* cur = head_->next;
+        size_t cnt = 0;
+        while (cur) {
+            cnt++;
+            cur = cur->next;
+        }
+        return cnt;
+    }
+    node* front() { return head_->next; }
+    mfwu::piar<node*, bool> push(const key_type& key) {
+        node* ret = search(key);
+        if (ret != nullptr) {
+            return {ret, false};
+        }
+        node* next = head_->next;
+        node* cur = new node(key, next);
+        head_->next = cur;
+        return {cur, true};
+    }
+    void pop() {
+        node* next = head_;
+        head_->next = next->next;
+        delete next;
+    }
+    bool pop(const key_type& key) {
+        node* prev = head_;
+        while (prev->next) {
+            if (prev->next->key == key) {
+                node* next = prev->next;
+                prev->next = next->next;
+                delete next;
+                return true;
+            }
+            prev = prev->next;
+        }
+        return false;
+    }
+private:
+    void bucket_copy(const bucket& bkt) {
+        head_ = new node(*bkt.head_);
+        node* src = bkt.head_;
+        node* dst = head_;
+        while (src->next != nullptr) {
+            dst->next = new node(*src->next);
+            src = src->next;
+            dst = dst->next;
+        }
+    }
+    void bucket_destroy() {
+        clear();
+        delete head_;
+    }
+    void clear() { while (head_->next) { pop(); } }
+    node* search(const key_type& key) {
+        node* cur = head_->next;
+        while (cur) {
+            if (cur->key == key) {
+                return cur;
+            }
+            cur = cur->next;
+        }
+        return nullptr;
+    }
+
+    node* head_;
+};  // endof class sbucket
+
+template <typename Key,
+          typename Hash=mfwu::hash_functor<Key>,
+          typename Alloc=mfwu::DefaultAllocator<
+                         mfwu::sbucket<Key>, mfwu::malloc_alloc>>
+class shashtable {
+public:
+
+};  // endof class shashtable
+
 }  // endof namespace mfwu
+
 
 
 #endif  // __HASHTABLE_HPP__
