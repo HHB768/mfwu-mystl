@@ -153,8 +153,8 @@ template <typename Key,
 class hashtable {
 public:
     friend class mfwu::unit_test_hashtable;
-    using key_type = Key;
-    using value_type = Value;
+    // using key_type = Key;
+    // using value_type = Value;
     using size_type = size_t;
     // actual size should be within max_primer
 
@@ -166,7 +166,7 @@ public:
     // just usable in hashtable  X-H2 24.08.08
     // tree/list/hashtable
     
-    using bucket = mfwu::bucket<key_type, value_type>;
+    using bucket = mfwu::bucket<Key, Value>;
     using node = typename bucket::node;
 
     class hashtable_iterator {
@@ -174,7 +174,9 @@ public:
         // TODO: should i use value_type = 
         //       mfwu::pair<Key, Value> ?
         //       how to adjust when Key is Value
-        using value_type = Value;
+        // 10.15: yes you should
+        // TODO: plz try this
+        using value_type = mfwu::pair<Key, Value>;
         using iterator_category = mfwu::forward_iterator_tag;
         using pointer = value_type*;
         using reference = value_type&;
@@ -184,10 +186,10 @@ public:
         hashtable_iterator(node* cur, bucket* buckets)
             : cur_(cur), buckets_(buckets) {}
         hashtable_iterator(const hashtable_iterator& it)
-            : cur_(it.cur), buckets_(it.buckets_) {}
+            : cur_(it.cur_), buckets_(it.buckets_) {}
         ~hashtable_iterator() {}
         hashtable_iterator& operator=(const hashtable_iterator& it) {
-            cur_ = it.cur; buckets_ = it.buckets_;
+            cur_ = it.cur_; buckets_ = it.buckets_;
             return *this;
         }
         bool operator==(const hashtable_iterator& it) const {
@@ -232,6 +234,9 @@ public:
         bucket* buckets_;
     };  // endof class hashtable_iterator
     using iterator = hashtable_iterator;
+
+    using key_type = Key;
+    using value_type = Value;
 
     hashtable(): capacity_(mfwu::get_next_primer(0)), size_(0),
         buckets_(Alloc::allocate(capacity_ + 1)) {
@@ -407,22 +412,22 @@ public:
     using node = bucket_node;
 
     sbucket() : head_(new node(key_type{})) {}
-    sbucket(const bucket* bkt) {
+    sbucket(const sbucket* bkt) {
         bucket_copy(bkt);
     }
-    sbucket(bucket&& bkt) : head_(bkt.head_) {
+    sbucket(sbucket&& bkt) : head_(bkt.head_) {
         bkt.head_ = nullptr;
     }
-    ~bucket() {
+    ~sbucket() {
         bucket_destroy();
     }
 
-    bucket& operator=(const bucket& bkt) {
+    sbucket& operator=(const sbucket& bkt) {
         clear();
         bucket_copy(bkt);
         return *this;
     }
-    bucket& operator=(bucket&& bkt) {
+    sbucket& operator=(sbucket&& bkt) {
         clear();
         head_ = bkt.head_;
         bkt.head_ = nullptr;
@@ -439,7 +444,7 @@ public:
         return cnt;
     }
     node* front() { return head_->next; }
-    mfwu::piar<node*, bool> push(const key_type& key) {
+    mfwu::pair<node*, bool> push(const key_type& key) {
         node* ret = search(key);
         if (ret != nullptr) {
             return {ret, false};
@@ -468,7 +473,7 @@ public:
         return false;
     }
 private:
-    void bucket_copy(const bucket& bkt) {
+    void bucket_copy(const sbucket& bkt) {
         head_ = new node(*bkt.head_);
         node* src = bkt.head_;
         node* dst = head_;
@@ -503,8 +508,191 @@ template <typename Key,
                          mfwu::sbucket<Key>, mfwu::malloc_alloc>>
 class shashtable {
 public:
+    friend class mfwu::unit_test_hashtable;
+    using key_type = Key;
+    using size_type = size_t;
+
+    using bucket = mfwu::sbucket<key_type>;
+    using node = typename bucket::node;
+
+    class hashtable_iterator {
+    public:
+        using value_type = Key;
+        using iterator_category = mfwu::forward_iterator_tag;
+        using porinter = value_type*;
+        using reference = value_type&;
+        using difference_type = mfwu::ptrdiff_t;
+
+        hashtable_iterator() : cur_(nullptr), buckets_(nullptr) {}
+        hashtable_iterator(node* cur, bucket* buckets)
+            : cur_(cur), buckets_(buckets) {}
+        hashtable_iterator(const hashtable_iterator& it)
+            : cur_(it.cur_), buckets_(it.buckets_) {}
+        ~hashtable_iterator() {}
+        hashtable_iterator& operator=(const hashtable_iterator& it) {
+            cur_ = it.cur_; buckets_ = it.buckets_;
+            return *this;
+        }
+        bool operator==(const hashtable_iterator& it) const {
+            return buckets_ == it.buckets_ && cur_ == it.cur_;
+        }
+        bool operator!=(const hashtable_iterator& it) const {
+            return !(*this == it);
+        }
+        value_type& operator*() const {
+            return cur_->key;
+        }
+        value_type* operator->() const {
+            return & this->operator*();
+        }
+        
+        hashtable_iterator& operator++() {
+            cur_ = cur_->next;
+            while (cur_ == nullptr) {
+                ++buckets_;
+                cur_ = buckets_->front();
+            }
+            return *this;
+        }
+        hashtable_iterator operator++(int) {
+            hashtable_iterator tmp = *this;
+            this->operator++();
+            return mfwu::move(tmp);
+        }
+    private:
+        node* cur_;
+        bucket* buckets_;
+    };  // endof class hashtable_iterator
+    using iterator = hashtable_iterator;
+
+    shashtable() : capacity_(mfwu::get_next_primer(0)), size_(0),
+        buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
+        init_dummy_node();
+    }
+    shashtable(size_type capacity) 
+        : capacity_(mfwu::get_next_primer(capacity)),
+          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
+        init_dummy_node();
+    }
+    shashtable(const std::initializer_list<key_type>& vals)
+        : capacity_(mfwu::get_next_primer(
+                    std::ceil((float)vals.size() / alpha))),
+          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
+        for (auto&& k: vals) {
+            this->insert(k);
+        }
+        init_dummy_node();
+    }
+    shashtable(const shashtable& tbl) 
+        : capacity_(tbl.capacity_), size_(tbl.size_),
+          buckets_(Alloc::allocate(capacity_ + 1)) {
+        mfwu::uninitialized_copy(tbl.buckets_,
+            tbl.buckets_ + capacity_ + 1, buckets_);
+    }
+    shashtable(shashtable&& tbl) : capacity_(tbl.capacity_),
+        size_(tbl.size_), buckets_(tbl.buckets_) {
+        tbl.buckets_ = nullptr;
+    }
+    ~shashtable() {
+        reset();
+    }
+    shashtable& operator=(const shashtable& tbl) {
+        reset();
+        capacity_ = tbl.capacity_;
+        size_ = tbl.size_;
+        buckets_ = Alloc::allocate(capacity_ + 1);
+        mfwu::uninitialized_copy(tbl.buckets_, 
+            tbl.buckets_ + capacity_ + 1, buckets_);
+        return *this;
+    }
+    shashtable& operator=(shashtable&& tbl) {
+        reset();
+        capacity_ = tbl.capacity_;
+        size_ = tbl.size_;
+        buckets_ = tbl.buckets_;
+        tbl.buckets_ = nullptr;
+        tbl.capacity_ = -1;  // nt!
+        return *this;
+    }
+    void insert(const key_type& key) {
+        size_type hashed_key = hash(key);
+        add_cnt(buckets_[hashed_key].push(key).second);
+    }
+    void erase(const key_type& key) {
+        size_type hashed_key = hash(key);
+        size_ -= buckets_[hashed_key].pop(key);
+    }
+    bool empty() const { return size_ == 0; }
+    size_type size() const { return size_; }
+    iterator begin() { iterator(get_first_node(), get_first_bucket()); }
+    iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
+private:
+    void construct() {
+        bucket bkt{};  // avoid move construct
+        mfwu::construct(buckets_, buckets_ + capacity_ + 1, bkt);
+    }
+    void destroy() { mfwu::destroy(buckets_, buckets_ + capacity_ + 1); }
+    void deallocate() { Alloc::deallocate(buckets_, capacity_ + 1); }
+    void reset() { destroy(); deallocate(); }
+    void init_dummy_node() {
+        buckets_[capacity_].push(key_type{});
+    }
+    size_type hash(const key_type& key) const {
+        return hashfunc_(key) % capacity_;
+    }
+    void enable(bool command) {
+        buckets_[0].enbale_next_ = command;
+    }
+    void req_mem() {
+        hashtable newtable = hashtable(mfwu::get_next_primer(capacity_ + 1));
+        for (size_type idx = 0; idx < capacity_; ++idx) {
+            bucket cur = buckets_[idx];
+            while (!cur.empty()) {
+                node* nd = cur.front();
+                newtable.insert(nd->key);
+                cur.pop();
+            }
+        }
+        newtable.size_ = this->size_;
+        *this = mfwu::move(newtable);
+    }
+    void add_cnt(int num) {
+        if (!num) return ;
+        size_ += num;
+        while ((float)size_ / capacity_ > alpha) {
+            req_mem();
+        }
+    }
+
+    bucket& get_first_bucket() const {
+        for (size_type idx = 0; idx < capacity_; ++idx) {
+            if (!buckets_[idx].empty()) return buckets_[idx];
+        }
+        return get_dummy_bucket();
+    }
+    node* get_first_node() const {
+        return get_first_bucket().front();
+    }
+    bucket& get_dummy_bucket() const {
+        return buckets_[capacity_];
+    }
+    node* get_dummy_node() const {
+        return get_dummy_bucket().front();
+    }
+
+    size_type capacity_;
+    size_type size_;
+    bucket* buckets_;
+    static Hash hashfunc_;
+    constexpr static float alpha = 0.7F;
 
 };  // endof class shashtable
+
+template <typename Key, typename Hash, typename Alloc>
+Hash shashtable<Key, Hash, Alloc>::hashfunc_ = {};
 
 }  // endof namespace mfwu
 

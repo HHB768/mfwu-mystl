@@ -11,3 +11,5 @@ schd:
 10.9 - 10.10 -> #3
 10.11 - 10.13 -> another hashtable & # 6
 10.14 - 10.20 deque & another TODOs
+
+checked stl todos before returning
