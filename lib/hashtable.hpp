@@ -412,7 +412,7 @@ public:
     using node = bucket_node;
 
     sbucket() : head_(new node(key_type{})) {}
-    sbucket(const sbucket* bkt) {
+    sbucket(const sbucket& bkt) {
         bucket_copy(bkt);
     }
     sbucket(sbucket&& bkt) : head_(bkt.head_) {
@@ -455,7 +455,7 @@ public:
         return {cur, true};
     }
     void pop() {
-        node* next = head_;
+        node* next = head_->next;
         head_->next = next->next;
         delete next;
     }
@@ -647,7 +647,7 @@ private:
         buckets_[0].enbale_next_ = command;
     }
     void req_mem() {
-        hashtable newtable = hashtable(mfwu::get_next_primer(capacity_ + 1));
+        shashtable newtable = shashtable(mfwu::get_next_primer(capacity_ + 1));
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket cur = buckets_[idx];
             while (!cur.empty()) {

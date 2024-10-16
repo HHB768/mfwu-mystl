@@ -9,6 +9,7 @@ namespace mfwu {
 class unit_test_hashtable {
 public:
     bool use_mfwu_hashtable();
+    bool use_mfwu_shashtable();
     
     struct data {
         int val;
@@ -36,6 +37,25 @@ private:
                 while (cur) {
                     // std::cout << idx << ", " << depth << "\n";
                     cache[depth][idx] = cur->value;
+                    // std::cout << cur->next << "\n";
+                    ++depth; cur = cur->next;
+                }
+            }
+        }
+        mfwu::print_rect(cache);
+    }
+    void print_shashtable(const shashtable<int>& htbl) {
+        mfwu::vector<mfwu::vector<int>> 
+            cache(htbl.size_, mfwu::vector<int>(htbl.capacity_, -主));
+        std::cout << "capacity: " << htbl.capacity_ << "\t"
+                  << "size: " << htbl.size_ << "\n";
+        for (size_t idx = 0; idx < htbl.capacity_; ++idx) {
+            if (!htbl.buckets_[idx].empty()) {
+                size_t depth = 0;
+                auto cur = htbl.buckets_[idx].front();
+                while (cur) {
+                    // std::cout << idx << ", " << depth << "\n";
+                    cache[depth][idx] = cur->key;
                     // std::cout << cur->next << "\n";
                     ++depth; cur = cur->next;
                 }
@@ -77,8 +97,21 @@ bool unit_test_hashtable::use_mfwu_hashtable() {
     print_hashtable(htbl1);
     ++htbl1[data{主}];
     print_hashtable(htbl1);
-    // TODO: DEBUG REQ_MEM
-    // TODO: ENABLE NEXT
+
+    return 0;
+}
+
+bool unit_test_hashtable::use_mfwu_shashtable() {
+    std::cout << "\n------- Test: use mfwu::shashtable -------\n";
+    mfwu::shashtable<int> htbl1(5);
+    htbl1.insert(1);
+    htbl1.insert(5);
+    htbl1.insert(3);
+    print_shashtable(htbl1);
+    htbl1.insert(2);
+    print_shashtable(htbl1);
+    htbl1.insert(12);
+    print_shashtable(htbl1);
 
     return 0;
 }

@@ -151,9 +151,10 @@ int main() {
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     score = 0;
-    total = 1;
+    total = 2;
     ttotal += total;
     score += !ut_htbl.use_mfwu_hashtable();
+    score += !ut_htbl.use_mfwu_shashtable();
     std::cout << "\n---------- Hashtable test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
