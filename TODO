@@ -1,15 +1,18 @@
-1. deque (ready to test)                3days
-2. iterator, and stl style              -
-3. hashtable (ready to test)            3days
-4. algorithm √ (almost finished)        -
-5. use random in unit test              -
-6. (unordered_)map/set                  5days each
-7. ringbuffer √ (almost finished)       -
+/*
+    1. deque (ready to test)                3days
+    2. iterator, and stl style              -
+    3. hashtable (ready to test)            3days
+    4. algorithm √ (almost finished)        -
+    5. use random in unit test              -
+    6. (unordered_)map/set                  5days each
+    7. ringbuffer √ (almost finished)       -
 
 
-schd:
-10.9 - 10.10 -> #3
-10.11 - 10.13 -> another hashtable & # 6
-10.14 - 10.20 deque & another TODOs
+    schd:
+    10.9 - 10.10 -> #3
+    10.11 - 10.13 -> another hashtable & # 6
+    10.14 - 10.20 deque & another TODOs
 
-checked stl todos before returning
+    checked stl todos before returning
+*/
+

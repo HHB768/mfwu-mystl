@@ -696,6 +696,11 @@ Hash shashtable<Key, Hash, Alloc>::hashfunc_ = {};
 
 }  // endof namespace mfwu
 
-
+// TODO: implement another hashatble as
+// shashtable is efficient, but i remember 
+// that they can be implemented into a
+// single class with shashtable has an empty
+// class in value_type, let me think about this...
+// 24.10.17
 
 #endif  // __HASHTABLE_HPP__
