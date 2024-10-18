@@ -83,10 +83,10 @@ using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*
 // X-H-Q2 24.07.15 [0809] 
 
 // maybe i can try this: 240924
-// template <typename T>
-// using is_input_iterator 
-//     = is_base_of_template<mfwu::input_iterator_tag,
-//                           mfwu::iterator_traits<T>::iterator_category>;
+template <typename T>
+using is_input_iterator 
+    = is_base_of_template<mfwu::input_iterator_tag,
+                          mfwu::iterator_traits<T>::iterator_category>;
 //////////////////////////
 
 template <typename T>

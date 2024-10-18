@@ -69,7 +69,7 @@ public:
     }
     node* front() { return head_->next; }
     mfwu::pair<node*, bool> push(const key_type& key, 
-                                    const value_type& value) {
+                                 const value_type& value) {
         node* ret = search(key);
         if (ret != nullptr) {
             ret->value = value;
@@ -153,6 +153,7 @@ template <typename Key,
 class hashtable {
 public:
     friend class mfwu::unit_test_hashtable;
+    friend class mfwu::unordered_map<Key, Value, Hash, Alloc>;
     // using key_type = Key;
     // using value_type = Value;
     using size_type = size_t;
@@ -299,17 +300,19 @@ public:
         // 24.10.11
         return *this;
     }
-    void insert(const key_type& key, const value_type& val) {
+    mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
         size_type hashed_key = hash(key);
         add_cnt(buckets_[hashed_key].push(key, val).second);
+        // TODO: RETURN
     }
     void insert(const mfwu::pair<key_type, value_type>& key_val) {
         insert(key_val.first, key_val.second);
-    }
+    } 
     void erase(const key_type& key) {
         size_type hashed_key = hash(key);
         size_ -= buckets_[hashed_key].pop(key);
     }
+    // TODO: erase by iterator !
     value_type& operator[](const key_type& key) {
         // assert
         add_cnt(buckets_[hash(key)].get(key).second);
@@ -319,6 +322,7 @@ public:
     }
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
+    size_type capacity() const { return capacity_; }
     iterator begin() { iterator(get_first_node(), get_first_bucket()); }
     iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
 private:
@@ -586,6 +590,20 @@ public:
         }
         init_dummy_node();
     }
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  is_input_iterator<InputIterator>::value>
+              >
+    shashtable(InputIterator first, InputIterator last)
+        : capacity_(mfwu::get_next_primer(std::ceil(
+                    (float)(mfwu::distance(last - first)) / alpha))),
+          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
+        for (; first != last; ++first) {
+            this->insert(*first);
+        }
+        init_dummy_node();
+    }
     shashtable(const shashtable& tbl) 
         : capacity_(tbl.capacity_), size_(tbl.size_),
           buckets_(Alloc::allocate(capacity_ + 1)) {
@@ -627,6 +645,7 @@ public:
     }
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
+    size_type capacity() const { return capacity_; }
     iterator begin() { iterator(get_first_node(), get_first_bucket()); }
     iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
 private:

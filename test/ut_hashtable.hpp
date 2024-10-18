@@ -28,8 +28,12 @@ private:
     void print_hashtable(const hashtable<data, int, data_hash>& htbl) {
         mfwu::vector<mfwu::vector<int>> 
             cache(htbl.size_, mfwu::vector<int>(htbl.capacity_, -主));
+#ifdef __UNIT_TEST_HASHTABLE__
+#ifndef __UNIT_TEST_HASHTABLE_BRIEF__
         std::cout << "capacity: " << htbl.capacity_ << "\t"
                   << "size: " << htbl.size_ << "\n";
+#endif  // __UNIT_TEST_HASHTABLE_BRIEF__
+#endif  // __UNIT_TEST_HASHTABLE__
         for (size_t idx = 0; idx < htbl.capacity_; ++idx) {
             if (!htbl.buckets_[idx].empty()) {
                 size_t depth = 0;
@@ -42,13 +46,21 @@ private:
                 }
             }
         }
+#ifdef __UNIT_TEST_HASHTABLE__
+#ifndef __UNIT_TEST_HASHTABLE_BRIEF__
         mfwu::print_rect(cache);
+#endif  // __UNIT_TEST_HASHTABLE_BRIEF__
+#endif  // __UNIT_TEST_HASHTABLE__
     }
     void print_shashtable(const shashtable<int>& htbl) {
         mfwu::vector<mfwu::vector<int>> 
             cache(htbl.size_, mfwu::vector<int>(htbl.capacity_, -主));
+#ifdef __UNIT_TEST_HASHTABLE__
+#ifndef __UNIT_TEST_HASHTABLE_BRIEF__
         std::cout << "capacity: " << htbl.capacity_ << "\t"
                   << "size: " << htbl.size_ << "\n";
+#endif  // __UNIT_TEST_HASHTABLE_BRIEF__
+#endif  // __UNIT_TEST_HASHTABLE__
         for (size_t idx = 0; idx < htbl.capacity_; ++idx) {
             if (!htbl.buckets_[idx].empty()) {
                 size_t depth = 0;
@@ -61,7 +73,11 @@ private:
                 }
             }
         }
+#ifdef __UNIT_TEST_HASHTABLE__
+#ifndef __UNIT_TEST_HASHTABLE_BRIEF__
         mfwu::print_rect(cache);
+#endif  // __UNIT_TEST_HASHTABLE_BRIEF__
+#endif  // __UNIT_TEST_HASHTABLE__
     }
 };  // endof class unit_test_hashtable
 
@@ -85,6 +101,7 @@ std::ostream& operator<<(std::ostream& os,
 
 bool unit_test_hashtable::use_mfwu_hashtable() {
     std::cout << "\n------- Test: use mfwu::hashtable -------\n";
+    std::cout << "testing hashtable\n";
     mfwu::hashtable<data, int, data_hash> htbl1(5);
     htbl1[data{1}] = 1;
     htbl1[data{5}] = 5;
@@ -97,12 +114,15 @@ bool unit_test_hashtable::use_mfwu_hashtable() {
     print_hashtable(htbl1);
     ++htbl1[data{主}];
     print_hashtable(htbl1);
+    // TODO: too many methods without test
+    //       but you may leave them to set/map test
 
     return 0;
 }
 
 bool unit_test_hashtable::use_mfwu_shashtable() {
     std::cout << "\n------- Test: use mfwu::shashtable -------\n";
+    std::cout << "testing shashtable\n";
     mfwu::shashtable<int> htbl1(5);
     htbl1.insert(1);
     htbl1.insert(5);
