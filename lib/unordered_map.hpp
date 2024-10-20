@@ -6,6 +6,8 @@
 
 namespace mfwu {
 
+class unit_test_unordered_map;
+
 template <typename Key,
           typename Value,
           typename Hasher=mfwu::hash_functor<Key>,
@@ -13,6 +15,7 @@ template <typename Key,
                          mfwu::bucket<Key, Value>, mfwu::malloc_alloc>>
 class unordered_map {
 public:
+    friend class unit_test_unordered_map;
     using key_type = Key;
     using mapped_type = Value;
     using value_type = mfwu::pair<const Key, Value>;

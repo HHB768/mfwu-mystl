@@ -6,12 +6,15 @@
 
 namespace mfwu {
 
+class unit_test_unordered_set;
+
 template <typename Key,
           typename Hash=mfwu::hash_functor<Key>,
           typename Alloc=mfwu::DefaultAllocator<
                          mfwu::sbucket<Key>, mfwu::malloc_alloc>>
 class unordered_set {
 public:
+    friend class unit_test_unordered_set;
     using key_type = Key;
     using value_type = Key;  // TODO: check
     using size_type = size_t;

@@ -8,9 +8,21 @@ namespace mfwu {
 
 class unit_test_hashtable {
 public:
+
+// GPT solution for
+/*
+    my user sometimes wanna use class A independently and its definition 
+    is not related to classs B except the friend class declaration, 
+    is there any solution to achieve this?
+*/
+// 24.10.20
 #ifdef __UNIT_TEST_UNORDERED_MAP__
     friend class unit_test_unordered_map;
 #endif  // __UNIT_TEST_UNORDERED_MAP__
+#ifdef __UNIT_TEST_UNORDERED_SET__
+    friend class unit_test_unordered_set;
+#endif  // __UNIT_TEST_UNORDERED_SET__
+
     bool use_mfwu_hashtable();
     bool use_mfwu_shashtable();
     
