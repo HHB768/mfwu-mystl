@@ -15,21 +15,20 @@ template <typename key_type, typename value_type>
 class bucket {
 public:
     struct bucket_node {
-        key_type key;
-        value_type value;
+        mfwu::pair<const key_type, value_type> value;
         bucket_node* next;
 
         // TODO: i found many class lacks one or more
         // rvalue constructor
-        bucket_node() : key(), value(), next(nullptr) {}
+        bucket_node() : value(), next(nullptr) {}
         bucket_node(const key_type& k, const value_type& v)
-            : key(k), value(v), next(nullptr) {}
+            : value(k, v), next(nullptr) {}
         bucket_node(const key_type& k, const value_type& v, bucket_node* n)
-            : key(k), value(v), next(n) {}
+            : value(k, v), next(n) {}
         bucket_node(const bucket_node& nd)
-            : key(nd.key), value(nd.value), next(nd.next) {}
-        bucket_node(bucket_node&& nd) : key(mfwu::move(nd.key)),
-            value(mfwu::move(nd.value)), next(nd.next) {
+            : value(nd.value), next(nd.next) {}
+        bucket_node(bucket_node&& nd) 
+            : value(mfwu::move(nd.value)), next(nd.next) {
             nd.next = nullptr;
         }
     };  // endof struct bucket_node
@@ -72,7 +71,7 @@ public:
                                  const value_type& value) {
         node* ret = search(key);
         if (ret != nullptr) {
-            ret->value = value;
+            ret->value.second = value;
             return {ret, false};
         }
         node* next = head_->next;
@@ -117,9 +116,9 @@ public:
             ret = push(key, value_type{}).first;
             is_new_node = true;
         }
-        return {ret->value, is_new_node};
+        return {ret->value.second, is_new_node};
     }
-    bool count(const key_type& key) {
+    bool count(const key_type& key) const {
         return search(key) != nullptr;
     }
     node* find(const key_type& key) const {
@@ -144,7 +143,7 @@ private:
     node* search(const key_type& key) const {
         node* cur = head_->next;
         while (cur) {
-            if (cur->key == key) {
+            if (cur->value.first == key) {
                 return cur;
             }
             cur = cur->next;
@@ -197,7 +196,7 @@ public:
         //       how to adjust when Key is Value
         // 10.15: yes you should
         // TODO: plz try this
-        using value_type = mfwu::pair<Key, Value>;
+        using value_type = mfwu::pair<const Key, Value>;
         using iterator_category = mfwu::forward_iterator_tag;
         using pointer = value_type*;
         using reference = value_type&;
@@ -283,13 +282,35 @@ public:
         init_dummy_node();
     }
     hashtable(const std::initializer_list<
-              mfwu::pair<key_type, value_type>>& vals)
+              mfwu::pair<const key_type, value_type>>& vals)
+    // GPT DEBUG LOG 10.21/24:
+    /*
+        std::initializer_list elements are immutable, meaning they need to be const. 
+        When you initialize with std::pair<B, C>, the compiler expects the first element 
+        of the pair to be const B. So to avoid compilation errors, you must use 
+        const std::initializer_list<std::pair<const B, C>>. 
+        Keeps things aligned with how initializer_list handles immutability.
+    */
         : capacity_(mfwu::get_next_primer(
                     std::ceil((float)vals.size() / alpha))),
           size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
         construct();
         for (auto&& [k, v] : vals) {
             this->insert(k, v);
+        }
+        init_dummy_node();
+    }
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  is_input_iterator<InputIterator>::value>
+             >
+    hashtable(InputIterator first, InputIterator last)
+        : capacity_(mfwu::get_next_primer(std::ceil(
+                    (float)(mfwu::distance(first, last)) / alpha))),
+          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+        construct();
+        for (; first != last; ++first) {
+            this->insert(*first);
         }
         init_dummy_node();
     }
@@ -332,13 +353,13 @@ public:
         add_cnt(ret.second);
         return {iterator(ret.first, buckets_ + hashed_key), ret.second};
     }
-    mfwu::pair<iterator, bool> insert(const mfwu::pair<key_type, value_type>& key_val) {
+    mfwu::pair<iterator, bool> insert(const mfwu::pair<const key_type, value_type>& key_val) {
         return insert(key_val.first, key_val.second);
     } 
     bool erase(const key_type& key) {
         size_type hashed_key = hash(key);
         bool ret = buckets_[hashed_key].pop(key);
-        size -= ret;
+        size_ -= ret;
         return ret;
     }
     iterator erase(iterator it) {
@@ -383,8 +404,8 @@ public:
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
     size_type capacity() const { return capacity_; }
-    iterator begin() { iterator(get_first_node(), get_first_bucket()); }
-    iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
+    iterator begin() const { return iterator(get_first_node(), &get_first_bucket()); }
+    iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
     void construct() {
         bucket bkt{};  // avoid move construct
@@ -408,7 +429,7 @@ private:
             bucket cur = buckets_[idx];
             while (!cur.empty()) {
                 node* nd = cur.front();
-                newtable.insert(nd->key, nd->value);
+                newtable.insert(nd->value);
                 cur.pop();
             }
         }
@@ -536,6 +557,24 @@ public:
         }
         return false;
     }
+    bool pop(node* cur) {
+        node* prev = head_;
+        while (prev->next) {
+            if (prev->next == cur) {
+                prev->next = cur->next;
+                delete cur;
+                return true;
+            }
+            prev = prev->next;
+        }
+        return false;
+    }
+    bool count(const key_type& key) const {
+        return search(key) != nullptr;
+    }
+    node* find(const key_type& key) const {
+        return search(key);
+    }
 private:
     void bucket_copy(const sbucket& bkt) {
         head_ = new node(*bkt.head_);
@@ -552,7 +591,7 @@ private:
         delete head_;
     }
     void clear() { while (head_->next) { pop(); } }
-    node* search(const key_type& key) {
+    node* search(const key_type& key) const {
         node* cur = head_->next;
         while (cur) {
             if (cur->key == key) {
@@ -565,6 +604,9 @@ private:
 
     node* head_;
 };  // endof class sbucket
+
+template <typename Key, typename Value, typename Hash, typename Alloc>
+class unordered_set;
 
 template <typename Key,
           typename Hash=mfwu::hash_functor<Key>,
@@ -623,6 +665,12 @@ public:
             this->operator++();
             return mfwu::move(tmp);
         }
+        node* get_cur() const {
+            return cur_;
+        }
+        bucket* get_bucket() const {
+            return buckets_;
+        }
     private:
         node* cur_;
         bucket* buckets_;
@@ -656,7 +704,7 @@ public:
               >
     shashtable(InputIterator first, InputIterator last)
         : capacity_(mfwu::get_next_primer(std::ceil(
-                    (float)(mfwu::distance(last - first)) / alpha))),
+                    (float)(mfwu::distance(first, last)) / alpha))),
           size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
         construct();
         for (; first != last; ++first) {
@@ -695,19 +743,55 @@ public:
         tbl.capacity_ = -1;  // nt!
         return *this;
     }
-    void insert(const key_type& key) {
+    mfwu::pair<iterator, bool> insert(const key_type& key) {
         size_type hashed_key = hash(key);
-        add_cnt(buckets_[hashed_key].push(key).second);
+        // add_cnt(buckets_[hashed_key].push(key).second);
+        mfwu::pair<node*, bool> ret = buckets_[hashed_key].push(key);
+        add_cnt(ret.second);
+        return {iterator(ret.first, buckets_ + hashed_key), ret.second};
     }
-    void erase(const key_type& key) {
+    bool erase(const key_type& key) {
         size_type hashed_key = hash(key);
-        size_ -= buckets_[hashed_key].pop(key);
+        bool ret = buckets_[hashed_key].pop(key);
+        size_ -= ret;
+        return ret;
+    }
+    iterator erase(iterator it) {
+        node* cur = it.get_cur();
+        bucket* bkt = it.get_bucket();
+        ++it;
+        bkt->pop(cur);
+        return it;
+    }
+    bool count(const key_type& key) const {
+        return buckets_[hash(key)].count(key);
+    }
+    iterator find(const key_type& key) const {
+        bucket* bkt = buckets_ + hash(key);
+        node* cur = bkt.find(key);
+        if (cur == nullptr) {
+            return end();
+        }
+        return iterator(cur, bkt);
+    }
+    float load_factor() const {
+        return (float)size_ / capacity_;
+    }
+    float max_load_factor() const {
+        return alpha;
+    }
+    void rehash(size_type capacity) {
+        capacity = mfwu::get_next_primer(capacity);
+        while ((float)size_ / capacity >= max_load_factor()) {
+            capacity = mfwu::get_next_primer(capacity + 1);
+        }
+        rehash_hard(capacity);
     }
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
     size_type capacity() const { return capacity_; }
-    iterator begin() { iterator(get_first_node(), get_first_bucket()); }
-    iterator end() { iterator(get_dummy_node(), get_dummy_bucket()); }
+    iterator begin() const { return iterator(get_first_node(), &get_first_bucket()); }
+    iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
     void construct() {
         bucket bkt{};  // avoid move construct
@@ -722,11 +806,8 @@ private:
     size_type hash(const key_type& key) const {
         return hashfunc_(key) % capacity_;
     }
-    void enable(bool command) {
-        buckets_[0].enbale_next_ = command;
-    }
-    void req_mem() {
-        shashtable newtable = shashtable(mfwu::get_next_primer(capacity_ + 1));
+    void rehash_hard(size_type capacity) {
+        shashtable newtable = shashtable(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket cur = buckets_[idx];
             while (!cur.empty()) {
@@ -738,7 +819,10 @@ private:
         newtable.size_ = this->size_;
         *this = mfwu::move(newtable);
     }
-    void add_cnt(int num) {
+    void req_mem() {
+        rehash(capacity_ + 1);
+    }
+    void add_cnt(size_type num) {
         if (!num) return ;
         size_ += num;
         while ((float)size_ / capacity_ > alpha) {
