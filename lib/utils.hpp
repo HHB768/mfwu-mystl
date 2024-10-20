@@ -42,6 +42,74 @@ public:
     using difference_type = std::ptrdiff_t;
 };
 
+// a tiny fix from
+// https://blog.csdn.net/mightbxg/article/details/108382265
+
+// case1: T* can cast to C*
+template <template <typename...> class C, typename...Ts>
+std::true_type is_base_of_template_impl(const C<Ts...>*); 
+// case2: T* cannot cast to C*
+template <template <typename...> class C>
+std::false_type is_base_of_template_impl(...);
+
+template <template <typename...> class C, typename T>
+using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
+// TODO: fix other containers
+
+// standard solutions :
+// c++11:
+// template<typename _InputIterator,
+//     typename = std::_RequireInputIter<_InputIterator>>
+// where:
+// template<typename _InIter>
+// using _RequireInputIter =
+//     __enable_if_t<is_convertible<__iter_category_t<_InIter>,
+//                 input_iterator_tag>::value>;
+// c++98:
+// Check whether it's an integral type.  If so, it's not an iterator.
+// typedef typename std::__is_integer<_InputIterator>::__type _Integral;
+// _M_initialize_dispatch(__first, __last, _Integral());
+// X-H-Q2 24.07.15 [0809] 
+
+// maybe i can try this: 240924
+// template <typename T>
+// using is_input_iterator 
+//     = is_base_of_template<mfwu::input_iterator_tag,
+//                           mfwu::iterator_traits<T>::iterator_category>;
+// no you cannot 24.10.19
+// GPTANS, try this:
+
+// void_t definition
+template <typename...>
+using void_t = void;
+
+// Primary template - defaults to false
+template <typename Base, typename Derived, typename = void>
+struct is_base_of : std::false_type {};
+
+// Specialization for valid Base-Derived relationship
+/*
+    When you see something like is_base_of<Base, Derived, void_t<...>>,
+    it checks if the expressions inside void_t are valid. If they are, 
+    void_t<...> results in void, and the template specialization is enabled.
+    If not, it fails gracefully without a hard error, due to SFINAE rules.
+*/ 
+template <typename Base, typename Derived>
+struct is_base_of<Base, Derived, 
+    void_t<decltype(static_cast<Base*>(std::declval<Derived*>()))>>
+    : std::true_type {};
+
+// Helper variable template
+template <typename Base, typename Derived>
+constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
+
+template <typename T>
+using is_input_iterator = 
+    mfwu::is_base_of<mfwu::input_iterator_tag,
+                     typename mfwu::iterator_traits<T>::iterator_category>;
+
+//////////////////////////
+
 // memory operations 
 // commit or rollback
 // 1. construct

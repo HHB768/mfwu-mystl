@@ -8,6 +8,9 @@ namespace mfwu {
 
 class unit_test_hashtable {
 public:
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+    friend class unit_test_unordered_map;
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     bool use_mfwu_hashtable();
     bool use_mfwu_shashtable();
     
@@ -124,13 +127,14 @@ bool unit_test_hashtable::use_mfwu_shashtable() {
     std::cout << "\n------- Test: use mfwu::shashtable -------\n";
     std::cout << "testing shashtable\n";
     mfwu::shashtable<int> htbl1(5);
-    htbl1.insert(1);
+    htbl1.insert(11);
     htbl1.insert(5);
     htbl1.insert(3);
+    htbl1.insert(11);
     print_shashtable(htbl1);
     htbl1.insert(2);
     print_shashtable(htbl1);
-    htbl1.insert(12);
+    htbl1.insert(22);
     print_shashtable(htbl1);
 
     return 0;

@@ -15,12 +15,12 @@ class unordered_map {
 public:
     using key_type = Key;
     using mapped_type = Value;
-    using value_type = mfwu::pair<const Key, Value>
+    using value_type = mfwu::pair<const Key, Value>;
 
     using size_type = size_t;
 
     using hashtable = mfwu::hashtable<Key, Value, Hasher, Alloc>;
-    using iterator = hashtable::iterator;
+    using iterator = typename hashtable::iterator;
 
     // in std::unordered_map constructor uses
     // bucket_count instead of capacity as the param
@@ -28,7 +28,7 @@ public:
     // man, what can i say, i just recognize that
     // capacity is exactly bucket_count...
     // 24.10.18 night XD
-    unordered_map() : htbl() {}    
+    unordered_map() : htbl_() {}    
     unordered_map(size_type capacity) : htbl_(capacity) {}
     template <typename InputIterator,
               typename = typename std::enable_if_t<
@@ -46,7 +46,7 @@ public:
         htbl_ = m.htbl_;
         return *this;
     }
-    unordered_map& operator(unordered_map&& m) {
+    unordered_map& operator=(unordered_map&& m) {
         htbl_ = mfwu::move(m.htbl_);
         return *this;
     }
@@ -64,32 +64,74 @@ public:
         hashtable empty_htbl(htbl_.capacity());
         mfwu::swap(empty_htbl, htbl_);
     }
-    // mfwu::pair<iterator, bool> insert(const value_type& value) {}
-    // mfwu::pair<iterator, bool> insert(value_type&& value) {}
-    // void insert(InputIterator first, InputIterator last) {}
-    // void insert(std::initializer_list<value_type> ilist) {}
-    // mfwu::pair<iterator, bool> emplace(Args&&... args) {}
-    // erase(iterator it) {}
-    // erase(const_iterator it) {}
-    // size_type erase(const Key& key) {}
-    // void swap(unordered_map& other) {}
+    mfwu::pair<iterator, bool> insert(const value_type& value) {
+        return htbl_.insert(value);
+    }
+    // we havent implemented rvalue push
+    // mfwu::pair<iterator, bool> insert(value_type&& value);
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  is_input_iterator<InputIterator>::value>
+              >
+    void insert(InputIterator first, InputIterator last) {
+        for (; first != last; ++first) {
+            htbl_.insert(*first);
+        }
+    }
+    void insert(std::initializer_list<value_type> ilist) {
+        for (auto&& val : ilist) {
+            htbl_.insert(val);
+        }
+    }
+    template <typename... Args>
+    mfwu::pair<iterator, bool> emplace(Args&&... args) {
+        return htbl_.insert(value_type{mfwu::forward<Args>(args)...});
+    }
+    iterator erase(iterator it) {
+        return htbl_.erase(it);
+    }
+    // we havent implemented const_iterator
+    // erase(const_iterator it);
+    size_type erase(const Key& key) {
+        return erase(key);
+    }
+    void swap(unordered_map& other) {
+        mfwu::swap(htbl_, other.htbl_);
+    }
+    // mapped_type& at(const Key& key);
+    // const mapped_type& at(const Key& key);
+    mapped_type& operator[](const Key& key) {
+        return htbl_[key];
+    }
+    size_type count(const Key& key) const {
+        return htbl_.count(key);
+    }
+    iterator find(const Key& key) const {
+        return htbl_.find(key);
+    }
+    bool contains(const Key& key) const {
+        return htbl_.count(key);
+    }
     
-    // T& at(const Key& key) {}
-    // const T& at(const Key& key) const {}
-    // T& operator[](const Key& key) {}
-    // size_type count(const Key& key) const {}
-    // iterator find(const Key& key) {}
-    // bool contains(const Key& key) const {}
-    
-    // float load_factor() const {}
-    // float max_load_factor() const {}
-    // void rehash(size_type capacity) {}
-    // void reserve(size_type size) {}  // == rehash(std::ceil(count / max_load_factor()))
+    float load_factor() const {
+        return htbl_.load_factor();
+    }
+    float max_load_factor() const {
+        return htbl_.max_load_factor();
+    }
+    void rehash(size_type capacity) {
+        htbl_.rehash(capacity);
+    }
+    void reserve(size_type size) {
+        htbl_.rehash(std::ceil(size / max_load_factor()));
+    }
 
-    // hash_function
+    Hasher hash_function() const {
+        return hash_;
+    }
+    // we havent implemented this
     // key_eq
 
-    
 private:
     hashtable htbl_;
     Alloc allocator_;

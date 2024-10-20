@@ -98,6 +98,18 @@ public:
         }
         return false;
     }
+    bool pop(node* cur) {
+        node* prev = head_;
+        while (prev->next) {
+            if (prev->next == cur) {
+                prev->next = cur->next;
+                delete cur;
+                return true;
+            }
+            prev = prev->next;
+        }
+        return false;
+    }
     mfwu::pair<value_type&, bool> get(const key_type& key) {
         node* ret = search(key);
         bool is_new_node = false;
@@ -106,6 +118,12 @@ public:
             is_new_node = true;
         }
         return {ret->value, is_new_node};
+    }
+    bool count(const key_type& key) {
+        return search(key) != nullptr;
+    }
+    node* find(const key_type& key) const {
+        return search(key);
     }
 private:
     void bucket_copy(const bucket& bkt) {
@@ -123,7 +141,7 @@ private:
         delete head_;
     }
     void clear() { while (head_->next) { pop(); } }
-    node* search(const key_type& key) {
+    node* search(const key_type& key) const {
         node* cur = head_->next;
         while (cur) {
             if (cur->key == key) {
@@ -144,6 +162,8 @@ private:
 };  // endof class bucket
 
 class unit_test_hashtable;
+template <typename Key, typename Value, typename Hash, typename Alloc>
+class unordered_map;
 
 template <typename Key,
           typename Value,
@@ -230,6 +250,12 @@ public:
             this->operator++();
             return mfwu::move(tmp);
         }
+        node* get_cur() const {
+            return cur_;
+        }
+        bucket* get_bucket() const {
+            return buckets_;
+        }
     private:
         node* cur_;
         bucket* buckets_;
@@ -302,15 +328,25 @@ public:
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
         size_type hashed_key = hash(key);
-        add_cnt(buckets_[hashed_key].push(key, val).second);
-        // TODO: RETURN
+        mfwu::pair<node*, bool> ret = buckets_[hashed_key].push(key, val);
+        add_cnt(ret.second);
+        return {iterator(ret.first, buckets_ + hashed_key), ret.second};
     }
-    void insert(const mfwu::pair<key_type, value_type>& key_val) {
-        insert(key_val.first, key_val.second);
+    mfwu::pair<iterator, bool> insert(const mfwu::pair<key_type, value_type>& key_val) {
+        return insert(key_val.first, key_val.second);
     } 
-    void erase(const key_type& key) {
+    bool erase(const key_type& key) {
         size_type hashed_key = hash(key);
-        size_ -= buckets_[hashed_key].pop(key);
+        bool ret = buckets_[hashed_key].pop(key);
+        size -= ret;
+        return ret;
+    }
+    iterator erase(iterator it) {
+        node* cur = it.get_cur();
+        bucket* bkt = it.get_bucket();
+        ++it;
+        bkt->pop(cur);
+        return it;
     }
     // TODO: erase by iterator !
     value_type& operator[](const key_type& key) {
@@ -319,6 +355,30 @@ public:
         // note: you must search again bcz add_cnt may
         //       rehash the buckets 24.10.11 
         return buckets_[hash(key)].get(key).first;
+    }
+    bool count(const key_type& key) const {
+        return buckets_[hash(key)].count(key);
+    }
+    iterator find(const key_type& key) const {
+        bucket* bkt = buckets_ + hash(key);
+        node* cur = bkt.find(key);
+        if (cur == nullptr) {
+            return end();
+        }
+        return iterator(cur, bkt);
+    }
+    float load_factor() const {
+        return (float)size_ / capacity_;
+    }
+    float max_load_factor() const {
+        return alpha;
+    }
+    void rehash(size_type capacity) {
+        capacity = mfwu::get_next_primer(capacity);
+        while ((float)size_ / capacity >= max_load_factor()) {
+            capacity = mfwu::get_next_primer(capacity + 1);
+        }
+        rehash_hard(capacity);  // TODO: check
     }
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
@@ -342,11 +402,8 @@ private:
     size_type hash(const key_type& key) const {
         return hashfunc_(key) % capacity_;
     }
-    void enable(bool command) {
-        buckets_[0].enbale_next_ = command;
-    }
-    void req_mem() {
-        hashtable newtable = hashtable(mfwu::get_next_primer(capacity_ + 1));
+    void rehash_hard(size_type capacity) {
+        hashtable newtable = hashtable(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket cur = buckets_[idx];
             while (!cur.empty()) {
@@ -358,7 +415,10 @@ private:
         newtable.size_ = this->size_;
         *this = mfwu::move(newtable);
     }
-    void add_cnt(int num) {
+    void req_mem() {
+        rehash(capacity_ + 1);
+    }
+    void add_cnt(size_type num) {
         if (!num) return ;
         size_ += num;
         while ((float)size_ / capacity_ > alpha) {
@@ -405,7 +465,7 @@ public:
         bucket_node(const key_type& k)
             : key(k), next(nullptr) {}
         bucket_node(const key_type& k, bucket_node* n)
-            : key(k), next(nullptr) {}
+            : key(k), next(n) {}
         bucket_node(const bucket_node& nd)
             : key(nd.key), next(nd.next) {}
         bucket_node(bucket_node&& nd) 

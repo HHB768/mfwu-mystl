@@ -53,42 +53,6 @@ move(T&& t) {
     return static_cast<typename mfwu::remove_reference<T>::type&&>(t);
 }
 
-// a tiny fix from
-// https://blog.csdn.net/mightbxg/article/details/108382265
-
-// case1: T* can cast to C*
-template <template <typename...> class C, typename...Ts>
-std::true_type is_base_of_template_impl(const C<Ts...>*); 
-// case2: T* cannot cast to C*
-template <template <typename...> class C>
-std::false_type is_base_of_template_impl(...);
-
-template <template <typename...> class C, typename T>
-using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*>()));
-// TODO: fix other containers
-
-// standard solutions :
-// c++11:
-// template<typename _InputIterator,
-//     typename = std::_RequireInputIter<_InputIterator>>
-// where:
-// template<typename _InIter>
-// using _RequireInputIter =
-//     __enable_if_t<is_convertible<__iter_category_t<_InIter>,
-//                 input_iterator_tag>::value>;
-// c++98:
-// Check whether it's an integral type.  If so, it's not an iterator.
-// typedef typename std::__is_integer<_InputIterator>::__type _Integral;
-// _M_initialize_dispatch(__first, __last, _Integral());
-// X-H-Q2 24.07.15 [0809] 
-
-// maybe i can try this: 240924
-template <typename T>
-using is_input_iterator 
-    = is_base_of_template<mfwu::input_iterator_tag,
-                          mfwu::iterator_traits<T>::iterator_category>;
-//////////////////////////
-
 template <typename T>
 inline void swap(T&& a, T&& b) {
     T temp = mfwu::move(a);
