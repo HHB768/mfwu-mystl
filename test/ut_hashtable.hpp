@@ -40,9 +40,10 @@ public:
     using hash_func = mfwu::hash_functor<int>;
 private:
     static hash_func hash_;
-    void print_hashtable(const hashtable<data, int, data_hash>& htbl) {
-        mfwu::vector<mfwu::vector<int>> 
-            cache(htbl.size_, mfwu::vector<int>(htbl.capacity_, -主));
+    template <typename Key, typename Value, typename Hasher, typename Alloc>
+    void print_hashtable(const hashtable<Key, Value, Hasher, Alloc>& htbl) {
+        mfwu::vector<mfwu::vector<Value>> 
+            cache(htbl.size_, mfwu::vector<Value>(htbl.capacity_, -主));
 #ifdef __UNIT_TEST_HASHTABLE__
 #ifndef __UNIT_TEST_HASHTABLE_BRIEF__
         std::cout << "capacity: " << htbl.capacity_ << "\t"
@@ -129,8 +130,10 @@ bool unit_test_hashtable::use_mfwu_hashtable() {
     print_hashtable(htbl1);
     ++htbl1[data{主}];
     print_hashtable(htbl1);
+    mfwu::hashtable<data, int, data_hash> htbl2(++htbl1.begin(), htbl1.end());
     // TODO: too many methods without test
     //       but you may leave them to set/map test
+    // ANS: yes indeed 241022
 
     return 0;
 }

@@ -87,7 +87,7 @@ public:
     bool pop(const key_type& key) {
         node* prev = head_;
         while (prev->next) {
-            if (prev->next->key == key) {
+            if (prev->next->value.first == key) {
                 node* next = prev->next;
                 prev->next = next->next;
                 delete next;
@@ -323,6 +323,9 @@ public:
     hashtable(hashtable&& tbl) : capacity_(tbl.capacity_),
         size_(tbl.size_), buckets_(tbl.buckets_) {
         tbl.buckets_ = nullptr;
+        tbl.capacity_ = -1;  
+        // found it ! 
+        // not in 10.11 but 241022
     }
     ~hashtable() {
         reset();
@@ -348,10 +351,11 @@ public:
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
-        size_type hashed_key = hash(key);
-        mfwu::pair<node*, bool> ret = buckets_[hashed_key].push(key, val);
+        mfwu::pair<node*, bool> ret = buckets_[hash(key)].push(key, val);
         add_cnt(ret.second);
-        return {iterator(ret.first, buckets_ + hashed_key), ret.second};
+        return {find(key), ret.second};
+        // note: you must search again bcz add_cnt may
+        //       rehash the buckets, but found on 24.10.23 T^T
     }
     mfwu::pair<iterator, bool> insert(const mfwu::pair<const key_type, value_type>& key_val) {
         return insert(key_val.first, key_val.second);
@@ -382,7 +386,7 @@ public:
     }
     iterator find(const key_type& key) const {
         bucket* bkt = buckets_ + hash(key);
-        node* cur = bkt.find(key);
+        node* cur = bkt->find(key);
         if (cur == nullptr) {
             return end();
         }

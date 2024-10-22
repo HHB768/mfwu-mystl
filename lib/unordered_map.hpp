@@ -43,7 +43,7 @@ public:
         : htbl_(vals) {}
     unordered_map(const unordered_map& m) : htbl_(m.htbl_) {}
     unordered_map(unordered_map&& m) : htbl_(mfwu::move(m.htbl_)) {}
-    ~unordered_map() { std::cout << "1\n"; }
+    ~unordered_map() {}
 
     unordered_map& operator=(const unordered_map& m) {
         htbl_ = m.htbl_;
@@ -66,6 +66,7 @@ public:
     void clear() {
         hashtable empty_htbl(htbl_.capacity());
         mfwu::swap(empty_htbl, htbl_);
+        // TODO: REALLY?
     }
     mfwu::pair<iterator, bool> insert(const value_type& value) {
         return htbl_.insert(value);
@@ -90,13 +91,14 @@ public:
     mfwu::pair<iterator, bool> emplace(Args&&... args) {
         return htbl_.insert(value_type{mfwu::forward<Args>(args)...});
     }
+    // try_emplace
     iterator erase(iterator it) {
         return htbl_.erase(it);
     }
     // we havent implemented const_iterator
     // erase(const_iterator it);
     size_type erase(const Key& key) {
-        return erase(key);
+        return htbl_.erase(key);
     }
     void swap(unordered_map& other) {
         mfwu::swap(htbl_, other.htbl_);
@@ -137,9 +139,14 @@ public:
 
 private:
     hashtable htbl_;
-    Alloc allocator_;
-    Hasher hash_;
+    static Alloc allocator_;
+    static Hasher hash_;
 };  // endof class unordered_map
+
+template <typename Key, typename Value, typename Hash, typename Alloc>
+Alloc unordered_map<Key, Value, Hash, Alloc>::allocator_ = {};
+template <typename Key, typename Value, typename Hash, typename Alloc>
+Hash unordered_map<Key, Value, Hash, Alloc>::hash_ = {};
 
 }  // endof namespace mfwu
 
