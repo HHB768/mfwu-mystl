@@ -27,20 +27,28 @@ bool unit_test_unordered_map::use_mfwu_unordered_map() {
     std::cout << "constructing & copying & moving\n";
     using test_map = mfwu::unordered_map<data, int, data_hash>;
     test_map map1;
+    print_unordered_map(map1);
     mfwu::unordered_map<data, bool, data_hash> map2(10);
+    // print_unordered_map(map2);
     test_map map3 = {{data{1}, 2}, 
                      {data{2}, 3}, 
                      {data{3}, 4}, 
                      {data{5}, 6}};
+    print_unordered_map(map3);
     test_map map4(++map3.begin(), map3.end());
+    print_unordered_map(map4);
     test_map map5 = map4;
+    print_unordered_map(map5);
     test_map map6 = mfwu::move(map5);
+    print_unordered_map(map6);
     mfwu::unordered_map<int, int> map7 = {{1, 2}, {3, 4}};
+    // print_unordered_map(map7);
     mfwu::unordered_map<int, int, int_hash> map8(map7);
-    map4 = map6;
-    map4 = mfwu::move(map6);
+    // print_unordered_map(map8);
+    // map4 = map6;
+    // map4 = mfwu::move(map6);
+    print_unordered_map(map4);
 
-    
     return 0;
 }
 

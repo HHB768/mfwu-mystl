@@ -48,6 +48,7 @@ int main() {
     // mfwu::unit_test_deque ut_deque;
     mfwu::unit_test_rbf ut_rbf;
     mfwu::unit_test_hashtable ut_htbl;
+    mfwu::unit_test_unordered_map ut_uod_map;
 
     int score = 0;
     int total = 2;
@@ -159,6 +160,16 @@ int main() {
     score += !ut_htbl.use_mfwu_shashtable();
     std::cout << "\n---------- Hashtable test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 3;
+    ttotal += total;
+    score += !ut_uod_map.use_mfwu_unordered_map();
+    score += !ut_uod_map.use_modifier_and_lookup();
+    score += !ut_uod_map.use_other_interface();
+    std::cout << "\n---------- Unordered_map test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
 
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;

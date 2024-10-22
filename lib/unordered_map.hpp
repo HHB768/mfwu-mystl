@@ -43,7 +43,7 @@ public:
         : htbl_(vals) {}
     unordered_map(const unordered_map& m) : htbl_(m.htbl_) {}
     unordered_map(unordered_map&& m) : htbl_(mfwu::move(m.htbl_)) {}
-    ~unordered_map() { htbl_.~hashtable(); }
+    ~unordered_map() { std::cout << "1\n"; }
 
     unordered_map& operator=(const unordered_map& m) {
         htbl_ = m.htbl_;
