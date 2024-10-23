@@ -609,7 +609,7 @@ private:
     node* head_;
 };  // endof class sbucket
 
-template <typename Key, typename Value, typename Hash, typename Alloc>
+template <typename Key, typename Hash, typename Alloc>
 class unordered_set;
 
 template <typename Key,
@@ -629,7 +629,7 @@ public:
     public:
         using value_type = Key;
         using iterator_category = mfwu::forward_iterator_tag;
-        using porinter = value_type*;
+        using pointer = value_type*;
         using reference = value_type&;
         using difference_type = mfwu::ptrdiff_t;
 
@@ -725,6 +725,7 @@ public:
     shashtable(shashtable&& tbl) : capacity_(tbl.capacity_),
         size_(tbl.size_), buckets_(tbl.buckets_) {
         tbl.buckets_ = nullptr;
+        tbl.capacity_ = -1;
     }
     ~shashtable() {
         reset();
@@ -748,11 +749,9 @@ public:
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key) {
-        size_type hashed_key = hash(key);
-        // add_cnt(buckets_[hashed_key].push(key).second);
-        mfwu::pair<node*, bool> ret = buckets_[hashed_key].push(key);
+        mfwu::pair<node*, bool> ret = buckets_[hash(key)].push(key);
         add_cnt(ret.second);
-        return {iterator(ret.first, buckets_ + hashed_key), ret.second};
+        return {find(key), ret.second};
     }
     bool erase(const key_type& key) {
         size_type hashed_key = hash(key);
@@ -772,7 +771,7 @@ public:
     }
     iterator find(const key_type& key) const {
         bucket* bkt = buckets_ + hash(key);
-        node* cur = bkt.find(key);
+        node* cur = bkt->find(key);
         if (cur == nullptr) {
             return end();
         }

@@ -35,8 +35,8 @@ public:
     unordered_map(size_type capacity) : htbl_(capacity) {}
     template <typename InputIterator,
               typename = typename std::enable_if_t<
-                  is_input_iterator<InputIterator>::value>
-              >
+                  mfwu::is_input_iterator<InputIterator>::value>
+             >
     unordered_map(InputIterator first, InputIterator last) 
         : htbl_(first, last) {}
     unordered_map(const std::initializer_list<value_type>& vals)
@@ -75,7 +75,7 @@ public:
     // mfwu::pair<iterator, bool> insert(value_type&& value);
     template <typename InputIterator,
               typename = typename std::enable_if_t<
-                  is_input_iterator<InputIterator>::value>
+                  mfwu::is_input_iterator<InputIterator>::value>
               >
     void insert(InputIterator first, InputIterator last) {
         for (; first != last; ++first) {

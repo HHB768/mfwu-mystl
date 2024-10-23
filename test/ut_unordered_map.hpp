@@ -26,41 +26,61 @@ private:
     void print_ret_info(
         typename unordered_map<Key, Value, Hash, Alloc>::iterator it,
         bool is_new) {
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
         std::cout << "*it = [" << it->first << ", " << it->second << "]\n";
         std::cout << "is new: " << (is_new ? "true" : "false") << "\n"; 
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     }
     template <typename Key, typename Value, typename Hash, typename Alloc>
     void print_it_info(
         typename unordered_map<Key, Value, Hash, Alloc>::iterator it) {
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
         std::cout << "*it = [" << it->first << ", " << it->second << "]\n";
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     }
     template <typename Key, typename Value, typename Hash, typename Alloc>
     void print_suc_info(bool is_new) {
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
         std::cout << "is successful: " << (is_new ? "true" : "false") << "\n"; 
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     }
     template <typename Key, typename Value, typename Hash, typename Alloc>
     void print_unordered_map_with_iterator(
         const unordered_map<Key, Value, Hash, Alloc>& map) {
         for (auto it = map.begin(); it != map.end(); ++it) {
-        auto&& [key, val] = *it;
+        const auto& [key, val] = *it;
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
         std::cout << "key: " << key << ", val: " << val << "\n";
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
         }
     }
     template <typename Key, typename Value, typename Hash, typename Alloc>
     void print_unordered_map_other_info(
         const unordered_map<Key, Value, Hash, Alloc>& map) {
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
         std::cout << "empty: " << (map.empty() ? "true" : "false") << "\n";
         std::cout << "size: " << map.size() << "\n";
         std::cout << "load_factor: " << map.load_factor() << "\n";
         std::cout << "max_size: " << map.max_size() << "\n";
         std::cout << "max_load_factor: " << map.max_load_factor() << "\n";
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     }
 };  // endof class unit_test_unordered_map
 
 bool unit_test_unordered_map::use_mfwu_unordered_map() {
     std::cout << "\n------- Test: use mfwu::unordered_map -------\n";
     std::cout << "constructing & copying & moving & destroying\n";
-    using test_map = mfwu::unordered_map<data, int, data_hash>;
+    // using test_map = mfwu::unordered_map<data, int, data_hash>;
     test_map map1;
     print_unordered_map(map1);
     mfwu::unordered_map<data, bool, data_hash> map2(10);
@@ -119,13 +139,21 @@ bool unit_test_unordered_map::use_modifier_and_lookup() {
     print_unordered_map(map1);
     map1.swap(map2);
     print_unordered_map(map1);
-    
+
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
     std::cout << (!!map1.count(data{20}) 
                     == map1.contains(data{20}) ? "true" : "false") << "\n";
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     it = map1.find(data{20});
     print_it_info<data, int, data_hash, mfwu::DefaultAllocator<
         mfwu::bucket<data, int>, mfwu::malloc_alloc>>(it);
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
     std::cout << map1[data{20}] << "\n";
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     return 0;
 }
 
@@ -140,7 +168,11 @@ bool unit_test_unordered_map::use_other_interface() {
     alc.deallocate(ptr, 2);
     std::cout << "hashing\n";
     auto hasher = map1.hash_function();
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
     std::cout << hasher(data{-主}) << "\n";
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
 
     std::cout << "testing interfaces\n";
     print_unordered_map_with_iterator(map1);

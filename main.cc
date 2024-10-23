@@ -12,6 +12,7 @@
 #   define __UNIT_TEST_RBTREE_BRIEF__
 #   define __UNIT_TEST_RBF_BRIEF__
 // #   define __UNIT_TEST_HASHTABLE_BRIEF__
+#   define __UNIT_TEST_UNORDERED_MAP_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -31,8 +32,9 @@
 #include "ut_rbtree.hpp"
 // #include "ut_deque.hpp"
 #include "ut_rbf.hpp"
-// #include "ut_hashtable.hpp"
+#include "ut_hashtable.hpp"
 #include "ut_unordered_map.hpp"
+#include "ut_unordered_set.hpp"
 
 int main() {
     int ttotal = 0;
@@ -49,6 +51,7 @@ int main() {
     mfwu::unit_test_rbf ut_rbf;
     mfwu::unit_test_hashtable ut_htbl;
     mfwu::unit_test_unordered_map ut_uod_map;
+    mfwu::unit_test_unordered_set ut_uod_set;
 
     int score = 0;
     int total = 2;
@@ -168,6 +171,15 @@ int main() {
     score += !ut_uod_map.use_modifier_and_lookup();
     score += !ut_uod_map.use_other_interface();
     std::cout << "\n---------- Unordered_map test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 3;
+    ttotal += total;
+    score += !ut_uod_set.use_mfwu_unordered_set();
+    score += !ut_uod_set.use_modifier_and_lookup();
+    score += !ut_uod_set.use_other_interface();
+    std::cout << "\n---------- Unordered_set test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
 

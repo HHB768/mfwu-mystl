@@ -1,3 +1,4 @@
+#ifndef __UNIT_TEST_HASHTABLE__
 #define __UNIT_TEST_HASHTABLE__
 
 #include "hashtable.hpp"
@@ -16,12 +17,16 @@ public:
     is there any solution to achieve this?
 */
 // 24.10.20
-#ifdef __UNIT_TEST_UNORDERED_MAP__
-    friend class unit_test_unordered_map;
-#endif  // __UNIT_TEST_UNORDERED_MAP__
-#ifdef __UNIT_TEST_UNORDERED_SET__
-    friend class unit_test_unordered_set;
-#endif  // __UNIT_TEST_UNORDERED_SET__
+// #ifdef __UNIT_TEST_UNORDERED_MAP__
+//     friend class unit_test_unordered_map;
+// #endif  // __UNIT_TEST_UNORDERED_MAP__
+// #ifdef __UNIT_TEST_UNORDERED_SET__
+//     friend class unit_test_unordered_set;
+// #endif  // __UNIT_TEST_UNORDERED_SET__
+// i cannot do it bcz when we #include both "unordered_map"
+// and "unordered_set", the first file including  "ut_hashtable"
+// will not define the other file's ut macro
+// 24.10.23
 
     bool use_mfwu_hashtable();
     bool use_mfwu_shashtable();
@@ -38,8 +43,7 @@ public:
         }
     };  // endof struct data_hash
     using hash_func = mfwu::hash_functor<int>;
-private:
-    static hash_func hash_;
+
     template <typename Key, typename Value, typename Hasher, typename Alloc>
     void print_hashtable(const hashtable<Key, Value, Hasher, Alloc>& htbl) {
         mfwu::vector<mfwu::vector<Value>> 
@@ -68,7 +72,8 @@ private:
 #endif  // __UNIT_TEST_HASHTABLE_BRIEF__
 #endif  // __UNIT_TEST_HASHTABLE__
     }
-    void print_shashtable(const shashtable<int>& htbl) {
+    template <typename Key, typename Hasher, typename Alloc>
+    void print_shashtable(const shashtable<Key, Hasher, Alloc>& htbl) {
         mfwu::vector<mfwu::vector<int>> 
             cache(htbl.size_, mfwu::vector<int>(htbl.capacity_, -主));
 #ifdef __UNIT_TEST_HASHTABLE__
@@ -95,6 +100,8 @@ private:
 #endif  // __UNIT_TEST_HASHTABLE_BRIEF__
 #endif  // __UNIT_TEST_HASHTABLE__
     }
+private:
+    static hash_func hash_;
 };  // endof class unit_test_hashtable
 
 unit_test_hashtable::hash_func unit_test_hashtable::hash_ = {};
@@ -157,3 +164,4 @@ bool unit_test_hashtable::use_mfwu_shashtable() {
 
 }  // endof namespace mfwu
 
+#endif  // __UNIT_TEST_HASHTABLE__
