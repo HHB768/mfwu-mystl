@@ -17,9 +17,9 @@
 */
 
 new schd on 24.10.24
-1. deque                                3 days
+1. deque                                3 days √
 2. map/set                              5 days
-3. pair                                 1 day
-4. queue/stack unit                     2 days
+3. pair                                 1 day  √
+4. queue/stack unit test                2 days
 5. string                               -
 6. ringbuffer                           -

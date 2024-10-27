@@ -20,7 +20,11 @@ private:
     template <typename Key, typename Value, typename Hash, typename Alloc>
     void print_unordered_map(
         const unordered_map<Key, Value, Hash, Alloc>& map) {
+#ifdef __UNIT_TEST_UNORDERED_MAP__
+#ifndef __UNIT_TEST_UNORDERED_MAP_BRIEF__
         ut_hashtable.print_hashtable(map.htbl_);
+#endif  // __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_MAP__
     }
     template <typename Key, typename Value, typename Hash, typename Alloc>
     void print_ret_info(

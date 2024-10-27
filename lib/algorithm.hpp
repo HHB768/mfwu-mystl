@@ -11,16 +11,16 @@
 
 namespace mfwu {
 
-template <typename RandomAccessIt>
-inline void copy_backward(RandomAccessIt first, 
-                          RandomAccessIt last,
-                          RandomAccessIt res) {
+template <typename It1, typename It2>
+inline void copy_backward(It1 first, 
+                          It1 last,
+                          It2 res) {
     --last;
-    for (RandomAccessIt pos = res + (last - first);
+    for (It2 pos = res + (last - first);
             pos >= res; --last, --pos) {
         *pos = *last;
     }
-}
+}  // TODO: fix it
 
 template <typename RandomAccessIt, typename CmpFunctor>
 inline RandomAccessIt partition(RandomAccessIt first,
@@ -764,10 +764,10 @@ OutputIt copy(InputIt first, InputIt last, OutputIt res) {
         typename mfwu::iterator_traits<InputIt>::iterator_category{});
 }
 
-template <typename RandomAccessIt>
-inline void copy_backward(RandomAccessIt first, 
-                          RandomAccessIt last,
-                          RandomAccessIt res);
+template <typename It1, typename It2>
+inline void copy_backward(It1 first, 
+                          It1 last,
+                          It2 res);
 
 template <typename ForwardIt,
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>

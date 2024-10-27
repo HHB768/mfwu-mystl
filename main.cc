@@ -11,8 +11,10 @@
 #   define __UNIT_TEST_AVL_TREE_BRIEF__
 #   define __UNIT_TEST_RBTREE_BRIEF__
 #   define __UNIT_TEST_RBF_BRIEF__
-// #   define __UNIT_TEST_HASHTABLE_BRIEF__
+#   define __UNIT_TEST_HASHTABLE_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MAP_BRIEF__
+#   define __UNIT_TEST_UNORDERED_SET_BRIEF__
+#   define __UNIT_TEST_DEQUE_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -30,7 +32,7 @@
 #include "ut_bst.hpp"
 #include "ut_avl_tree.hpp"
 #include "ut_rbtree.hpp"
-// #include "ut_deque.hpp"
+#include "ut_deque.hpp"
 #include "ut_rbf.hpp"
 #include "ut_hashtable.hpp"
 #include "ut_unordered_map.hpp"
@@ -52,6 +54,7 @@ int main() {
     mfwu::unit_test_hashtable ut_htbl;
     mfwu::unit_test_unordered_map ut_uod_map;
     mfwu::unit_test_unordered_set ut_uod_set;
+    mfwu::unit_test_deque ut_deque;
 
     int score = 0;
     int total = 2;
@@ -144,10 +147,6 @@ int main() {
     // std::cout << "\n---------- Deque test result -----------\n";
     // std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
-    // hashtable
-    // stk queue pq
-    // (unordered_)set/map
-    // string
 
     score = 0;
     total = 1;
@@ -180,6 +179,16 @@ int main() {
     score += !ut_uod_set.use_modifier_and_lookup();
     score += !ut_uod_set.use_other_interface();
     std::cout << "\n---------- Unordered_set test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 4;
+    ttotal += total;
+    score += !ut_deque.use_deque_block();
+    score += !ut_deque.use_deque_iterator();
+    score += !ut_deque.use_mfwu_deque();
+    score += !ut_deque.use_ranged_insert_erase();
+    std::cout << "\n---------- Deque test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
 

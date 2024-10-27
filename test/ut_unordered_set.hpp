@@ -20,7 +20,11 @@ private:
     template <typename Key, typename Hash, typename Alloc>
     void print_unordered_set(
         const unordered_set<Key, Hash, Alloc>& set) {
+#ifdef __UNIT_TEST_UNORDERED_SET__
+#ifndef __UNIT_TEST_UNORDERED_SET_BRIEF__
         ut_hashtable.print_shashtable(set.htbl_);
+#endif  // __UNIT_TEST_UNORDERED_SET_BRIEF__
+#endif  // __UNIT_TEST_UNORDERED_SET__
     }
     template <typename Key, typename Hash, typename Alloc>
     void print_ret_info(
