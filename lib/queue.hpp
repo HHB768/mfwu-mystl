@@ -5,7 +5,8 @@
 
 namespace mfwu {
 
-template <typename T, typename Container=mfwu::deque<T, mfwu::malloc_alloc>>
+template <typename T, typename Container=deque<T, 512UL, 
+    mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>>
 class queue {
 public:
     using value_type = T;

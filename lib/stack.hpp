@@ -5,7 +5,8 @@
 
 namespace mfwu {
 
-template <typename T, typename Container=deque<T, mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>>
+template <typename T, typename Container=deque<T, 512UL, 
+    mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>>
 // try other container
 class stack {
 public:

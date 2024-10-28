@@ -5,7 +5,8 @@
 
 namespace mfwu {
 
-template <typename T, typename Container=mfwu::vector<T>, typename CmpFunctor=mfwu::less<T>>
+template <typename T, typename Container=mfwu::vector<T>, 
+    typename CmpFunctor=mfwu::less<T>>
 using priority_queue = mfwu::heap<T, Container, CmpFunctor>;
 
 }  // endof namespace mfwu

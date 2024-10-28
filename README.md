@@ -10,7 +10,7 @@ Progress:
 * algorithm 80%
 * allocator 100%
 * bst 100%
-* deque 85%
+* deque 95%
 * hashtable 90%
 * heap 100%
 * iterator 100%
