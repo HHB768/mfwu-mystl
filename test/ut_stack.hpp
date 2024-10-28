@@ -8,14 +8,14 @@ class unit_test_stack {
 public:
     bool use_mfwu_stack();
 private:
-    template <typename T, size_t size, typename Container>
-    void print_stack_basic_info(const mfwu::stack<T, size, Container>& stk) {
+    template <typename T, typename Container>
+    void print_stack_basic_info(const mfwu::stack<T, Container>& stk) {
         std::cout << "empty : " << stk.empty() << " "
                   << "size : " << stk.size() << " "
                   << "top : " << stk.top() << "\n";
     }
-    template <typename T, size_t size, typename Container>
-    void print_stack_detailed_info(const mfwu::stack<T, size, Container>& stk) {
+    template <typename T, typename Container>
+    void print_stack_detailed_info(const mfwu::stack<T, Container>& stk) {
         print_stack_basic_info(stk);
         for (auto it = stk.stk_.begin(); it != stk.stk_.end(); ++it) {
             std::cout << *it << " ";

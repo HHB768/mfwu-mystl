@@ -9,6 +9,7 @@ template <typename T, typename Container=deque<T, 512UL,
     mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>>
 class queue {
 public:
+    friend class unit_test_queue;
     using value_type = T;
     using container_type = Container;
     using size_type = size_t;
@@ -17,6 +18,7 @@ public:
     queue(size_type n, const value_type& val) : q_(n, val) {}
     template <typename InputIterator>
     queue(InputIterator first, InputIterator last) : q_(first, last) {}
+    queue(const std::initializer_list<value_type>& vals) : q_(vals) {}
     queue(const queue& q) : q_(q) {}
     queue(queue&& q) : q_(mfwu::move(q)) {}
     ~queue() { q_.~container_type(); }
