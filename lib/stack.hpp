@@ -10,6 +10,8 @@ template <typename T, typename Container=deque<T, 512UL,
 // try other container
 class stack {
 public:
+    friend class unit_test_stack;
+
     using value_type = T;
     using container_type = Container;
     using size_type = size_t;
@@ -18,9 +20,10 @@ public:
     stack(size_type n, const value_type& val) : stk_(n, val) {}
     template <typename InputIterator>  // TODO
     stack(InputIterator first, InputIterator last) : stk_(first, last) {}
+    stack(const std::initializer_list<value_type>& vals) : stk_(vals) {}
     stack(const stack& stk) : stk_(stk.stk_) {}
     stack(stack&& stk) : stk(mfwu::move(stk.stk_)) {}
-    ~stk() { stk.~deque(); }
+    ~stk() {}
 
     stack& operator=(const stack& stk) {
         stk_ = stk.stk_;
