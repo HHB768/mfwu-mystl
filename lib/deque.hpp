@@ -257,6 +257,13 @@ public:
         // so we reserve full mem for dummy pblock
         // but when BLK_SIZE too large, it is a waste
     }
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  mfwu::is_input_iterator<InputIterator>::value>
+             >
+    deque(InputIterator first, InputIterator last) {
+        copy_init(first, last);  // TODO: test it !
+    }
     deque(const std::initializer_list<value_type>& vals) {
         copy_init(vals.begin(), vals.end());
     }
@@ -351,6 +358,10 @@ public:
         }
     }
 
+    // TODO:
+    // emplace
+    // emplace_back
+    // emplace_front
     void insert(int idx, const value_type& val) {
         insert(begin() + idx, val);
     }
@@ -472,13 +483,15 @@ private:
     }
     template <typename RandomAccessIterator>
     void copy_init(RandomAccessIterator first, RandomAccessIterator last) {
-        init_ctrl(last - first);
+        init_ctrl(mfwu::distance(first, last));
         pblock* blk = ctrl_;
         auto it = first;
         for ( ; blk < last_ - 1; blk++) {
             *blk = new block();  // the block is aware of the ctrl
             (*blk)->assign(it, it + BLK_SIZE, (*blk)->begin());
-            it += BLK_SIZE;  // TODO: check
+            // it += BLK_SIZE;
+            mfwu::advance(it, BLK_SIZE);  
+            // TODO: check
         }
         *blk = new block();
         (*blk)->assign(it, last, (*blk)->begin());

@@ -335,7 +335,7 @@ inline ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n, const
 // 1. advance
 // 2. distance
 template <typename It>
-void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
+inline void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
     mfwu::input_iterator_tag) {
     while (n > 0) {
         ++it;
@@ -344,7 +344,7 @@ void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
 }
 
 template <typename It>
-void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
+inline void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
     mfwu::bidirectional_iterator_tag) {
         while (n > 0) {
             ++it;
@@ -357,13 +357,13 @@ void advance_aux(It& it, typename mfwu::iterator_traits<It>::difference_type n,
     }
 
 template <typename It>
-void advance_aux(It & it, typename mfwu::iterator_traits<It>::difference_type n,
+inline void advance_aux(It & it, typename mfwu::iterator_traits<It>::difference_type n,
     mfwu::random_access_iterator_tag) {
     it += n;
 }
 
 template <typename It, typename Distance>
-void advance(It& it, Distance n) {
+inline void advance(It& it, Distance n) {
     advance_aux(it,
         typename mfwu::iterator_traits<It>::difference_type(n),
         typename mfwu::iterator_traits<It>::iterator_category());
@@ -371,13 +371,13 @@ void advance(It& it, Distance n) {
 
 
 template <typename It>
-typename mfwu::iterator_traits<It>::difference_type
+inline typename mfwu::iterator_traits<It>::difference_type
 distance_aux(It first, It last, mfwu::random_access_iterator_tag) {
     return last - first;
 }
 
 template <typename It>
-typename mfwu::iterator_traits<It>::difference_type
+inline typename mfwu::iterator_traits<It>::difference_type
 distance_aux(It first, It last, mfwu::input_iterator_tag) {
     typename mfwu::iterator_traits<It>::difference_type res{0};
     while (first != last) {
@@ -388,7 +388,7 @@ distance_aux(It first, It last, mfwu::input_iterator_tag) {
 }
 
 template <typename It>
-typename mfwu::iterator_traits<It>::difference_type
+inline typename mfwu::iterator_traits<It>::difference_type
 distance(It first, It last) {
     return distance_aux(first, last, typename mfwu::iterator_traits<It>::iterator_category{});
 }

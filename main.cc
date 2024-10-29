@@ -37,6 +37,8 @@
 #include "ut_hashtable.hpp"
 #include "ut_unordered_map.hpp"
 #include "ut_unordered_set.hpp"
+#include "ut_stack.hpp"
+#include "ut_queue.hpp"
 
 int main() {
     int ttotal = 0;
@@ -55,6 +57,8 @@ int main() {
     mfwu::unit_test_unordered_map ut_uod_map;
     mfwu::unit_test_unordered_set ut_uod_set;
     mfwu::unit_test_deque ut_deque;
+    mfwu::unit_test_stack ut_stack;
+    mfwu::unit_test_queue ut_queue;
 
     int score = 0;
     int total = 2;
@@ -189,6 +193,20 @@ int main() {
     score += !ut_deque.use_mfwu_deque();
     score += !ut_deque.use_ranged_insert_erase();
     std::cout << "\n---------- Deque test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 1;
+    ttotal += total;
+    score += !ut_stack.use_mfwu_stack();
+    std::cout << "\n---------- Stack test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 1;
+    ttotal += total;
+    score += !ut_queue.use_mfwu_queue();
+    std::cout << "\n---------- Queue test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
 

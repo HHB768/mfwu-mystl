@@ -18,27 +18,32 @@ public:
 
     stack() : stk_() {}
     stack(size_type n, const value_type& val) : stk_(n, val) {}
-    template <typename InputIterator>  // TODO
-    stack(InputIterator first, InputIterator last) : stk_(first, last) {}
+    // template <typename InputIterator,
+    //           typename = typename std::enable_if_t<
+    //               mfwu::is_input_iterator<InputIterator>::value>
+    //          >
+    // stack(InputIterator first, InputIterator last) : stk_(first, last) {}
     stack(const std::initializer_list<value_type>& vals) : stk_(vals) {}
     stack(const stack& stk) : stk_(stk.stk_) {}
-    stack(stack&& stk) : stk(mfwu::move(stk.stk_)) {}
-    ~stk() {}
+    stack(stack&& stk) : stk_(mfwu::move(stk.stk_)) {}
+    ~stack() {}
 
     stack& operator=(const stack& stk) {
         stk_ = stk.stk_;
+        return *this;
     }
     stack& operator=(stack&& stk) {
         stk_ = mfwu::move(stk.stk_);
+        return *this;
     }
 
-    bool empty() {
+    bool empty() const {
         return stk_.empty();
     }
-    size_type size() {
+    size_type size() const {
         return stk_.size();
     }
-    value_type& top() {
+    value_type& top() const {
         return stk_.back();
     }
     void push(const value_type& val) {
@@ -52,7 +57,9 @@ public:
     }
     template <class... Args>
     void emplace(Args&&... args) {
-        stk_.emplace_back(args);
+        // stk_.emplace_back(mfwu::forward<Args>(args)...);
+        // deque hasnt implemented emplace yet 10.29/24
+        push(value_type{mfwu::forward<Args>(args)...});
     }
 
     // lexicographically compare the values
