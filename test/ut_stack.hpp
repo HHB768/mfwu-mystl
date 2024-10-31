@@ -10,9 +10,11 @@ public:
 private:
     template <typename T, typename Container>
     void print_stack_basic_info(const mfwu::stack<T, Container>& stk) {
-        std::cout << "empty : " << stk.empty() << " "
-                  << "size : " << stk.size() << " "
-                  << "top : " << stk.top() << "\n";
+        std::cout << "empty : " 
+                  << (stk.empty() ? "true" : "false") << ", "
+                  << "size : " << stk.size();
+        stk.empty() ? std::cout << "\n" 
+                    : std::cout << ", top : " << stk.top() << "\n";
     }
     template <typename T, typename Container>
     void print_stack_detailed_info(const mfwu::stack<T, Container>& stk) {
@@ -43,19 +45,24 @@ bool unit_test_stack::use_mfwu_stack() {
     stk6 = mfwu::move(stk4);
     print_stack_detailed_info(stk6);
 
+    mfwu::swap(stk6, mfwu::stack<int>{});
+    print_stack_detailed_info(stk6);
     stk6.emplace(7);
     stk6.push(8);
+    print_stack_detailed_info(stk6);
     for (int i = 0; i < 10; i++) {
         int num = rand() % 10;
         stk6.push(num);
+        print_stack_detailed_info(stk6);
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 12; i++) {
         int num = rand() % 10;
         if (num & 1) {
             stk6.push(num);
         } else {
             stk6.pop();
         }
+        print_stack_detailed_info(stk6);
     }
 
     return 0;

@@ -101,7 +101,7 @@ public:
     template <typename InputIterator,
               typename = typename std::enable_if_t<is_base_of_template<
                 mfwu::iterator, InputIterator>::value>
-             >
+             >   // that is my earliest method to 'concept' this [1031]
     ForwardLinkedList(InputIterator first, InputIterator last) 
         : head_(new node(42)) {
         node* prev = head_;

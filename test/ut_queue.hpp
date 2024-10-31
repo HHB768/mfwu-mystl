@@ -10,14 +10,18 @@ public:
 private:
     template <typename T, typename Container>
     void print_queue_basic_info(const mfwu::queue<T, Container>& q) {
-        std::cout << "empty : " << q.empty() << " "
-                  << "size : " << q.size() << " "
-                  << "top : " << q.top() << "\n";
+        std::cout << "empty : " 
+                  << (q.empty() ? "true" : "false") << ", "
+                  << "size : " << q.size();
+        q.empty() ? std::cout << "\n" 
+                    : std::cout << ", front : " << q.front() << "\n";
     }
     template <typename T, typename Container>
     void print_queue_detailed_info(const mfwu::queue<T, Container>& q) {
         print_queue_basic_info(q);
         for (auto it = q.q_.begin(); it != q.q_.end(); ++it) {
+            std::cout << mfwu::distance(it, q.q_.end()) << ":";
+            std::cout << it.get_pos() << ":" << it.get_cur() << ":";
             std::cout << *it << " ";
         }
         std::cout << "\n";
@@ -43,20 +47,25 @@ bool unit_test_queue::use_mfwu_queue() {
     q6 = mfwu::move(q4);
     print_queue_detailed_info(q6);
 
+    mfwu::swap(q6, mfwu::queue<int>{});
+    print_queue_detailed_info(q6);
     q6.emplace(7);
     q6.push(8);
-    for (int i = 0; i < 10; i++) {
-        int num = rand() % 10;
-        q6.push(num);
-    }
-    for (int i = 0; i < 15; i++) {
-        int num = rand() % 10;
-        if (num & 1) {
-            q6.push(num);
-        } else {
-            q6.pop();
-        }
-    }
+    print_queue_detailed_info(q6);
+    // for (int i = 0; i < 10; i++) {
+    //     int num = rand() % 10;
+    //     q6.push(num);
+    //     print_queue_detailed_info(q6);
+    // }
+    // for (int i = 0; i < 12; i++) {
+    //     int num = rand() % 10;
+    //     if (num & 1) {
+    //         q6.push(num);
+    //     } else {
+    //         q6.pop();
+    //     }
+    //     print_queue_detailed_info(q6);
+    // }
 
     return 0;
 }

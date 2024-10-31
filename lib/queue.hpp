@@ -24,7 +24,7 @@ public:
     queue(const std::initializer_list<value_type>& vals) : q_(vals) {}
     queue(const queue& q) : q_(q.q_) {}
     queue(queue&& q) : q_(mfwu::move(q.q_)) {}
-    ~queue() { q_.~container_type(); }
+    ~queue() {}
 
     queue& operator=(const queue& q) {
         q_ = q.q_;

@@ -258,7 +258,7 @@ public:
         // but when BLK_SIZE too large, it is a waste
     }
     template <typename InputIterator,
-              typename = typename std::enable_if_t<
+              typename = std::enable_if_t<
                   mfwu::is_input_iterator<InputIterator>::value>
              >
     deque(InputIterator first, InputIterator last) {
@@ -314,6 +314,9 @@ public:
         return iterator((*end_)->begin(), end_);
         // nearly equivalent to iterator(nullptr, end_)
         // end_ has dummy begin_, cur_, end_
+    }
+    bool empty() const {
+        return end_ == begin_;  // TODO: can i ? or use end() == begin()
     }
     size_type size() const {
         return end() - begin();
@@ -473,7 +476,8 @@ private:
     // init ctrl region for n elements
     size_type init_ctrl(size_type n=0) {
         if (0 == n) {
-            ctrl_ = last_ = begin_ = end_ = nullptr;
+            ctrl_ = last_ = begin_ = end_ 
+                = (pblock*)malloc(sizeof(pblock));  // 1 dummy
             return 0;
         }
         int blk_num = (n + BLK_SIZE - 1) / BLK_SIZE;
@@ -533,7 +537,7 @@ private:
             init_dummy_block();
         } else {
             req_mem_back();
-            push_front_block();
+            push_back_block();
         }
     }
     void pop_front_block() {
@@ -591,12 +595,13 @@ private:
     }
 
     pblock* req_mem_front(pblock* cur) {
+        std::cout << "\n1\n";
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;
         size_type cur_idx = cur - ctrl_;
         size_type new_capacity = original_capacity * 2 + 1;
-        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity);
+        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity + 1);
         mfwu::uninitialized_copy(  // copy all these pblocks to new ctrl
             begin_, end_ + 1, new_ctrl + original_capacity + begin_idx);
         free(ctrl_);
@@ -607,11 +612,12 @@ private:
         return ctrl_ + original_capacity + cur_idx;
     }
     void req_mem_front() {
+        std::cout << "\n2\n";
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;
         size_type new_capacity = original_capacity * 2 + 1;
-        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity);
+        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity + 1);
         mfwu::uninitialized_copy(  // copy all these pblocks to new ctrl
             begin_, end_ + 1, new_ctrl + original_capacity + begin_idx);
         mfwu::destroy(*end_);
@@ -620,9 +626,16 @@ private:
         last_ = ctrl_ + new_capacity;
         begin_ = ctrl_ + original_capacity + begin_idx;
         end_ = ctrl_ + original_capacity + end_idx;  // here
-        init_dummy_block();
+        init_dummy_block();  
+        // TODO: BUGFIX: maybe we should use 
+        // begin_ = ctrl_ + original_capacity + begin_idx + 1;
+        // CHECK IT 11.1/24
+        // but it seems that ... nothing goes wrong
+        // and this logic is good enough if we regard the +1 in
+        // new_capacity as the dummy blk pos  11.1/24 (later)
     }
     void req_mem_back() {
+        std::cout << "\n3\n";
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;

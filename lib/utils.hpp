@@ -12,15 +12,87 @@ struct forward_iterator_tag;
 struct bidirectional_iterator_tag;
 struct random_access_iterator_tag;
 
-template <typename It>
-class iterator_traits {
-public:
-    using value_type = typename It::value_type;
-    using iterator_category = typename It::iterator_category;
-    using pointer = typename It::pointer;
-    using reference = typename It::reference;
-    using difference_type = typename It::difference_type;
-};  // endof class iterator_traits
+// void_t definition
+template <typename...>
+using void_t = void;
+
+template<typename _Iterator, typename = mfwu::void_t<>>
+struct __iterator_traits { };
+
+template<typename _Iterator>
+struct __iterator_traits<_Iterator,
+                mfwu::void_t<typename _Iterator::iterator_category,
+                    typename _Iterator::value_type,
+                    typename _Iterator::difference_type,
+                    typename _Iterator::pointer,
+                    typename _Iterator::reference>>
+{
+    typedef typename _Iterator::iterator_category iterator_category;
+    typedef typename _Iterator::value_type        value_type;
+    typedef typename _Iterator::difference_type   difference_type;
+    typedef typename _Iterator::pointer           pointer;
+    typedef typename _Iterator::reference         reference;
+};
+
+template<typename _Iterator>
+struct iterator_traits
+: public __iterator_traits<_Iterator> {};
+
+// in <type_traits>:
+/* 
+    #if __cplusplus >= 201103L
+    // _GLIBCXX_RESOLVE_LIB_DEFECTS
+    ////////////////////////////////////////////////////////////////////////
+    // 2408. SFINAE-friendly common_type/iterator_traits is missing in C++14 
+    (! 24.10.31, so we need to add this __iterator_traits)
+    ////////////////////////////////////////////////////////////////////////
+    template<typename _Iterator, typename = __void_t<>>
+        struct __iterator_traits { };
+
+    #if ! __cpp_lib_concepts
+
+    template<typename _Iterator>
+        struct __iterator_traits<_Iterator,
+                    __void_t<typename _Iterator::iterator_category,
+                        typename _Iterator::value_type,
+                        typename _Iterator::difference_type,
+                        typename _Iterator::pointer,
+                        typename _Iterator::reference>>
+        {
+        typedef typename _Iterator::iterator_category iterator_category;
+        typedef typename _Iterator::value_type        value_type;
+        typedef typename _Iterator::difference_type   difference_type;
+        typedef typename _Iterator::pointer           pointer;
+        typedef typename _Iterator::reference         reference;
+        };
+    #endif // ! concepts
+
+    template<typename _Iterator>
+        struct iterator_traits
+        : public __iterator_traits<_Iterator> { };
+
+    #else // ! C++11
+    template<typename _Iterator>
+        struct iterator_traits
+        {
+        typedef typename _Iterator::iterator_category iterator_category;
+        typedef typename _Iterator::value_type        value_type;
+        typedef typename _Iterator::difference_type   difference_type;
+        typedef typename _Iterator::pointer           pointer;
+        typedef typename _Iterator::reference         reference;
+        };
+    #endif // C++11
+*/
+// instead of directly use:
+// template <typename It>
+// class iterator_traits {
+// public:
+//     using value_type = typename It::value_type;
+//     using iterator_category = typename It::iterator_category;
+//     using pointer = typename It::pointer;
+//     using reference = typename It::reference;
+//     using difference_type = typename It::difference_type;
+// };  // endof class iterator_traits
 
 template <typename T>
 class iterator_traits<T*> {
@@ -79,10 +151,6 @@ using is_base_of_template = decltype(is_base_of_template_impl<C>(std::declval<T*
 // no you cannot 24.10.19
 // GPTANS, try this:
 
-// void_t definition
-template <typename...>
-using void_t = void;
-
 // Primary template - defaults to false
 template <typename Base, typename Derived, typename = void>
 struct is_base_of : std::false_type {};
@@ -96,17 +164,50 @@ struct is_base_of : std::false_type {};
 */ 
 template <typename Base, typename Derived>
 struct is_base_of<Base, Derived, 
-    void_t<decltype(static_cast<Base*>(std::declval<Derived*>()))>>
+    mfwu::void_t<decltype(static_cast<Base*>(std::declval<Derived*>()))>>
     : std::true_type {};
 
 // Helper variable template
 template <typename Base, typename Derived>
 constexpr bool is_base_of_v = is_base_of<Base, Derived>::value;
 
-template <typename T>
-using is_input_iterator = 
-    mfwu::is_base_of<mfwu::input_iterator_tag,
-                     typename mfwu::iterator_traits<T>::iterator_category>;
+template<typename, typename = std::void_t<>>
+struct is_input_iterator : std::false_type {};
+
+template<typename T>
+struct is_input_iterator<T, mfwu::void_t<typename mfwu::iterator_traits<T>::iterator_category>>
+    :  mfwu::is_base_of<mfwu::input_iterator_tag, typename mfwu::iterator_traits<T>::iterator_category> {};
+
+template<typename T>
+constexpr bool is_input_iterator_v = is_input_iterator<T>::value;
+
+// many other trials here 10.29
+// template <typename T>
+// using is_input_iterator = 
+//     mfwu::is_base_of<mfwu::input_iterator_tag,
+//                      typename mfwu::iterator_traits<T>::iterator_category>;
+
+// template <typename T, typename = void>
+// struct is_input_iterator : std::false_type {};
+
+// template <typename T>
+// struct is_input_iterator<T, mfwu::void_t<typename mfwu::iterator_traits<T>::iterator_category>>
+//     : std::true_type {};
+
+// template <typename T> struct is_input_iterator { 
+//     using iterator_category = 
+//         typename mfwu::iterator_traits<T>::iterator_category; 
+//     static const bool value = 
+//         std::is_base_of<mfwu::input_iterator_tag, iterator_category>::value; 
+// };
+
+// template <typename T, typename = void>
+// struct is_input_iterator : std::false_type {};
+
+// template <typename T>
+// struct is_input_iterator<T, std::void_t<typename mfwu::iterator_traits<T>::iterator_category>> 
+//     : std::is_base_of<mfwu::input_iterator_tag, typename std::iterator_traits<T>::iterator_category> {};
+
 
 //////////////////////////
 
