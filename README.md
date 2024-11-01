@@ -18,11 +18,11 @@ Progress:
 * map 0%
 * pair 50%
 * priority_queue 100%
-* queue 80%
+* queue 100%
 * rbtree 95%
 * ringbuffer 75%
 * set 0%
-* stack 80%
+* stack 100%
 * string 70%
 * unordered_map 100%
 * unordered_set 100%
