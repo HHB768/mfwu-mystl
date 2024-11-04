@@ -39,6 +39,8 @@
 #include "ut_unordered_set.hpp"
 #include "ut_stack.hpp"
 #include "ut_queue.hpp"
+#include "ut_map.hpp"
+
 
 int main() {
     int ttotal = 0;
