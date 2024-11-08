@@ -67,6 +67,23 @@ public:
         // void invert_color() {
         //     this->color = !this->color;
         // }
+        node* get_inorder_next() const {
+            node* ret = nullptr;
+            if (right) {
+                ret = right;
+                while (ret->left) { ret = ret->left; }
+                return ret;
+            } else if (parent) {
+                ret = this;
+                while (ret->parent) {
+                    if (ret->parent->left == ret) {
+                        return ret->parent;
+                    }
+                    ret = ret->parent;
+                }
+            }
+            return nullptr;
+        }
     };  // endof struct rb_node
     using node = rb_node;
 
@@ -101,6 +118,7 @@ public:
     size_type size() const { return size(root_); }
     size_type height() const { return height(root_); }
     value_type& root() const { return root_->val; }
+    node* get_tree() const { return root_; }
     
     node* insert(const value_type& val) {
         if (root_ == nullptr) {
@@ -236,6 +254,10 @@ public:
     }
     node* search(const value_type& val) const {
         return search(root_, val);
+    }
+
+    void clear() {
+        destroy_tree(root_);
     }
 
 private:

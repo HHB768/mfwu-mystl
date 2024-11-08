@@ -19,6 +19,12 @@ public:
 
     class set_iterator {
     public:
+        using iterator_category = mfwu::forward_iterator_tag;
+        using value_type = T;
+        using pointer = value_type*;
+        using reference = value_type&;
+        using difference_type = mfwu::ptrdiff_t;
+
         set_iterator() : cur_(nullptr) {}
         set_iterator(node* cur) : cur_(cur) {}
         set_iterator(const set_iterator& it)
@@ -36,7 +42,17 @@ public:
             return *this;
         }
         set_iterator& operator++() {
-            // TODO
+            cur_ = cur_->get_inorder_next();
+            return *this;
+        }
+        set_iterator operator++(int) {
+            set_iterator temp = *this;
+            this->operator++();
+            return temp;
+        }
+
+        bool operator==(const set_iterator& it) {
+            return cur_ == it.cur_;
         }
 
     private:
@@ -62,18 +78,30 @@ public:
 
     /*
     get_allocator
-    begin
-    end
     */
+    iterator begin() const {
+        if (rbt_.root_ == nullptr) {
+            return iterator(nullptr);
+        }
+        node* cur = rbt_.root_;
+        while (cur->left) {
+            cur = cur->left;
+        }
+        return iterator(cur);
+    }
+    iterator end() const {
+        return iterator(nullptr);
+    }
+
     bool empty() const { return rbt_.empty(); }
     size_type size() const { return rbt_.size(); }
     size_type height() const { return  rbt_.height(); }
     value_type& root() const { return rbt_.root(); }
-    /*
-    max_size
-    clear
-    */ 
-    
+
+    size_type max_size() const { 
+        return std::numeric_limits<mfwu::ptrdiff_t>::max();
+    }
+    void clear() { rbt_.clear(); }  // TODO: O(n) -> ?
 
     mfwu::pair<iterator, bool> insert(const value_type& val) {
         node* ret = rbt_.search(val);
@@ -84,9 +112,23 @@ public:
         ret = rbt_.insert(val);
         return {iterator(ret), true};
     }
-    // void insert(range)
-    // insert(k)
-    // emplace
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  mfwu::is_input_iterator<InputIterator>::value>
+             >
+    void insert(InputIterator first, InputIterator last) {
+        for (; first != last; ++first) {
+            insert(*first);
+        }
+    }
+    template< class K >
+    mfwu::pair<iterator, bool> insert(K&& x) {
+        return insert(value_type{mfwu::forward<K>(x)});
+    }
+    template <typename... Args>
+    mfwu::pair<iterator, bool> emplace(Args&&... args) {+
+        return insert(value_type{mfwu::forward<Args>(x)...});
+    }
     size_type erase(const value_type& val) {
         node* ret = rbt_.search(val);
         if (ret != nullptr) {
@@ -97,16 +139,33 @@ public:
     }
     iterator erase(iterator it) {
         node* cur = it.get_cur();
-        // node* ret = rbt_.get_next();  // may not be right
-                                      // bcz ret can be changed
-        value_type val = rbt_.get_next()->val;
-        rbt_.erase(cur);
-        return iterator(rbt_.search(val));
+        // node* ret = cur_.get_next();  // may not be right
+                                         // bcz ret can be changed
+        ++it;
+        value_type next_val = *it;  // is it a little stupid?
+        rbt_.erase(cur);            // but node may change...
+        return iterator(rbt_.search(next_val));
     }
     // iterator erase(/*range*/)
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  mfwu::is_input_iterator<InputIterator>::value>
+             >
+    iterator erase(InputIterator first, InputIterator last) {
+        typename mfwu::iterator_traits<InputIterator>::difference_type
+        num = mfwu::distance(first, last);
+        for (int i = 0; i < num; ++i) {
+            // first = erase(*first);  // TODO: how to do this in multiset?
+            first = erase(first);      // ANS : like this?  1108/24
+        }
+    }
+    void swap(set& other) {
+        mfwu::swap(rbt_, other.rbt_);
+    }
+    node* extract() const {
+        return rbt_.get_tree();
+    }
     /*
-    swap
-    extract
     merge
     count
     find
