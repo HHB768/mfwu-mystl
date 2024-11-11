@@ -269,6 +269,14 @@ public:
         return cnt;
     }
 
+    node* lower_bound(const value_type& val) const {
+        return lower_bound(root_, val);
+    }
+
+    node* upper_bound(const value_type& val) const {
+        return upper_bound(root_, val);
+    }
+
 private:
     void copy(const rbtree& rbt) {
         root_ = copy_tree(rbt.root_);
@@ -735,6 +743,33 @@ private:
         } else {
             return search(root->right, val);
         }
+    }
+
+    static node* lower_bound(node* root, const value_type& val) {
+        if (root == nullptr) {
+            return nullptr;
+        }
+        node* ret = nullptr;
+        if (root->val > val) {
+            ret = lower_bound(root->left, val);
+            if (ret) { return ret; }
+            return root;
+        }
+        if (root->val == val) return root;
+        return lower_bound(root->right, val);
+    }
+
+    static node* upper_bound(node* root, const value_type& val) {
+        if (root == nullptr) {
+            return nullptr;
+        }
+        node* ret = nullptr;
+        if (root->val > val) {
+            ret = upper_bound(root->left, val);
+            if (ret) { return ret; }
+            return root;
+        }
+        return upper_bound(root->right, val);
     }
 
     node* root_;
