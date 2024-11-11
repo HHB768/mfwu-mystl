@@ -165,6 +165,25 @@ public:
     node* extract() const {
         return rbt_.get_tree();
     }
+    template <typename Cmp>
+    void merge(const set<value_type, Cmp>& s) {
+        for (auto it = s.begin(); it != s.end(); ++it) {
+            insert(*it);  // TODO: for these ordered & tree-like type
+                          //       maybe we have some faster way to merge? 241108
+        }
+    }
+    size_type count(const value_type& val) const {
+        return rbt_.count(val);
+    }
+    iterator find(const value_type& val) const {
+        return iterator(rbt_.search(val));
+    }
+    bool contains(const value_type& val) const {
+        return rbt_.search(val) != nullptr;
+    }
+    iterator lower_bound(const value_type& val) const {
+        
+    }
     /*
     merge
     count

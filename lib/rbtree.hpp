@@ -259,6 +259,15 @@ public:
     void clear() {
         destroy_tree(root_);
     }
+    size_type count(const value_type& val) {
+        node* cur = search(val);
+        size_type cnt = 0;
+        while (cur && cur->val == val) {
+            ++cnt;
+            cur = cur->get_inorder_next();
+        }
+        return cnt;
+    }
 
 private:
     void copy(const rbtree& rbt) {
