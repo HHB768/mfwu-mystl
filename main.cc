@@ -9,12 +9,14 @@
 #   define __UNIT_TEST_HEAP_BRIEF__
 #   define __UNIT_TEST_BST_BRIEF__
 #   define __UNIT_TEST_AVL_TREE_BRIEF__
-#   define __UNIT_TEST_RBTREE_BRIEF__
+// #   define __UNIT_TEST_RBTREE_BRIEF__
 #   define __UNIT_TEST_RBF_BRIEF__
 #   define __UNIT_TEST_HASHTABLE_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MAP_BRIEF__
 #   define __UNIT_TEST_UNORDERED_SET_BRIEF__
 #   define __UNIT_TEST_DEQUE_BRIEF__
+#   define __UNIT_TEST_STACK_BRIEF__
+#   define __UNIT_TEST_QUEUE_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -39,6 +41,7 @@
 #include "ut_unordered_set.hpp"
 #include "ut_stack.hpp"
 #include "ut_queue.hpp"
+#include "ut_set.hpp"
 #include "ut_map.hpp"
 
 
@@ -61,6 +64,7 @@ int main() {
     mfwu::unit_test_deque ut_deque;
     mfwu::unit_test_stack ut_stack;
     mfwu::unit_test_queue ut_queue;
+    mfwu::unit_test_set ut_set;
 
     int score = 0;
     int total = 2;
@@ -138,8 +142,8 @@ int main() {
     score = 0;
     total = 3;
     ttotal += total;
-    score += !ut_rbtree.use_rbtree_push();
-    score += !ut_rbtree.use_rbtree_pop();
+    score += !ut_rbtree.use_rbtree_insert();
+    score += !ut_rbtree.use_rbtree_erase();
     score += !ut_rbtree.use_cmp_functor();
     std::cout << "\n---------- Rbtree test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
@@ -211,7 +215,17 @@ int main() {
     std::cout << "\n---------- Queue test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
+    score = 0;
+    total = 3;
+    ttotal += total;
+    score += !ut_set.use_mfwu_set();
+    score += !ut_set.use_modifier_and_lookup();
+    score += !ut_set.use_other_interface();
+    std::cout << "\n---------- Unordered_set test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
+    // TODO: use function or marco
+    
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;
     std::cout << "\nEndof unit tests\n";

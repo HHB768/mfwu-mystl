@@ -102,13 +102,6 @@ bool unit_test_heap::use_mfwu_heap() {
     return 0;
 }
 
-template <typename T>
-struct greater {
-    bool operator()(const T& a, const T& b) {
-        return a > b;
-    }
-};  // endof struct greater
-
 bool unit_test_heap::use_cmp_functor() {
     std::cout << "\n------- Test: use cmp functor -------\n";
     std::cout << "making heap and sorting with default mfwu::less<int>\n";

@@ -5,17 +5,22 @@
 
 namespace mfwu {
 
+class unit_test_set;
+
 template <typename T, typename CmpFunctor=mfwu::less<T>>
 class set {
 public:
+    friend class unit_test_set;
+
+    using key_type = T;
     using value_type = T;
     using size_type = size_t;
 
     constexpr static bool red = false;
     constexpr static bool black = true;
 
-    using rbtree = mfwu::rbtree<T, CmpFunctor>;
-    using node = rbtree::rb_node;
+    using rbtree = mfwu::rbtree<value_type, CmpFunctor>;
+    using node = typename rbtree::rb_node;
 
     class set_iterator {
     public:
@@ -51,9 +56,20 @@ public:
             return temp;
         }
 
-        bool operator==(const set_iterator& it) {
+        bool operator==(const set_iterator& it) const {
             return cur_ == it.cur_;
         }
+        bool operator!=(const set_iterator& it) const {
+            return !(*this == it);
+        }
+
+        const value_type& operator*() const {
+            return cur_->val;
+        }
+        const value_type* operator->() const {
+            return & this->operator*();
+        }
+
 
     private:
         node* cur_;
@@ -62,9 +78,22 @@ public:
 
     set() : rbt_() {}
     set(const std::initializer_list<value_type>& vals)
-        : rbt_(vals) {}
+        : rbt_() {
+        for (auto&& val : vals) { 
+            insert(val); 
+        }
+    }
     set(const set& s) : rbt_(s.rbt_) {}
     set(set&& s) : rbt_(mfwu::move(s.rbt_)) {}
+    template <typename InputIterator,
+              typename = typename std::enable_if<
+                  mfwu::is_input_iterator<InputIterator>::value>
+             >
+    set(InputIterator first, InputIterator last) : rbt_() {
+        for ( ; first != last; ++first) {
+            insert(*first);
+        }
+    }
     ~set() {}
 
     set& operator=(const set& s) {
@@ -80,10 +109,10 @@ public:
     get_allocator
     */
     iterator begin() const {
-        if (rbt_.root_ == nullptr) {
+        if (rbt_.get_tree() == nullptr) {
             return iterator(nullptr);
         }
-        node* cur = rbt_.root_;
+        node* cur = rbt_.get_tree();
         while (cur->left) {
             cur = cur->left;
         }
@@ -121,13 +150,13 @@ public:
             insert(*first);
         }
     }
-    template< class K >
+    template <class K>
     mfwu::pair<iterator, bool> insert(K&& x) {
         return insert(value_type{mfwu::forward<K>(x)});
     }
     template <typename... Args>
-    mfwu::pair<iterator, bool> emplace(Args&&... args) {+
-        return insert(value_type{mfwu::forward<Args>(x)...});
+    mfwu::pair<iterator, bool> emplace(Args&&... args) {
+        return insert(value_type{mfwu::forward<Args>(args)...});
     }
     size_type erase(const value_type& val) {
         node* ret = rbt_.search(val);
@@ -182,18 +211,15 @@ public:
         return rbt_.search(val) != nullptr;
     }
     iterator lower_bound(const value_type& val) const {
-        
+        return iterator(rbt_.lower_bound(val));
     }
-    /*
-    merge
-    count
-    find
-    contains
-    equal_range
-    lower_bound
-    upper_bound
-    */
-    
+    iterator upper_bound(const value_type& val) const {
+        return iterator(rbt_.upper_bound(val));
+    }
+    mfwu::pair<iterator, iterator> equal_range(const value_type& val) const {
+        return {lower_bound(val), upper_bound(val)};
+    }
+    // TODO: use key_type explicitly 11.12/24
 private:
     rbtree rbt_;
 };  // endof class set

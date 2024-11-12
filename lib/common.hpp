@@ -91,6 +91,13 @@ struct less {
 };  // endof struct less
 
 template <typename T>
+struct greater {
+    bool operator()(const T& a, const T& b) const {
+        return a > b;
+    }
+};  // endof struct greater
+
+template <typename T>
 class double_linked_node;
 template <typename T>
 using list_node = double_linked_node<T>;

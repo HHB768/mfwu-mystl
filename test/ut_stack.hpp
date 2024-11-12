@@ -10,19 +10,35 @@ public:
 private:
     template <typename T, typename Container>
     void print_stack_basic_info(const mfwu::stack<T, Container>& stk) {
+#ifdef __UNIT_TEST_STACK__
+#ifndef  __UNIT_TEST_STACK_BRIEF__
         std::cout << "empty : " 
                   << (stk.empty() ? "true" : "false") << ", "
                   << "size : " << stk.size();
         stk.empty() ? std::cout << "\n" 
                     : std::cout << ", top : " << stk.top() << "\n";
+#else  // __UNIT_TEST_STACK_BRIEF__
+        stk.empty();
+#endif  // __UNIT_TEST_STACK_BRIEF__
+#endif  // __UNIT_TEST_STACK__
     }
     template <typename T, typename Container>
     void print_stack_detailed_info(const mfwu::stack<T, Container>& stk) {
         print_stack_basic_info(stk);
         for (auto it = stk.stk_.begin(); it != stk.stk_.end(); ++it) {
+#ifdef __UNIT_TEST_STACK__
+#ifndef  __UNIT_TEST_STACK_BRIEF__
             std::cout << *it << " ";
+#else  // __UNIT_TEST_STACK_BRIEF__
+            *it;
+#endif  // __UNIT_TEST_STACK_BRIEF__
+#endif  // __UNIT_TEST_STACK__
         }
+#ifdef __UNIT_TEST_STACK__
+#ifndef  __UNIT_TEST_STACK_BRIEF__
         std::cout << "\n";
+#endif  // __UNIT_TEST_STACK_BRIEF__
+#endif  // __UNIT_TEST_STACK__
     }
 };  // endof class unit_test_stack
 

@@ -10,21 +10,37 @@ public:
 private:
     template <typename T, typename Container>
     void print_queue_basic_info(const mfwu::queue<T, Container>& q) {
+#ifdef __UNIT_TEST_QUEUE__
+#ifndef  __UNIT_TEST_QUEUE_BRIEF__
         std::cout << "empty : " 
                   << (q.empty() ? "true" : "false") << ", "
                   << "size : " << q.size();
         q.empty() ? std::cout << "\n" 
                     : std::cout << ", front : " << q.front() << "\n";
+#else  // __UNIT_TEST_QUEUE_BRIEF__
+        q.empty();
+#endif  // __UNIT_TEST_QUEUE_BRIEF__
+#endif  // __UNIT_TEST_QUEUE__
     }
     template <typename T, typename Container>
     void print_queue_detailed_info(const mfwu::queue<T, Container>& q) {
         print_queue_basic_info(q);
         for (auto it = q.q_.begin(); it != q.q_.end(); ++it) {
-            std::cout << mfwu::distance(it, q.q_.end()) << ":";
-            std::cout << it.get_pos() << ":" << it.get_cur() << ":";
+#ifdef __UNIT_TEST_QUEUE__
+#ifndef  __UNIT_TEST_QUEUE_BRIEF__
+            // std::cout << mfwu::distance(it, q.q_.end()) << ":";
+            // std::cout << it.get_pos() << ":" << it.get_cur() << ":";
             std::cout << *it << " ";
+#else  // __UNIT_TEST_QUEUE_BRIEF__
+            *it;
+#endif  // __UNIT_TEST_QUEUE_BRIEF__
+#endif  // __UNIT_TEST_QUEUE__
         }
+#ifdef __UNIT_TEST_QUEUE__
+#ifndef  __UNIT_TEST_QUEUE_BRIEF__
         std::cout << "\n";
+#endif  // __UNIT_TEST_QUEUE_BRIEF__
+#endif  // __UNIT_TEST_QUEUE__
     }
 };  // endof class unit_test_queue
 

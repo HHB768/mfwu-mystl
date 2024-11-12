@@ -67,14 +67,14 @@ public:
         // void invert_color() {
         //     this->color = !this->color;
         // }
-        node* get_inorder_next() const {
-            node* ret = nullptr;
+        rb_node* get_inorder_next() const {
+            rb_node* ret = nullptr;
             if (right) {
                 ret = right;
                 while (ret->left) { ret = ret->left; }
                 return ret;
             } else if (parent) {
-                ret = this;
+                const rb_node* ret = this;
                 while (ret->parent) {
                     if (ret->parent->left == ret) {
                         return ret->parent;
@@ -91,6 +91,15 @@ public:
     rbtree(const std::initializer_list<value_type>& vals) : root_(nullptr) {
         for (auto&& val : vals) { 
             insert(val); 
+        }
+    }
+    template <typename InputIterator,
+              typename = typename std::enable_if<
+                  mfwu::is_input_iterator<InputIterator>::value>
+             >
+    rbtree(InputIterator first, InputIterator last) : root_(nullptr) {
+        for ( ; first != last; ++first) {
+            insert(*first);
         }
     }
     rbtree(const rbtree& rbt) {
@@ -315,7 +324,7 @@ private:
             return cur;
         }
         node* parent = root->parent;
-        if (val >= root->val) {
+        if (!cmp(val, root->val)) {
             node* ret = insert(root->right, val);
             if (ret) {  // xrx
                 ret->parent = root;
@@ -738,7 +747,7 @@ private:
     static node* search(node* root, const value_type& val) {
         if (root == nullptr) { return nullptr; }
         if (root->val == val) { return root; }
-        if (root->val > val) {
+        if (cmp(val, root->val)) {
             return search(root->left, val);
         } else {
             return search(root->right, val);
@@ -750,12 +759,12 @@ private:
             return nullptr;
         }
         node* ret = nullptr;
-        if (root->val > val) {
+        if (cmp(val, root->val)) {
             ret = lower_bound(root->left, val);
             if (ret) { return ret; }
             return root;
         }
-        if (root->val == val) return root;
+        if (root->val == val) { return root; }
         return lower_bound(root->right, val);
     }
 
@@ -764,7 +773,7 @@ private:
             return nullptr;
         }
         node* ret = nullptr;
-        if (root->val > val) {
+        if (cmp(val, root->val)) {
             ret = upper_bound(root->left, val);
             if (ret) { return ret; }
             return root;
@@ -773,8 +782,15 @@ private:
     }
 
     node* root_;
+    static CmpFunctor cmp;  // TODO: CHECK ALL COMPARISON
+                            //       AND FOCUS ON == senario
+                            //       FIX THE 'INVALID TREE' PROBLEM
+                            // 24.11.12 X
 
 };  // endof class rbtree
+
+template <typename T, typename CmpFunctor>
+CmpFunctor rbtree<T, CmpFunctor>::cmp = {};
 
 }  // endof namespace mfwu
 

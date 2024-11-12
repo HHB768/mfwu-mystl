@@ -595,7 +595,7 @@ private:
     }
 
     pblock* req_mem_front(pblock* cur) {
-        std::cout << "\n1\n";
+        // std::cout << "\n1\n";
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;
@@ -612,7 +612,7 @@ private:
         return ctrl_ + original_capacity + cur_idx;
     }
     void req_mem_front() {
-        std::cout << "\n2\n";
+        // std::cout << "\n2\n";
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;
@@ -635,7 +635,7 @@ private:
         // new_capacity as the dummy blk pos  11.1/24 (later)
     }
     void req_mem_back() {
-        std::cout << "\n3\n";
+        // std::cout << "\n3\n";
         size_type original_capacity = last_ - ctrl_;
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;
