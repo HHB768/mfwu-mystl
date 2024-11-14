@@ -136,12 +136,18 @@ public:
         }
         return insert(root_, val);
     }
-    void erase() {
+    node* erase() {
+        if (root_ == nullptr) return nullptr;
+        node* ret = root_->get_inorder_next();
         erase(root_);
+        return ret;
     }
-    void erase(const value_type& val) {
+    node* erase(const value_type& val) {
         node* cur = search(val);
+        if (cur == nullptr) return nullptr;
+        node* ret = cur->get_inorder_next();
         erase(cur);
+        return ret;
     }
     void erase(node* root) {
         if (root == nullptr) return ;
@@ -267,8 +273,9 @@ public:
 
     void clear() {
         destroy_tree(root_);
+        root_ = nullptr;
     }
-    size_type count(const value_type& val) {
+    size_type count(const value_type& val) const {
         node* cur = search(val);
         size_type cnt = 0;
         while (cur && cur->val == val) {
@@ -309,8 +316,10 @@ private:
     }
     void set_root(node* root) {
         root_ = root;
-        root_->parent = nullptr;
-        root_->color = black;
+        if (root_) {  // also found in 24.11.15 02:48
+            root_->parent = nullptr;
+            root_->color = black;
+        }
     }
     node* insert(node* root, const value_type& val) {
 #ifdef __RBTREE_DEBUG__
@@ -583,6 +592,11 @@ private:
         if (next == nullptr) {
             // root is leaf
             node* parent = root->parent;
+            if (parent == nullptr) {
+                // root == root_ ! fixed on 24.11.15 02:41
+                erase_node(root, nullptr);
+                return ;
+            }
             node* brother = nullptr;
             if (parent->left == root) {
                 brother = parent->right;

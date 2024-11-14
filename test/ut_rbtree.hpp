@@ -36,7 +36,7 @@ public:
         // print_tree_struct(rbt.root_);
         print_colored_struct(rbt.root_);
         is_valid_rbtree(rbt.root_, rbt.cmp);
-        std::cout << rbt.cmp(0, 1) << "\n";
+        // std::cout << rbt.cmp(0, 1) << "\n";
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
     template <typename Node>
