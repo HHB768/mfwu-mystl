@@ -773,7 +773,7 @@ private:
             return nullptr;
         }
         node* ret = nullptr;
-        if (cmp(val, root->val)) {
+        if (cmp(val, root->val)) {  // TODO: CHECK if we can do this cmp
             ret = lower_bound(root->left, val);
             if (ret) { return ret; }
             return root;

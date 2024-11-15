@@ -101,6 +101,13 @@ bool unit_test_set::use_modifier_and_lookup() {
 }
 
 bool unit_test_set::use_other_interface() {
+    std::cout << "\n------- Test: use other interfaces -------\n";
+    mfwu::set<char> s1 = {1, 2, 6, 9, 8, 7, 3, 4};
+    std::cout << "empty(): " << s1.empty() << "\n";
+    std::cout << "size(): " << s1.size() << "\n";
+    std::cout << "height(): " << s1.height() << "\n";
+    std::cout << "root(): " << (int)s1.root() << "\n";
+    std::cout << "max_size(): " << s1.max_size() << "\n";
 
     return 0;
 }
