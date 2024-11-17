@@ -16,8 +16,8 @@ public:
     using value_type = T;
     using size_type = size_t;
 
-    constexpr static bool red = false;
-    constexpr static bool black = true;
+    // constexpr static bool red = false;
+    // constexpr static bool black = true;
 
     using rbtree = mfwu::rbtree<value_type, CmpFunctor>;
     using node = typename rbtree::rb_node;

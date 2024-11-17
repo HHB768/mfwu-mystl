@@ -40,6 +40,10 @@ bool unit_test_set::use_mfwu_set() {
     print_set(s6);
     mfwu::set<int, mfwu::greater<int>> 
     s7(++s6.begin(), ++++++++++++s6.begin());
+    // TODO: test greater set with all interfaces 11.16/24
+    // if you have problems within inserting, try to complete 
+    // the ut_rebtree::use_cmp_functor()
+    // other parts may have problems too...
     print_set(s7);
 
     return 0;
