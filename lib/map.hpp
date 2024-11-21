@@ -17,9 +17,10 @@ public:
     using key_type = Key;
     using mapped_type = Value;
     using value_type = mfwu::pair<Key, Value>;
+    using size_type = size_t;
 
-    using rbtree = mfwu::drbtree<key_type, mapped_type, Compare>;
-    using node = typename drbtree::rb_node;
+    using rbtr = mfwu::drbtree<key_type, mapped_type, Compare>;
+    using node = typename rbtr::rb_node;
 
     class map_iterator {
     public:
@@ -93,7 +94,7 @@ public:
              >
     map(InputIterator first, InputIterator last) : rbt_() {
         for ( ; first != last; ++first) {
-            insert(*first);
+            insert((*first).first, (*first).second);  // lol
         }
     }
     ~map() {}
@@ -127,7 +128,7 @@ public:
     bool empty() const { return rbt_.empty(); }
     size_type size() const { return rbt_.size(); }
     size_type height() const { return  rbt_.height(); }
-    value_type& root() const { return rbt_.root(); }
+    // value_type& root() const { return rbt_.root(); }
 
     size_type max_size() const { 
         return std::numeric_limits<mfwu::ptrdiff_t>::max();
@@ -217,7 +218,7 @@ public:
             auto [_, suc] = insert(*it);  
             // TODO: for these ordered & tree-like type
             //       maybe we have some faster way to merge? 241108
-            if (suc) { it = s.erase(it); 
+            if (suc) { it = m.erase(it); 
             continue; }
             ++it;
         }
@@ -241,7 +242,7 @@ public:
         return {lower_bound(key), upper_bound(key)};
     }
 private:
-    rbtree rbt_;
+    rbtr rbt_;
 };  // endof class map
 
 }  // endof namespace mfwu

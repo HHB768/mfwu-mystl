@@ -19,10 +19,14 @@
 
 namespace mfwu {
 
+class unit_test_map;
+
 template <typename Key, typename Value,
           typename Compare=mfwu::less<Key>>
 class drbtree {
 public:
+    friend class unit_test_map;
+
     using key_type = Key;
     using mapped_type = Value;
     using value_type = mfwu::pair<Key, Value>;
@@ -53,11 +57,11 @@ public:
             : val(k, m), color(red),
               left(nullptr), right(nullptr), parent(nullptr) {}  // can i?
         rb_node(const key_type& k, const mapped_type& m, bool ib) 
-            : val(v), color(ib), 
+            : val(k, m), color(ib), 
               left(nullptr), right(nullptr), parent(nullptr) {}
         rb_node(const key_type& k, const mapped_type& m, bool ib, 
                 rb_node* l, rb_node* r, rb_node* p)
-            : val(v), color(ib), left(l), right(r), parent(p) {}
+            : val(k, m), color(ib), left(l), right(r), parent(p) {}
         rb_node(const rb_node& node) 
             : val(node.val), color(node.color), 
               left(node.left), right(node.right), parent(node.parent) {}
@@ -741,9 +745,12 @@ private:
     }  // TODO: check this
 
     node* root_;
-    static CmpFunctor cmp;
+    static Compare cmp;
 
 };  // endof class drbtree
+
+template <typename Key, typename Value, typename Compare>
+Compare drbtree<Key, Value, Compare>::cmp = {};
 
 }  // endof namespace mfwu
 
