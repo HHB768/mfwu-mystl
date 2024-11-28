@@ -163,7 +163,7 @@ private:
 // interesting! you must place this operator<<(...) forward
 // otherwise the operator<<(...) for node will not know this overload
 // and its os << nd.value will try to be os << node(nd.value)
-// my comment is : 我趣，逆天 (2024.06.18)
+// my comment: 我趣，逆天 (2024.06.18)
 std::ostream& operator<<(std::ostream& os, const
     typename unit_test_iterator::data& dt) {
     os << dt.value;

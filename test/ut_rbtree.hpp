@@ -16,31 +16,31 @@ public:
 
     // TODO: make these static
     template <typename T, typename CmpFunctor>
-    void print_basic_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
+    static void print_basic_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
 #ifndef __UNIT_TEST_RBTREE_BRIEF__
         std::cout << "size() : " << rbt.size() << " "
                   << " height(): " << rbt.height() << "\n";
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
     template <typename T, typename CmpFunctor>
-    void print_color_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
+    static void print_color_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
 #ifndef __UNIT_TEST_RBTREE_BRIEF__
         print_color_struct(rbt.root_);
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
     template <typename T, typename CmpFunctor>
-    void print_detailed_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
+    static void print_detailed_info(const mfwu::rbtree<T, CmpFunctor>& rbt) {
 #ifndef __UNIT_TEST_RBTREE_BRIEF__
         print_basic_info(rbt);
         // print_color_info(rbt);
         // print_tree_struct(rbt.root_);
         print_colored_struct(rbt.root_);
         is_valid_rbtree(rbt.root_, rbt.cmp);
-        std::cout << rbt.cmp(0, 1) << "\n";
+        // std::cout << rbt.cmp(0, 1) << "\n";
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
     template <typename Node>
-    mfwu::vector<std::string> tree2color(Node* root) {
+    static mfwu::vector<std::string> tree2color(Node* root) {
         using node = Node;
         mfwu::vector<std::string> ret;
         if (root == nullptr) return {};
@@ -68,13 +68,13 @@ public:
         return ret;
     } 
     template <typename Node>
-    void print_color_struct(Node* root) {
+    static void print_color_struct(Node* root) {
 #ifndef __UNIT_TEST_RBTREE_BRIEF__
         print_heap_struct(tree2color(root));
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
     template <typename Node>
-    mfwu::vector<Node*> tree2node(Node* root) {
+    static mfwu::vector<Node*> tree2node(Node* root) {
         using node = Node;
         mfwu::vector<node*> ret;
         if (root == nullptr) return {};
@@ -101,14 +101,14 @@ public:
         return ret;
     } 
     template <typename Node>
-    void print_colored_struct(Node* root) {
+    static void print_colored_struct(Node* root) {
 #ifndef __UNIT_TEST_RBTREE_BRIEF__
         print_rbtree_heap_struct(tree2node(root));
 #endif  // __UNIT_TEST_RBTREE_BRIEF__
     }
 
     template <typename Node, typename Compare>
-    bool is_valid_rbtree(Node* root, Compare cmp) {
+    static bool is_valid_rbtree(Node* root, Compare cmp) {
         try {
             root->color;
             root->val;
@@ -159,7 +159,8 @@ private:
         int black_cnt = 1;
     };  // endof class minmax
     template <typename Node, typename Compare>
-    minmax<decltype(Node::val)> is_valid_rbtree_aux(Node* root, Compare cmp) {
+    static minmax<decltype(Node::val)> 
+    is_valid_rbtree_aux(Node* root, Compare cmp) {
         using return_type = minmax<decltype(Node::val)>;
         
         return_type mm = {};
@@ -193,7 +194,7 @@ private:
         return mm;
     }
     template <typename Node>
-    bool color(Node* root) {
+    static bool color(Node* root) {
         if (root == nullptr) { return 1; }
         return root->color;
     }

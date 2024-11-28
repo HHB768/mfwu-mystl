@@ -16,8 +16,8 @@ public:
     using value_type = T;
     using size_type = size_t;
 
-    constexpr static bool red = false;
-    constexpr static bool black = true;
+    // constexpr static bool red = false;
+    // constexpr static bool black = true;
 
     using rbtree = mfwu::rbtree<value_type, CmpFunctor>;
     using node = typename rbtree::rb_node;
@@ -70,6 +70,9 @@ public:
             return & this->operator*();
         }
 
+        node* get_cur() const {
+            return cur_;
+        }
 
     private:
         node* cur_;
@@ -135,7 +138,7 @@ public:
     mfwu::pair<iterator, bool> insert(const value_type& val) {
         node* ret = rbt_.search(val);
         if (ret != nullptr) {
-            ret->val = val;
+            // ret->val = val;  // meaningless in set
             return {iterator(ret), false};
         }
         ret = rbt_.insert(val);
@@ -150,10 +153,14 @@ public:
             insert(*first);
         }
     }
-    template <class K>
-    mfwu::pair<iterator, bool> insert(K&& x) {
-        return insert(value_type{mfwu::forward<K>(x)});
-    }
+    // template <class K>
+    // mfwu::pair<iterator, bool> insert(K&& x) {
+    //     return insert(value_type{mfwu::forward<K>(x)});
+    // }
+    /*
+        i cannot get it, using this function leads to core dump
+        and i wonder if it is useful?  24.11.15
+    */
     template <typename... Args>
     mfwu::pair<iterator, bool> emplace(Args&&... args) {
         return insert(value_type{mfwu::forward<Args>(args)...});
@@ -171,6 +178,10 @@ public:
         // node* ret = cur_.get_next();  // may not be right
                                          // bcz ret can be changed
         ++it;
+        if (it.get_cur() == nullptr) {
+            rbt_.erase(cur);  
+            return iterator(nullptr);
+        }
         value_type next_val = *it;  // is it a little stupid?
         rbt_.erase(cur);            // but node may change...
         return iterator(rbt_.search(next_val));
@@ -187,6 +198,7 @@ public:
             // first = erase(*first);  // TODO: how to do this in multiset?
             first = erase(first);      // ANS : like this?  1108/24
         }
+        return first;
     }
     void swap(set& other) {
         mfwu::swap(rbt_, other.rbt_);
@@ -195,10 +207,14 @@ public:
         return rbt_.get_tree();
     }
     template <typename Cmp>
-    void merge(const set<value_type, Cmp>& s) {
-        for (auto it = s.begin(); it != s.end(); ++it) {
-            insert(*it);  // TODO: for these ordered & tree-like type
-                          //       maybe we have some faster way to merge? 241108
+    void merge(set<value_type, Cmp>& s) {
+        for (auto it = s.begin(); it != s.end(); ) {
+            auto [_, suc] = insert(*it);  
+            // TODO: for these ordered & tree-like type
+            //       maybe we have some faster way to merge? 241108
+            if (suc) { it = s.erase(it); 
+            continue; }
+            ++it;
         }
     }
     size_type count(const value_type& val) const {

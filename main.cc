@@ -65,6 +65,7 @@ int main() {
     mfwu::unit_test_stack ut_stack;
     mfwu::unit_test_queue ut_queue;
     mfwu::unit_test_set ut_set;
+    mfwu::unit_test_map ut_map;
 
     int score = 0;
     int total = 2;
@@ -221,7 +222,16 @@ int main() {
     score += !ut_set.use_mfwu_set();
     score += !ut_set.use_modifier_and_lookup();
     score += !ut_set.use_other_interface();
-    std::cout << "\n---------- Unordered_set test result -----------\n";
+    std::cout << "\n---------- Set test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+
+    score = 0;
+    total = 3;
+    ttotal += total;
+    score += !ut_map.use_mfwu_map();
+    score += !ut_map.use_modifier_and_lookup();
+    score += !ut_map.use_other_interface();
+    std::cout << "\n---------- Map test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
     // TODO: use function or marco

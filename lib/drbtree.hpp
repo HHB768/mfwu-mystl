@@ -1,42 +1,41 @@
-#ifndef __RBTREE_HPP__
-#define __RBTREE_HPP__
+#ifndef __DRBTREE_HPP__
+#define __DRBTREE_HPP__
 
 #ifdef __GLOBAL_DEBUG__
-#   define __RBTREE_DEBUG__
+#   define __DRBTREE_DEBUG__
 #else
-#   ifdef __UNIT_TEST_RBTREE_BRIEF__
-#       undef __RBTREE_DEBUG__
-#   endif  // __UNIT_TEST_RBTREE_BRIEF__
+#   ifdef __UNIT_TEST_DRBTREE_BRIEF__
+#       undef __DRBTREE_DEBUG__
+#   endif  // __UNIT_TEST_DRBTREE_BRIEF__
 #endif // __GLOBAL_DEBUG__
 
-// rbtree is complicated and i am not confident
-// i leave some debug output ive used
-// ---- X-H2 24.08.07
-
-// debug rbtree
-// #define __RBTREE_DEBUG__
+// debug drbtree
+// #define __DRBTREE_DEBUG__
 
 #include "common.hpp"
 #include "algorithm.hpp"
 #include "adelson_velskii_landis_tree.hpp"
+#include "rbtree.hpp"
 
 namespace mfwu {
 
-class unit_test_rbtree;
-// class set;
+class unit_test_map;
 
-template <typename T, typename CmpFunctor=mfwu::less<T>>
-class rbtree {
+template <typename Key, typename Value,
+          typename Compare=mfwu::less<Key>>
+class drbtree {
 public:
-    friend class mfwu::unit_test_rbtree;
-    // friend class mfwu::set;
-    
-    using value_type = T;
+    friend class unit_test_map;
+
+    using key_type = Key;
+    using mapped_type = Value;
+    using value_type = mfwu::pair<Key, Value>;
     using size_type = size_t;
-    
-    // TODO: check
-    constexpr static bool red = false;
-    constexpr static bool black = true;
+
+    using rbtree = mfwu::rbtree<Key, Compare>;
+
+    constexpr static bool red = rbtree::red;
+    constexpr static bool black = rbtree::black;
 
     struct rb_node {
         value_type val;
@@ -44,29 +43,31 @@ public:
         rb_node* left;
         rb_node* right;
         rb_node* parent;
-        // TODO: ready key - value pair in mfwu::map
-        // not implement here, just cmp the key
-        rb_node() : val(), color(red), 
+
+        rb_node() : val(), color(red),
             left(nullptr), right(nullptr), parent(nullptr) {}
         rb_node(const value_type& v) : val(v), color(red),
             left(nullptr), right(nullptr), parent(nullptr) {}
         rb_node(const value_type& v, bool ib) : val(v), color(ib),
             left(nullptr), right(nullptr), parent(nullptr) {}
-        rb_node(const value_type& v, bool ib,
+        rb_node(const value_type& v, bool ib, 
                 rb_node* l, rb_node* r, rb_node* p)
             : val(v), color(ib), left(l), right(r), parent(p) {}
+        rb_node(const key_type& k, const mapped_type& m) 
+            : val(k, m), color(red),
+              left(nullptr), right(nullptr), parent(nullptr) {}  // can i?
+        rb_node(const key_type& k, const mapped_type& m, bool ib) 
+            : val(k, m), color(ib), 
+              left(nullptr), right(nullptr), parent(nullptr) {}
+        rb_node(const key_type& k, const mapped_type& m, bool ib, 
+                rb_node* l, rb_node* r, rb_node* p)
+            : val(k, m), color(ib), left(l), right(r), parent(p) {}
         rb_node(const rb_node& node) 
             : val(node.val), color(node.color), 
               left(node.left), right(node.right), parent(node.parent) {}
         rb_node(rb_node&& node) 
             : val(mfwu::move(node.val)), color(node.color), 
               left(node.left), right(node.right), parent(node.parent) {}
-        // void set_color(bool c) {
-        //     this->color = c;
-        // }
-        // void invert_color() {
-        //     this->color = !this->color;
-        // }
         rb_node* get_inorder_next() const {
             rb_node* ret = nullptr;
             if (right) {
@@ -75,7 +76,7 @@ public:
                 return ret;
             } else if (parent) {
                 const rb_node* ret = this;
-                while (ret->parent) {
+                while (ret->parent){
                     if (ret->parent->left == ret) {
                         return ret->parent;
                     }
@@ -87,37 +88,38 @@ public:
     };  // endof struct rb_node
     using node = rb_node;
 
-    rbtree() : root_(nullptr) {}
-    rbtree(const std::initializer_list<value_type>& vals) : root_(nullptr) {
-        for (auto&& val : vals) { 
-            insert(val); 
+    drbtree() : root_(nullptr) {}
+    drbtree(const std::initializer_list<value_type>& vals)
+        : root_(nullptr) {
+        for (auto&& val : vals) {
+            insert(val);
         }
     }
     template <typename InputIterator,
               typename = typename std::enable_if<
                   mfwu::is_input_iterator<InputIterator>::value>
              >
-    rbtree(InputIterator first, InputIterator last) : root_(nullptr) {
+    drbtree(InputIterator first, InputIterator last) : root_(nullptr) {
         for ( ; first != last; ++first) {
             insert(*first);
         }
     }
-    rbtree(const rbtree& rbt) {
+    drbtree(const drbtree& rbt) {
         this->copy(rbt);
     }
-    rbtree(rbtree&& rbt) : root_(rbt.root_) {
+    drbtree(drbtree&& rbt) : root_(rbt.root_) {
         rbt.root_ = nullptr;
     }
-    ~rbtree() {
+    ~drbtree() {
         this->destroy_tree(root_);
     }
 
-    rbtree& operator=(const rbtree& rbt) {
+    drbtree& operator=(const drbtree& rbt) {
         this->destroy_tree(root_);
         this->copy(rbt);
         return *this;
     }
-    rbtree& operator=(rbtree&& rbt) {
+    drbtree& operator=(drbtree&& rbt) {
         root_ = rbt.root_;
         rbt.root_ = nullptr;
         return *this;
@@ -126,9 +128,12 @@ public:
     bool empty() const { return root_ == nullptr; }
     size_type size() const { return size(root_); }
     size_type height() const { return height(root_); }
-    value_type& root() const { return root_->val; }
+    // value_type& root() const { return root_->val; }
     node* get_tree() const { return root_; }
-    
+
+    node* insert(const key_type& key, const mapped_type& mapped) {
+        return insert(mfwu::make_pair<key_type, mapped_type>(key, mapped));
+    }
     node* insert(const value_type& val) {
         if (root_ == nullptr) {
             root_ = new node(val, black);  // set_root
@@ -142,72 +147,75 @@ public:
         erase(root_);
         return ret;
     }
-    node* erase(const value_type& val) {
-        node* cur = search(val);
+    node* erase(const key_type& key) {
+        node* cur = search(key);
         if (cur == nullptr) return nullptr;
         node* ret = cur->get_inorder_next();
         erase(cur);
         return ret;
     }
+    node* erase(const value_type& val) {
+        return erase(val.first);
+    }
     void erase(node* root) {
         if (root == nullptr) return ;
         if (root->color == red) {
-#ifdef __RBTREE_DEBUG__
-            std::cout << "erase red: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+            std::cout << "erase red: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
             if (root->left == nullptr && root->right == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "erase red leaf\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
                 erase_node(root, nullptr);
             } else if (root->left == nullptr) {
                 // erase_node(root, root->right);  // is it possible?
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "a?\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
             } else if (root->right == nullptr) {
                 // erase_node(root, root->left);  // is it possible?
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "b?\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
             } else {  // has both children
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "erase red inner node\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
                 node* next = get_successor(root);
                 root->val = next->val;
                 erase(next);  // remains the structure and erase successor
             }
         } else {  // root is black 
             // TODO: can we conclude these into uxy?
-#ifdef __RBTREE_DEBUG__
-            std::cout << "erase black: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+            std::cout << "erase black: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
             if (root->left == nullptr && root->right == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "erase black leaf\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
                 bbb(root, nullptr, nullptr);
             } else if (root->left == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "erase black node 1r\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
                 // 必是右边单走一个红
                 root->val = root->right->val;
                 // = erase_node(root->right, nullptr)
                 delete root->right;
                 root->right = nullptr;
             } else if (root->right == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "erase black node 1l\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
                 root->val = root->left->val;
                 delete root->left;
                 root->left = nullptr;
             } else {
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
                 std::cout << "erase black node 2\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
                 node* next = get_successor(root);
                 node* nnext = get_successor(next);
                 if (color(next) == black && color(nnext) == black) {
@@ -219,82 +227,41 @@ public:
                 }
             }
         }
-    }    
-    void pre_order(void(*usr_func)(node*)) {
-        pre_order_aux(root_, usr_func);
     }
-    void in_order(void(*usr_func)(node*)) {
-        in_order_aux(root_, usr_func);
-    }
-    void post_order(void(*usr_func)(node*)) {
-        post_order_aux(root_, usr_func);
-    }
-    mfwu::vector<value_type> sequentialize() const {
-        mfwu::vector<value_type> res;
-        std::queue<node*> q;  // TODO
-        if (root_ == nullptr) return res;
-        q.emplace(root_);
-        while (!q.empty()) {
-            size_type size = q.size();
-            for (int i = 0; i < size; i++) {
-                node* cur = q.front();
-                res.emplace_back(cur->val);
-                if (cur->left != nullptr) {
-                    q.emplace(cur->left);
-                }
-                if (cur->right != nullptr) {
-                    q.emplace(cur->right);
-                }
-                q.erase();
-            }
-        }
-        return res;
-    }
-
-    value_type minimum() const {
-        if (root_ == nullptr) return {};  // TODO: we dont need this
-        node* cur = root_;
-        while (cur->left != nullptr) {
-            cur = cur->left;
-        }
-        return cur->val;
-    }
-    value_type maximum() const {
-        if (root_ == nullptr) return {};
-        node* cur = root_;
-        while (cur->right != nullptr) {
-            cur = cur->right;
-        }
-        return cur->val;
+    node* search(const key_type& key) const {
+        return search(root_, key);
     }
     node* search(const value_type& val) const {
-        return search(root_, val);
+        return search(root_, val.first);
     }
 
     void clear() {
         destroy_tree(root_);
         root_ = nullptr;
     }
-    size_type count(const value_type& val) const {
-        node* cur = search(val);
+    size_type count(const key_type& key) const {
+        node* cur = search(key);
         size_type cnt = 0;
-        while (cur && cur->val == val) {
+        while (cur && cur->val.first == key) {
             ++cnt;
             cur = cur->get_inorder_next();
         }
         return cnt;
     }
-
-    node* lower_bound(const value_type& val) const {
-        return lower_bound(root_, val);
+    size_type count(const value_type& val) const {
+        return count(val.first);
     }
 
-    node* upper_bound(const value_type& val) const {
-        return upper_bound(root_, val);
+    node* lower_bound(const key_type& key) const {
+        return lower_bound(root_, key);
+    }
+
+    node* upper_bound(const key_type& key) const {
+        return upper_bound(root_, key);
     }
 
 private:
-    void copy(const rbtree& rbt) {
+    void copy(const drbtree& rbt) {
         root_ = copy_tree(rbt.root_);
     }
     static node* copy_tree(node* root) {
@@ -322,18 +289,18 @@ private:
         }
     }
     node* insert(node* root, const value_type& val) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "insert: " << val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "insert: " << val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         if (root == nullptr) {
             node* cur = new node(val);
-#ifdef __RBTREE_DEBUG__
-            std::cout << "create new node: " << val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+            std::cout << "create new node: " << val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
             return cur;
         }
         node* parent = root->parent;
-        if (!cmp(val, root->val)) {
+        if (!cmp(val.first, root->val.first)) {
             node* ret = insert(root->right, val);
             if (ret) {  // xrx
                 ret->parent = root;
@@ -382,69 +349,69 @@ private:
     }
     void llr(node* root) {
         // TODO: detect nullptr
-#ifdef __RBTREE_DEBUG__
-        std::cout << "llr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "llr: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         root->color = red;
         root->left->color = root->right->color = black;
         maintain(root);
     }
     void rrr(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "rrr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "rrr: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         llr(root);
     }
     void lrr(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "lrr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "lrr: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         llr(root);
     }
     void rlr(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "rlr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "rlr: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         llr(root);
     }
     void llb(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "llb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "llb: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         root->color = red;
         root->left->color = black;
         rotate_right(root);
     }
     void rrb(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "rrb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "rrb: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         root->color = red;
         root->right->color = black;
         rotate_left(root);
     }
     void lrb(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "lrb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "lrb: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         rotate_left(root->left);
         llb(root);
     }
     void rlb(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "rlb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "rlb: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         rotate_right(root->right);
         rrb(root);
     }
     void maintain(node* root) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "maintain: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "maintain: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         if (root == nullptr) { 
-#ifdef __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
             std::cout << "啊？\n"; 
-#endif  // __RBTREE_DEBUG__
+#endif  // __DRBTREE_DEBUG__
         } else if (root->parent == nullptr) { 
             root->color = black;  // ROOT
             return ;
@@ -564,16 +531,16 @@ private:
     void brb(node* root, node* next, node* nnext) {
         // 'r' must be a leaf
         // last 'b' must be nullptr
-#ifdef __RBTREE_DEBUG__
-        std::cout << "brb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "brb: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         root->val = next->val;
         erase_node(next, nullptr);  // or erase(next), whatever
     }
     void bbr(node* root, node* next, node* nnext) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "bbr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "bbr: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         // 'r' must be a leaf
         root->val = next->val;
         next->val = nnext->val;
@@ -585,9 +552,9 @@ private:
         // nnext->color = black;
     }
     void bbb(node* root, node* next, node* nnext) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "bbb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "bbb: " << root->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         // last 'b' must be nullptr
         if (next == nullptr) {
             // root is leaf
@@ -623,9 +590,9 @@ private:
         
     }
     void Lr(node* brother) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "Lr: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "Lr: " << brother->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         node* parent = brother->parent;
         brother->color = black;
         parent->color = red;
@@ -633,9 +600,9 @@ private:
         Lb(parent->right);
     }  // sym
     void Lb(node* brother) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "Lb: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "Lb: " << brother->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         node* parent = brother->parent;
         if (color(brother->left) == black && color(brother->right) == black) {
             // in this senario, brother should be a leaf
@@ -663,9 +630,9 @@ private:
         }
     }  // sym
     void Rr(node* brother) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "Rr: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "Rr: " << brother->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         node* parent = brother->parent;  // TODO: root_
         brother->color = black;
         parent->color = red;
@@ -673,9 +640,9 @@ private:
         Rb(parent->left);  // !
     }
     void Rb(node* brother) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "Rb: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "Rb: " << brother->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         node* parent = brother->parent;  // TODO: root_
         if (color(brother->left) == black && color(brother->right) == black) {
             // Rb0
@@ -703,9 +670,9 @@ private:
         }
     }
     void maintain_up(node* parent) {
-#ifdef __RBTREE_DEBUG__
-        std::cout << "maintain_up: " << parent->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#ifdef __DRBTREE_DEBUG__
+        std::cout << "maintain_up: " << parent->val.first << "\n";
+#endif  // __DRBTREE_DEBUG__
         node* gparent = parent->parent;
         node* brother = nullptr;
         if (gparent != nullptr) {
@@ -740,72 +707,51 @@ private:
         return 1 + max(height(root->left), height(root->right));
     }
 
-    static void pre_order_aux(node* root, void(*usr_func)(node*)) {
-        if (root == nullptr) { return ; }
-        usr_func(root);
-        pre_order_aux(root->left, usr_func);
-        pre_order_aux(root->right, usr_func);
-    }
-    static void in_order_aux(node* root, void(*usr_func)(node*)) {
-        if (root == nullptr) { return ; }
-        in_order_aux(root->left, usr_func);
-        usr_func(root);
-        in_order_aux(root->right, usr_func);
-    }
-    static void post_order_aux(node* root, void(*usr_func)(node*)) {
-        if (root == nullptr) { return ; }
-        post_order_aux(root->left, usr_func);
-        post_order_aux(root->right, usr_func);
-        usr_func(root);
-    }
-    static node* search(node* root, const value_type& val) {
+    static node* search(node* root, const key_type& key) {
         if (root == nullptr) { return nullptr; }
-        if (root->val == val) { return root; }
-        if (cmp(val, root->val)) {
-            return search(root->left, val);
+        if (root->val.first == key) { return root; }
+        if (cmp(key, root->val.first)) {
+            return search(root->left, key);
         } else {
-            return search(root->right, val);
+            return search(root->right, key);
         }
     }
 
-    static node* lower_bound(node* root, const value_type& val) {
+    static node* lower_bound(node* root, const key_type& key) {
         if (root == nullptr) {
             return nullptr;
         }
         node* ret = nullptr;
-        if (cmp(val, root->val)) {  // TODO: CHECK if we can do this cmp
-            ret = lower_bound(root->left, val);
+        if (cmp(key, root->val.first)) {  // TODO: CHECK if we can do this cmp
+            ret = lower_bound(root->left, key);
             if (ret) { return ret; }
             return root;
         }
-        if (root->val == val) { return root; }
-        return lower_bound(root->right, val);
+        if (root->val.first == key) { return root; }
+        return lower_bound(root->right, key);
     }
 
-    static node* upper_bound(node* root, const value_type& val) {
+    static node* upper_bound(node* root, const key_type& key) {
         if (root == nullptr) {
             return nullptr;
         }
         node* ret = nullptr;
-        if (cmp(val, root->val)) {
-            ret = upper_bound(root->left, val);
+        if (cmp(key, root->val.first)) {
+            ret = upper_bound(root->left, key);
             if (ret) { return ret; }
             return root;
         }
-        return upper_bound(root->right, val);
-    }
+        return upper_bound(root->right, key);
+    }  // TODO: check this
 
     node* root_;
-    static CmpFunctor cmp;  // TODO: CHECK ALL COMPARISON
-                            //       AND FOCUS ON == senario
-                            //       FIX THE 'INVALID TREE' PROBLEM
-                            // 24.11.12 X
+    static Compare cmp;
 
-};  // endof class rbtree
+};  // endof class drbtree
 
-template <typename T, typename CmpFunctor>
-CmpFunctor rbtree<T, CmpFunctor>::cmp = {};
+template <typename Key, typename Value, typename Compare>
+Compare drbtree<Key, Value, Compare>::cmp = {};
 
 }  // endof namespace mfwu
 
-#endif  // __RBTREE_HPP__
+#endif  // __DRBTREE_HPP__
