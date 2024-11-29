@@ -65,9 +65,13 @@ private:
         mfwu::pair<typename mfwu::rbtree<Key, Compare>::node*,
                    typename mfwu::rbtree<Value, Compare>::node*>
         res = split_map(m);
+#ifdef __UNIT_TEST_MAP__
+#ifndef __UNIT_TEST_MAP_BRIEF__  
         unit_test_rbtree::print_colored_struct(res.first);
         unit_test_rbtree::is_valid_rbtree(res.first, m.rbt_.cmp);
         unit_test_rbtree::print_colored_struct(res.second);
+#endif  // __UNIT_TEST_MAP_BRIEF__
+#endif  // __UNIT_TEST_MAP__
     }
 
 };  // endof class unit_test_map
@@ -140,17 +144,28 @@ bool unit_test_map::use_modifier_and_lookup() {
     print_map(m1);
 
     std::cout << "finding & counting & containing & calcing equal_range\n";
+#ifdef __UNIT_TEST_MAP__
+#ifndef __UNIT_TEST_MAP_BRIEF__  
     std::cout << mfwu::distance(m1.find(2), m1.end()) << "\n";
     std::cout << m1.count(2) << "\n";
     std::cout << mfwu::distance(m2.find(1), m2.end()) << "\n";
     std::cout << m2.contains(1) << "\n";
+#else  // __UNIT_TEST_SET_BRIEF__
+    mfwu::distance(m1.find(2), m1.end());
+    m1.count(2);
+#endif  // __UNIT_TEST_MAP_BRIEF__
+#endif  // __UNIT_TEST_MAP__
 
     auto [it1, it2] = m1.equal_range(1);
     auto [it3, it4] = m2.equal_range(2);
+#ifdef __UNIT_TEST_MAP__
+#ifndef __UNIT_TEST_MAP_BRIEF__  
     std::cout << mfwu::distance(m1.begin(), it1) << ", "
               << mfwu::distance(m1.begin(), it2) << ", "
               << mfwu::distance(m2.begin(), it3) << ", "
               << mfwu::distance(m2.begin(), it4) << "\n";
+#endif  // __UNIT_TEST_MAP_BRIEF__
+#endif  // __UNIT_TEST_MAP__
 
     return 0;
 }
@@ -159,11 +174,15 @@ bool unit_test_map::use_other_interface() {
     std::cout << "\n------- Test: use other interfaces -------\n";
     mfwu::map<char, int> m1 = {{1, 1}, {2, 2}, {6, 6}, {9, 9}, 
                                {8, 8}, {7, 7}, {3, 3}, {4, 4}};
+#ifdef __UNIT_TEST_MAP__
+#ifndef __UNIT_TEST_MAP_BRIEF__  
     std::cout << "empty(): " << m1.empty() << "\n";
     std::cout << "size(): " << m1.size() << "\n";
     std::cout << "height(): " << m1.height() << "\n";
     // std::cout << "root().val: " << m1.root().second << "\n";
     std::cout << "max_size(): " << m1.max_size() << "\n";
+#endif  // __UNIT_TEST_MAP_BRIEF__
+#endif  // __UNIT_TEST_MAP__
 
     return 0;
 }

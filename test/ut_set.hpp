@@ -13,7 +13,11 @@ public:
 private:
     template <typename T, typename Compare>
     void print_set(const set<T, Compare>& s) {
+#ifdef __UNIT_TEST_SET__
+#ifndef __UNIT_TEST_SET_BRIEF__
         ut_rbtree.print_detailed_info(s.rbt_);
+#endif  // __UNIT_TEST_SET_BRIEF__
+#endif  // __UNIT_TEST_SET__
     }
 
     unit_test_rbtree ut_rbtree;
@@ -89,17 +93,27 @@ bool unit_test_set::use_modifier_and_lookup() {
     print_set(s1);
 
     std::cout << "finding & counting & containing & calcing equal_range\n";
+#ifdef __UNIT_TEST_SET__
+#ifndef __UNIT_TEST_SET_BRIEF__    
     std::cout << mfwu::distance(s1.find(2), s1.end()) << "\n";
     std::cout << s1.count(2) << "\n";
     std::cout << mfwu::distance(s2.find(1), s2.end()) << "\n";
     std::cout << s2.contains(1) << "\n";
-
+#else  // __UNIT_TEST_SET_BRIEF__
+    mfwu::distance(s1.find(2), s1.end());
+    s1.count(2);
+#endif  // __UNIT_TEST_SET_BRIEF__
+#endif  // __UNIT_TEST_SET__
     auto [it1, it2] = s2.equal_range(1);
     auto [it3, it4] = s2.equal_range(2);
+#ifdef __UNIT_TEST_SET__
+#ifndef __UNIT_TEST_SET_BRIEF__   
     std::cout << mfwu::distance(s2.begin(), it1) << ", "
               << mfwu::distance(s2.begin(), it2) << ", "
               << mfwu::distance(s2.begin(), it3) << ", "
               << mfwu::distance(s2.begin(), it4) << "\n";
+#endif  // __UNIT_TEST_SET_BRIEF__
+#endif  // __UNIT_TEST_SET__
 
     return 0;
 }
@@ -107,11 +121,15 @@ bool unit_test_set::use_modifier_and_lookup() {
 bool unit_test_set::use_other_interface() {
     std::cout << "\n------- Test: use other interfaces -------\n";
     mfwu::set<char> s1 = {1, 2, 6, 9, 8, 7, 3, 4};
+#ifdef __UNIT_TEST_SET__
+#ifndef __UNIT_TEST_SET_BRIEF__   
     std::cout << "empty(): " << s1.empty() << "\n";
     std::cout << "size(): " << s1.size() << "\n";
     std::cout << "height(): " << s1.height() << "\n";
     std::cout << "root(): " << (int)s1.root() << "\n";
     std::cout << "max_size(): " << s1.max_size() << "\n";
+#endif  // __UNIT_TEST_SET_BRIEF__
+#endif  // __UNIT_TEST_SET__
 
     return 0;
 }

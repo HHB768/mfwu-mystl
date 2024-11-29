@@ -9,7 +9,7 @@
 #   define __UNIT_TEST_HEAP_BRIEF__
 #   define __UNIT_TEST_BST_BRIEF__
 #   define __UNIT_TEST_AVL_TREE_BRIEF__
-// #   define __UNIT_TEST_RBTREE_BRIEF__
+#   define __UNIT_TEST_RBTREE_BRIEF__
 #   define __UNIT_TEST_RBF_BRIEF__
 #   define __UNIT_TEST_HASHTABLE_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MAP_BRIEF__
@@ -17,6 +17,8 @@
 #   define __UNIT_TEST_DEQUE_BRIEF__
 #   define __UNIT_TEST_STACK_BRIEF__
 #   define __UNIT_TEST_QUEUE_BRIEF__
+#   define __UNIT_TEST_SET_BRIEF__
+#   define __UNIT_TEST_MAP_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -45,8 +47,29 @@
 #include "ut_map.hpp"
 
 
+size_t unit_test() {
+    return 1;
+}
+
+template <typename UtFunc, typename... ResUtFunc>
+size_t unit_test(UtFunc ut_func, ResUtFunc... other_func) {
+    return !ut_func() + unit_test(other_func...);
+}
+
+template <typename... UtFunc>
+std::pair<size_t, size_t> unit_test(const char* title, UtFunc... ut_func) {
+    size_t total = sizeof...(ut_func);
+    size_t score = unit_test(ut_func...);
+    std::cout << "\n----------- " << title << " test result -----------\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    return {score, total};
+}
+
+
 int main() {
-    int ttotal = 0;
+    size_t ttotal = 0;
+    size_t sscore = 0;
+
     mfwu::unit_test_allocator ut_alloc;
     mfwu::unit_test_iterator ut_iter;
     mfwu::unit_test_utils ut_utils;
@@ -67,13 +90,16 @@ int main() {
     mfwu::unit_test_set ut_set;
     mfwu::unit_test_map ut_map;
 
-    int score = 0;
-    int total = 2;
+    size_t score = 0;
+    size_t total = 0;
+
+    // TODO: use mfwu::tie and mfwu::pair instead
+    
+    std::tie(score, total) = unit_test("Alloc", 
+        std::bind(&mfwu::unit_test_allocator::use_malloc_allocator, &ut_alloc),
+        std::bind(&mfwu::unit_test_allocator::use_default_allocator, &ut_alloc));
     ttotal += total;
-    score += !ut_alloc.use_malloc_allocator();
-    score += !ut_alloc.use_default_allocator();
-    std::cout << "\n----------- Alloc test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    sscore += score;
 
     score = 0;
     total = 6;

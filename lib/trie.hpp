@@ -1,5 +1,9 @@
+#ifndef __TRIE_HPP__
+#define __TRIE_HPP__
+
 #include "unordered_map.hpp"
 
+namespace mfwu {
 
 template <typename T, bool Mode>
 struct trie_node;
@@ -10,7 +14,7 @@ struct trie_node<T, 0> {
     size_t path_count = 0;
     size_t end_count = 0;
     mfwu::unordered_map<T, trie_node*> children;    
-};
+};  // endof struct trie_node<T, 0>
 
 template <typename T>
 struct trie_node<T, 1> {
@@ -18,7 +22,7 @@ struct trie_node<T, 1> {
     size_t path_count = 0;
     size_t end_count = 0;
     trie_node*[128] children;
-};
+};  // endof struct trie_node<T, 1>
 
 template <typename ContainerType, bool Mode=false>
 class trie {
@@ -61,7 +65,7 @@ public:
         insert(first, last);
     }   
     trie(const trie& t) {
-        copy_trie(t);
+        root_ = copy_trie(t.root_);
     } 
     trie(trie&& t) : root_(t.root_) {
         t.root_ = nullptr;
@@ -72,7 +76,7 @@ public:
 
     trie& operator=(const trie& t) {
         reset();
-        copy_trie(t);
+        root_ = copy_trie(t.root_);
         return *this;
     }
     trie& operator=(trie&& t) {
@@ -168,15 +172,40 @@ public:
             }
             cur = cur->children[*first];
         }
-        return get_suc();
+        mfwu::vector<ContainerType> ret = {};
+        get_suc(cur, ret);
+        for (auto&& suc : ret) {
+            suc = container + suc;
+        }
+        return ret;
     }
 
 private:
-    void copy_trie() {
-
+    node* copy_trie(node* cur) {
+        if (cur == nullptr) return nullptr;
+        node* ret = new node(*cur);
+        for (auto [val, child] : cur->children) {
+            ret->children[val] = copy_trie(child);
+        }
+        retirm ret;
     }
-    mfwu::vector<ContainerType> get_suc
+    void get_suc(node* cur, mfwu::vector<ContainerType>& ret,
+                 ContainerType& container) {
+        for (auto&& [val, child] : cur->children) {
+            container += val;
+            if (cur->end_count > 0) {
+                ret.emplace_back(container);
+            }
+            get_suc(cur, ret, container);
+            container.pop_back();
+        }
+    }
 
     node* root_;
 
-};
+};  // endof class trie
+
+
+}  // endof namespace mfwu
+
+#endif  // __TRIE_HPP__
