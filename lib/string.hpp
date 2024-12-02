@@ -343,6 +343,56 @@ private:
     
 };  // endof class string
 
+
+template <typename C=char, size_t BuffSize=8, 
+          typename Alloc=mfwu::DefaultAllocator<C, mfwu::malloc_alloc>>
+class tiny_string {
+public:
+    using value_type = C;
+    using size_type = size_t;
+    using iterator = C*;
+
+    string(size_type n, const C& c) {
+        if (n > BuffSize) {
+            begin_ = new Alloc::allocate(n);
+            last_ = buf_ + BuffSize;
+        } else {
+            begin_ = buf_;
+            last_ = begin_ + n;
+        }
+        end_ = begin_ + n;
+        mfwu::fill(begin_, end_, c);
+    }
+
+    template <size_t Buf>
+    tiny_string& operator+=(const tiny_string<C, Buf, Alloc>& str) {
+        // check is_tiny & begin_ + n < last_
+    }
+
+private:
+    void switch(bool toHeapMem=true, size_type n=2*BuffSize) {
+        if (toHeapMem) {
+            is_tiny = false;
+            begin_ = Alloc::allocate(n);
+            end_ = last_ = begin_ + n;
+            end_ = mfwu::copy(buf_, end_, begin_);
+        } else {
+            if (is_tiny) return ;
+            if (size() > BuffSize) return ;
+            mfwu::copy(begin_, end_, buf_);
+            begin_ = buf_;
+            end_ = buf_ + size();
+            last_ = begin_ + BuffSize;
+            Alloc::deallocate(buf_, size());
+        }
+        // check
+    }
+
+    iterator begin_, end_, last_;
+    bool is_tiny;
+    C[BuffSize] buf_;
+};  // endof class tiny_string
+
 }
 
 

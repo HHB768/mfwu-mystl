@@ -46,9 +46,11 @@
 #include "ut_set.hpp"
 #include "ut_map.hpp"
 
+static size_t ttotal = 0;
+static size_t sscore = 0;
 
 size_t unit_test() {
-    return 1;
+    return 0;
 }
 
 template <typename UtFunc, typename... ResUtFunc>
@@ -57,19 +59,20 @@ size_t unit_test(UtFunc ut_func, ResUtFunc... other_func) {
 }
 
 template <typename... UtFunc>
-std::pair<size_t, size_t> unit_test(const char* title, UtFunc... ut_func) {
+void unit_test(const char* title, UtFunc... ut_func) {
     size_t total = sizeof...(ut_func);
     size_t score = unit_test(ut_func...);
     std::cout << "\n----------- " << title << " test result -----------\n";
     std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
-    return {score, total};
+    ttotal += total; sscore += score;
 }
 
+// void update_score(const mfwu::pair<size_t, size_t>& p) {
+//     ttotal += p.first;
+//     sscore += p.second;
+// }
 
 int main() {
-    size_t ttotal = 0;
-    size_t sscore = 0;
-
     mfwu::unit_test_allocator ut_alloc;
     mfwu::unit_test_iterator ut_iter;
     mfwu::unit_test_utils ut_utils;
@@ -94,87 +97,73 @@ int main() {
     size_t total = 0;
 
     // TODO: use mfwu::tie and mfwu::pair instead
+
+#define ut_func(func, obj) std::bind(&func, &obj)
+
+    unit_test(
+        "Alloc",
+        ut_func(mfwu::unit_test_allocator::use_malloc_allocator, ut_alloc),
+        ut_func(mfwu::unit_test_allocator::use_default_allocator, ut_alloc)
+    );
     
-    std::tie(score, total) = unit_test("Alloc", 
-        std::bind(&mfwu::unit_test_allocator::use_malloc_allocator, &ut_alloc),
-        std::bind(&mfwu::unit_test_allocator::use_default_allocator, &ut_alloc));
-    ttotal += total;
-    sscore += score;
+    unit_test(
+        "Iterator",
+        ut_func(mfwu::unit_test_iterator::use_list_iterator, ut_iter),
+        ut_func(mfwu::unit_test_iterator::use_input_iterator, ut_iter),
+        ut_func(mfwu::unit_test_iterator::use_output_iterator, ut_iter),
+        ut_func(mfwu::unit_test_iterator::use_forward_iterator, ut_iter),
+        ut_func(mfwu::unit_test_iterator::use_bidirectional_iterator, ut_iter),
+        ut_func(mfwu::unit_test_iterator::use_random_access_iterator, ut_iter)
+    );
 
-    score = 0;
-    total = 6;
-    ttotal += total;
-    score += !ut_iter.use_list_iterator();
-    score += !ut_iter.use_input_iterator();
-    score += !ut_iter.use_output_iterator();
-    score += !ut_iter.use_forward_iterator();
-    score += !ut_iter.use_bidirectional_iterator();
-    score += !ut_iter.use_random_access_iterator();
-    std::cout << "\n---------- Iterator test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Utils",
+        ut_func(mfwu::unit_test_utils::use_construct_destroy, ut_utils),
+        ut_func(mfwu::unit_test_utils::use_uninitialized_op, ut_utils),
+        ut_func(mfwu::unit_test_utils::use_advance_distance, ut_utils)
+    );
 
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_utils.use_construct_destroy();
-    score += !ut_utils.use_uninitialized_op();
-    score += !ut_utils.use_advance_distance();
-    std::cout << "\n---------- Utils test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Vector",
+        ut_func(mfwu::unit_test_vector::use_vector_iterator, ut_vector),
+        ut_func(mfwu::unit_test_vector::use_mfwu_vector, ut_vector),
+        ut_func(mfwu::unit_test_vector::use_vector_algo, ut_vector)
+    );
 
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_vector.use_vector_iterator();
-    score += !ut_vector.use_mfwu_vector();
-    score += !ut_vector.use_vector_algo();
-    std::cout << "\n---------- Vector test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "List",
+        ut_func(mfwu::unit_test_list::use_forward_list_iterator, ut_list),
+        ut_func(mfwu::unit_test_list::use_mfwu_forward_list, ut_list),
+        ut_func(mfwu::unit_test_list::use_list_iterator, ut_list),
+        ut_func(mfwu::unit_test_list::use_mfwu_list, ut_list)
+    );
 
+    unit_test(
+        "Heap",
+        ut_func(mfwu::unit_test_heap::use_mfwu_heap, ut_heap),
+        ut_func(mfwu::unit_test_heap::use_cmp_functor, ut_heap)
+    );
 
-    score = 0;
-    total = 4;
-    ttotal += total;
-    score += !ut_list.use_forward_list_iterator();
-    score += !ut_list.use_mfwu_forward_list();
-    score += !ut_list.use_list_iterator();
-    score += !ut_list.use_mfwu_list();
-    std::cout << "\n---------- List test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "BST",
+        ut_func(mfwu::unit_test_bst::use_mfwu_bst, ut_bst),
+        ut_func(mfwu::unit_test_bst::use_cmp_functor, ut_bst)
+    );
 
-    score = 0;
-    total = 2;
-    ttotal += total;
-    score += !ut_heap.use_mfwu_heap();
-    score += !ut_heap.use_cmp_functor();
-    std::cout << "\n---------- Heap test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "AVL_tree",
+        ut_func(mfwu::unit_test_avl_tree::use_avl_tree, ut_avl_tree),
+        ut_func(mfwu::unit_test_avl_tree::use_cmp_functor, ut_avl_tree)
+    );
 
-    score = 0;
-    total = 2;
-    ttotal += total;
-    score += !ut_bst.use_mfwu_bst();
-    score += !ut_bst.use_cmp_functor();
-    std::cout << "\n---------- BST test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Rbtree",
+        ut_func(mfwu::unit_test_rbtree::use_rbtree_insert, ut_rbtree),
+        ut_func(mfwu::unit_test_rbtree::use_rbtree_erase, ut_rbtree),
+        ut_func(mfwu::unit_test_rbtree::use_cmp_functor, ut_rbtree)
+    );
 
-    score = 0;
-    total = 2;
-    ttotal += total;
-    score += !ut_avl_tree.use_avl_tree();
-    score += !ut_avl_tree.use_cmp_functor();
-    std::cout << "\n---------- AVL_tree test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
-
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_rbtree.use_rbtree_insert();
-    score += !ut_rbtree.use_rbtree_erase();
-    score += !ut_rbtree.use_cmp_functor();
-    std::cout << "\n---------- Rbtree test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
-
+    // legacy: [archieved 241129]
     // score = 0;
     // total = 3;
     // ttotal += total;
@@ -184,83 +173,62 @@ int main() {
     // std::cout << "\n---------- Deque test result -----------\n";
     // std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
 
+    unit_test(
+        "Rbf",
+        ut_func(mfwu::unit_test_rbf::use_mfwu_rbf, ut_rbf)  
+    );
 
-    score = 0;
-    total = 1;
-    ttotal += total;
-    score += !ut_rbf.use_mfwu_rbf();
-    std::cout << "\n---------- Rbf test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Hashtable",
+        ut_func(mfwu::unit_test_hashtable::use_mfwu_hashtable, ut_htbl),
+        ut_func(mfwu::unit_test_hashtable::use_mfwu_shashtable, ut_htbl)
+    );
+    
+    unit_test(
+        "Unordered_map",
+        ut_func(mfwu::unit_test_unordered_map::use_mfwu_unordered_map, ut_uod_map),
+        ut_func(mfwu::unit_test_unordered_map::use_modifier_and_lookup, ut_uod_map),
+        ut_func(mfwu::unit_test_unordered_map::use_other_interface, ut_uod_map)
+    );
 
-    score = 0;
-    total = 2;
-    ttotal += total;
-    score += !ut_htbl.use_mfwu_hashtable();
-    score += !ut_htbl.use_mfwu_shashtable();
-    std::cout << "\n---------- Hashtable test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Unordered_set",
+        ut_func(mfwu::unit_test_unordered_set::use_mfwu_unordered_set, ut_uod_set),
+        ut_func(mfwu::unit_test_unordered_set::use_modifier_and_lookup, ut_uod_set),
+        ut_func(mfwu::unit_test_unordered_set::use_other_interface, ut_uod_set)
+    );
 
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_uod_map.use_mfwu_unordered_map();
-    score += !ut_uod_map.use_modifier_and_lookup();
-    score += !ut_uod_map.use_other_interface();
-    std::cout << "\n---------- Unordered_map test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Deque",
+        ut_func(mfwu::unit_test_deque::use_deque_block, ut_deque),
+        ut_func(mfwu::unit_test_deque::use_deque_iterator, ut_deque),
+        ut_func(mfwu::unit_test_deque::use_mfwu_deque, ut_deque),
+        ut_func(mfwu::unit_test_deque::use_ranged_insert_erase, ut_deque)
+    );
 
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_uod_set.use_mfwu_unordered_set();
-    score += !ut_uod_set.use_modifier_and_lookup();
-    score += !ut_uod_set.use_other_interface();
-    std::cout << "\n---------- Unordered_set test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Stack",
+        ut_func(mfwu::unit_test_stack::use_mfwu_stack, ut_stack)
+    );
 
-    score = 0;
-    total = 4;
-    ttotal += total;
-    score += !ut_deque.use_deque_block();
-    score += !ut_deque.use_deque_iterator();
-    score += !ut_deque.use_mfwu_deque();
-    score += !ut_deque.use_ranged_insert_erase();
-    std::cout << "\n---------- Deque test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Queue",
+        ut_func(mfwu::unit_test_queue::use_mfwu_queue, ut_queue)
+    );
 
-    score = 0;
-    total = 1;
-    ttotal += total;
-    score += !ut_stack.use_mfwu_stack();
-    std::cout << "\n---------- Stack test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    unit_test(
+        "Set",
+        ut_func(mfwu::unit_test_set::use_mfwu_set, ut_set),
+        ut_func(mfwu::unit_test_set::use_modifier_and_lookup, ut_set),
+        ut_func(mfwu::unit_test_set::use_other_interface, ut_set)
+    );
 
-    score = 0;
-    total = 1;
-    ttotal += total;
-    score += !ut_queue.use_mfwu_queue();
-    std::cout << "\n---------- Queue test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
-
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_set.use_mfwu_set();
-    score += !ut_set.use_modifier_and_lookup();
-    score += !ut_set.use_other_interface();
-    std::cout << "\n---------- Set test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
-
-    score = 0;
-    total = 3;
-    ttotal += total;
-    score += !ut_map.use_mfwu_map();
-    score += !ut_map.use_modifier_and_lookup();
-    score += !ut_map.use_other_interface();
-    std::cout << "\n---------- Map test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
-
-    // TODO: use function or marco
+    unit_test(
+        "Map",
+        ut_func(mfwu::unit_test_map::use_mfwu_map, ut_map),
+        ut_func(mfwu::unit_test_map::use_modifier_and_lookup, ut_map),
+        ut_func(mfwu::unit_test_map::use_other_interface, ut_map)
+    );
     
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;
