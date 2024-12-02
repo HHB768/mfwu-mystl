@@ -1,20 +1,16 @@
-#ifndef __RBTREE_HPP__
-#define __RBTREE_HPP__
+#ifndef __RBTREE_EXP_HPP__
+#define __RBTREE_EXP_HPP__
 
 #ifdef __GLOBAL_DEBUG__
-#   define __RBTREE_DEBUG__
+#   define __RBTREE_EXP_DEBUG__
 #else
 #   ifdef __UNIT_TEST_RBTREE_BRIEF__
-#       undef __RBTREE_DEBUG__
+#       undef __RBTREE_EXP_DEBUG__
 #   endif  // __UNIT_TEST_RBTREE_BRIEF__
 #endif // __GLOBAL_DEBUG__
 
-// rbtree is complicated and i am not confident
-// i leave some debug output ive used
-// ---- X-H2 24.08.07
-
 // debug rbtree
-// #define __RBTREE_DEBUG__
+// #define __RBTREE_EXP_DEBUG__
 
 #include "common.hpp"
 #include "algorithm.hpp"
@@ -22,24 +18,18 @@
 
 namespace mfwu {
 
-class unit_test_rbtree;
-// class set;
-
 template <typename T, typename CmpFunctor=mfwu::less<T>>
-class rbtree {
+class rbtree_exp {
 public:
-    friend class mfwu::unit_test_rbtree;
-    // friend class mfwu::set;
     
     using value_type = T;
     using size_type = size_t;
     
-    // TODO: check
     constexpr static bool red = false;
     constexpr static bool black = true;
 
     struct rb_node {
-        value_type val;
+        const value_type val;  // can i? 12.3/24
         bool color;
         rb_node* left;
         rb_node* right;
@@ -61,12 +51,6 @@ public:
         rb_node(rb_node&& node) 
             : val(mfwu::move(node.val)), color(node.color), 
               left(node.left), right(node.right), parent(node.parent) {}
-        // void set_color(bool c) {
-        //     this->color = c;
-        // }
-        // void invert_color() {
-        //     this->color = !this->color;
-        // }
         rb_node* get_inorder_next() const {
             rb_node* ret = nullptr;
             if (right) {
@@ -87,8 +71,8 @@ public:
     };  // endof struct rb_node
     using node = rb_node;
 
-    rbtree() : root_(nullptr) {}
-    rbtree(const std::initializer_list<value_type>& vals) : root_(nullptr) {
+    rbtree_exp() : root_(nullptr) {}
+    rbtree_exp(const std::initializer_list<value_type>& vals) : root_(nullptr) {
         for (auto&& val : vals) { 
             insert(val); 
         }
@@ -97,27 +81,27 @@ public:
               typename = typename std::enable_if<
                   mfwu::is_input_iterator<InputIterator>::value>
              >
-    rbtree(InputIterator first, InputIterator last) : root_(nullptr) {
+    rbtree_exp(InputIterator first, InputIterator last) : root_(nullptr) {
         for ( ; first != last; ++first) {
             insert(*first);
         }
     }
-    rbtree(const rbtree& rbt) {
+    rbtree_exp(const rbtree& rbt) {
         this->copy(rbt);
     }
-    rbtree(rbtree&& rbt) : root_(rbt.root_) {
+    rbtree_exp(rbtree&& rbt) : root_(rbt.root_) {
         rbt.root_ = nullptr;
     }
-    ~rbtree() {
+    ~rbtree_exp() {
         this->destroy_tree(root_);
     }
 
-    rbtree& operator=(const rbtree& rbt) {
+    rbtree_exp& operator=(const rbtree& rbt) {
         this->destroy_tree(root_);
         this->copy(rbt);
         return *this;
     }
-    rbtree& operator=(rbtree&& rbt) {
+    rbtree_exp& operator=(rbtree&& rbt) {
         root_ = rbt.root_;
         rbt.root_ = nullptr;
         return *this;
@@ -145,72 +129,78 @@ public:
     node* erase(const value_type& val) {
         node* cur = search(val);
         if (cur == nullptr) return nullptr;
-        node* ret = cur->get_inorder_next();
+        node* ret = cur->get_inorder_next();  // IS IT RIGHT? 24.12.03
         erase(cur);
-        return ret;  
-        // TODO: bug fix: 
-        // there is no gurantee for the validation of the 'ret'
-        // 24.12.03
+        return ret;
     }
     void erase(node* root) {
         if (root == nullptr) return ;
         if (root->color == red) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
             std::cout << "erase red: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
             if (root->left == nullptr && root->right == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase red leaf\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
                 erase_node(root, nullptr);
             } else if (root->left == nullptr) {
                 // erase_node(root, root->right);  // is it possible?
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "a?\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
             } else if (root->right == nullptr) {
                 // erase_node(root, root->left);  // is it possible?
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "b?\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
             } else {  // has both children
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase red inner node\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
                 node* next = get_successor(root);
-                root->val = next->val;
+                root->val = next->val;  // HERE: 
+                // we should write a function to implement this!
+                /*
+                    replace(src, dst) {
+                        src->parent->? = dst, dst->parent = src->parent
+                        src->left->parent = dst, dst->left = src->left
+                        src->right ...
+                        return src;  // may be deleted later
+                    }
+                */
                 erase(next);  // remains the structure and erase successor
             }
         } else {  // root is black 
             // TODO: can we conclude these into uxy?
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
             std::cout << "erase black: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
             if (root->left == nullptr && root->right == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase black leaf\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
                 bbb(root, nullptr, nullptr);
             } else if (root->left == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase black node 1r\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
                 // 必是右边单走一个红
-                root->val = root->right->val;
+                root->val = root->right->val;  // HERE
                 // = erase_node(root->right, nullptr)
                 delete root->right;
                 root->right = nullptr;
             } else if (root->right == nullptr) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase black node 1l\n";
-#endif  // __RBTREE_DEBUG__
-                root->val = root->left->val;
+#endif  // __RBTREE_EXP_DEBUG__
+                root->val = root->left->val;  // HERE
                 delete root->left;
                 root->left = nullptr;
             } else {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase black node 2\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
                 node* next = get_successor(root);
                 node* nnext = get_successor(next);
                 if (color(next) == black && color(nnext) == black) {
@@ -325,14 +315,14 @@ private:
         }
     }
     node* insert(node* root, const value_type& val) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "insert: " << val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         if (root == nullptr) {
             node* cur = new node(val);
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
             std::cout << "create new node: " << val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
             return cur;
         }
         node* parent = root->parent;
@@ -385,69 +375,69 @@ private:
     }
     void llr(node* root) {
         // TODO: detect nullptr
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "llr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         root->color = red;
         root->left->color = root->right->color = black;
         maintain(root);
     }
     void rrr(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "rrr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         llr(root);
     }
     void lrr(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "lrr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         llr(root);
     }
     void rlr(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "rlr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         llr(root);
     }
     void llb(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "llb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         root->color = red;
         root->left->color = black;
         rotate_right(root);
     }
     void rrb(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "rrb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         root->color = red;
         root->right->color = black;
         rotate_left(root);
     }
     void lrb(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "lrb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         rotate_left(root->left);
         llb(root);
     }
     void rlb(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "rlb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         rotate_right(root->right);
         rrb(root);
     }
     void maintain(node* root) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "maintain: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         if (root == nullptr) { 
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
             std::cout << "啊？\n"; 
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         } else if (root->parent == nullptr) { 
             root->color = black;  // ROOT
             return ;
@@ -567,18 +557,18 @@ private:
     void brb(node* root, node* next, node* nnext) {
         // 'r' must be a leaf
         // last 'b' must be nullptr
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "brb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
-        root->val = next->val;
+#endif  // __RBTREE_EXP_DEBUG__
+        root->val = next->val;  // HERE
         erase_node(next, nullptr);  // or erase(next), whatever
     }
     void bbr(node* root, node* next, node* nnext) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "bbr: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         // 'r' must be a leaf
-        root->val = next->val;
+        root->val = next->val;  // HERE
         next->val = nnext->val;
         next->color = black;
         erase_node(nnext, nullptr);
@@ -588,9 +578,9 @@ private:
         // nnext->color = black;
     }
     void bbb(node* root, node* next, node* nnext) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "bbb: " << root->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         // last 'b' must be nullptr
         if (next == nullptr) {
             // root is leaf
@@ -619,16 +609,16 @@ private:
                 }
             }
         } else {
-            root->val = next->val;
+            root->val = next->val;  // HERE
             // next is leaf
             bbb(next, nullptr, nullptr);
         }
         
     }
     void Lr(node* brother) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "Lr: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         node* parent = brother->parent;
         brother->color = black;
         parent->color = red;
@@ -636,9 +626,9 @@ private:
         Lb(parent->right);
     }  // sym
     void Lb(node* brother) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "Lb: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         node* parent = brother->parent;
         if (color(brother->left) == black && color(brother->right) == black) {
             // in this senario, brother should be a leaf
@@ -666,9 +656,9 @@ private:
         }
     }  // sym
     void Rr(node* brother) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "Rr: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         node* parent = brother->parent;  // TODO: root_
         brother->color = black;
         parent->color = red;
@@ -676,9 +666,9 @@ private:
         Rb(parent->left);  // !
     }
     void Rb(node* brother) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "Rb: " << brother->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         node* parent = brother->parent;  // TODO: root_
         if (color(brother->left) == black && color(brother->right) == black) {
             // Rb0
@@ -706,9 +696,9 @@ private:
         }
     }
     void maintain_up(node* parent) {
-#ifdef __RBTREE_DEBUG__
+#ifdef __RBTREE_EXP_DEBUG__
         std::cout << "maintain_up: " << parent->val << "\n";
-#endif  // __RBTREE_DEBUG__
+#endif  // __RBTREE_EXP_DEBUG__
         node* gparent = parent->parent;
         node* brother = nullptr;
         if (gparent != nullptr) {
@@ -806,8 +796,8 @@ private:
 
 };  // endof class rbtree
 
-template <typename T, typename CmpFunctor>
-CmpFunctor rbtree<T, CmpFunctor>::cmp = {};
+// template <typename T, typename CmpFunctor>
+// CmpFunctor rbtree_exp<T, CmpFunctor>::cmp = {};
 
 }  // endof namespace mfwu
 

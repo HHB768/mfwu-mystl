@@ -172,7 +172,7 @@ public:
     size_type erase(const key_type& key) {
         node* ret = rbt_.search(key);
         if (ret != nullptr) {
-            ret = rbt_.erase(key);
+            rbt_.erase(key);
             return 1;
         }
         return 0;

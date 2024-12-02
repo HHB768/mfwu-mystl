@@ -153,6 +153,9 @@ public:
         node* ret = cur->get_inorder_next();
         erase(cur);
         return ret;
+        // TODO: bug fix: 
+        // there is no gurantee for the validation of the 'ret'
+        // 24.12.03
     }
     node* erase(const value_type& val) {
         return erase(val.first);

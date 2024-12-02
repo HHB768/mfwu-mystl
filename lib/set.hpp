@@ -168,7 +168,7 @@ public:
     size_type erase(const value_type& val) {
         node* ret = rbt_.search(val);
         if (ret != nullptr) {
-            ret = rbt_.erase(val);
+            rbt_.erase(val);  
             return 1;
         }
         return 0;

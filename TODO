@@ -21,8 +21,9 @@ new schd on 24.10.24
 2. map/set                              5 days
 3. pair                                 1 day  √
 4. queue/stack unit test                2 days √
-5. string                               -
+5. tiny_string                          -
 6. ringbuffer                           -
 7. sort                                 -
+8. webserver & logger & postman         30+ days
 
-24.11.01 X-H
+24.12.03 X-H
