@@ -1,4 +1,4 @@
-#define __ALL_BRIEF__
+// #define __ALL_BRIEF__
 
 #ifdef __ALL_BRIEF__
 #   define __UNIT_TEST_ALLOCATOR_BRIEF__
