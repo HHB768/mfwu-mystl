@@ -96,12 +96,12 @@ public:
         this->destroy_tree(root_);
     }
 
-    rbtree_exp& operator=(const rbtree& rbt) {
+    rbtree_exp& operator=(const rbtree_exp& rbt) {
         this->destroy_tree(root_);
         this->copy(rbt);
         return *this;
     }
-    rbtree_exp& operator=(rbtree&& rbt) {
+    rbtree_exp& operator=(rbtree_exp&& rbt) {
         root_ = rbt.root_;
         rbt.root_ = nullptr;
         return *this;
@@ -159,16 +159,8 @@ public:
                 std::cout << "erase red inner node\n";
 #endif  // __RBTREE_EXP_DEBUG__
                 node* next = get_successor(root);
-                root->val = next->val;  // HERE: 
-                // we should write a function to implement this!
-                /*
-                    replace(src, dst) {
-                        src->parent->? = dst, dst->parent = src->parent
-                        src->left->parent = dst, dst->left = src->left
-                        src->right ...
-                        return src;  // may be deleted later
-                    }
-                */
+                // root->val = next->val;  // HERE: 
+                swap_pos(root, next);
                 erase(next);  // remains the structure and erase successor
             }
         } else {  // root is black 
@@ -313,6 +305,57 @@ private:
             root_->parent = nullptr;
             root_->color = black;
         }
+    }
+    // void copy_node(node* src, node* dst) {
+    //     src->parent = dst->parent;
+    //     src->left = dst->left;
+    //     src->right = dst->right;
+    //     if (dst->parent->left == dst) {
+    //         dst->parent->left = src;
+    //     } else {
+    //         dst->parent->right = src;
+    //     }
+    //     dst->left->parent = src;
+    //     dst->right->parent = src;
+    // }
+    void connect(node* node1, node* node2, direction dir) {
+        if (node1 == nullptr) ...
+    }
+    // note: to replace the src->val = dst->val
+    //       we ensure src & dst are not null
+    void swap_pos(node* src, node* dst) {
+        if (src->right == dst) {
+            return swap_prs(src, dst);
+        } else if (src->left == dst) {
+            return swap_pls(src, dst);
+        } else if (dst->right == src) {
+            return swap_prs(dst, src);
+        } else if (dst->left == src) {
+            return swap_pls(dst, src);
+        }
+        node* sp = src->parent;
+        node* sl = src->left;
+        node* sr = src->right;
+        node* dp = dst->parent;
+        node* dl = dst->left;
+        node* dr = dst->right;
+
+        connect(sp)
+
+        
+        dst->parent = temp->parent;
+        dst->left = temp->left;
+        dst->right = temp->right;
+        if (temp->parent->left == src) {  // ! 1203/24
+            temp->parent->left = dst;
+        } else {
+            temp->parent->right = dst;
+        }
+        temp->left->parent = dst;
+        temp->right->parent = dst;
+
+        delete temp;
+        // return src;  // may be deleted later
     }
     node* insert(node* root, const value_type& val) {
 #ifdef __RBTREE_EXP_DEBUG__
