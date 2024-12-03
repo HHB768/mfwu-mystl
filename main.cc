@@ -1,4 +1,4 @@
-// #define __ALL_BRIEF__
+#define __ALL_BRIEF__
 
 #ifdef __ALL_BRIEF__
 #   define __UNIT_TEST_ALLOCATOR_BRIEF__
@@ -9,7 +9,7 @@
 #   define __UNIT_TEST_HEAP_BRIEF__
 #   define __UNIT_TEST_BST_BRIEF__
 #   define __UNIT_TEST_AVL_TREE_BRIEF__
-#   define __UNIT_TEST_RBTREE_BRIEF__
+// #   define __UNIT_TEST_RBTREE_BRIEF__
 #   define __UNIT_TEST_RBF_BRIEF__
 #   define __UNIT_TEST_HASHTABLE_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MAP_BRIEF__
@@ -45,6 +45,7 @@
 #include "ut_queue.hpp"
 #include "ut_set.hpp"
 #include "ut_map.hpp"
+#include "ut_rbtree_exp.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -92,6 +93,7 @@ int main() {
     mfwu::unit_test_queue ut_queue;
     mfwu::unit_test_set ut_set;
     mfwu::unit_test_map ut_map;
+    mfwu::unit_test_rbtree_exp ut_rbte; 
 
     size_t score = 0;
     size_t total = 0;
@@ -228,6 +230,11 @@ int main() {
         ut_func(mfwu::unit_test_map::use_mfwu_map, ut_map),
         ut_func(mfwu::unit_test_map::use_modifier_and_lookup, ut_map),
         ut_func(mfwu::unit_test_map::use_other_interface, ut_map)
+    );
+
+    unit_test(
+        "Rbtree_exp",
+        ut_func(mfwu::unit_test_rbtree_exp::use_rbtree_exp, ut_rbte)
     );
     
     std::cout << "\n---------- test result -----------\n";

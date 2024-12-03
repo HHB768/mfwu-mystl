@@ -86,10 +86,10 @@ public:
             insert(*first);
         }
     }
-    rbtree_exp(const rbtree& rbt) {
+    rbtree_exp(const rbtree_exp& rbt) {
         this->copy(rbt);
     }
-    rbtree_exp(rbtree&& rbt) : root_(rbt.root_) {
+    rbtree_exp(rbtree_exp&& rbt) : root_(rbt.root_) {
         rbt.root_ = nullptr;
     }
     ~rbtree_exp() {
@@ -161,7 +161,7 @@ public:
                 node* next = get_successor(root);
                 // root->val = next->val;  // HERE: 
                 swap_pos(root, next);
-                erase(next);  // remains the structure and erase successor
+                erase(root);  // remains the structure and erase successor
             }
         } else {  // root is black 
             // TODO: can we conclude these into uxy?
@@ -178,17 +178,23 @@ public:
                 std::cout << "erase black node 1r\n";
 #endif  // __RBTREE_EXP_DEBUG__
                 // 必是右边单走一个红
-                root->val = root->right->val;  // HERE
+                // root->val = root->right->val;  // HERE
                 // = erase_node(root->right, nullptr)
-                delete root->right;
-                root->right = nullptr;
+                swap_pos(root, root->right);
+                // delete root->right;
+                // root->right = nullptr;
+                root->parent->right = nullptr;
+                delete root;
             } else if (root->right == nullptr) {
 #ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase black node 1l\n";
 #endif  // __RBTREE_EXP_DEBUG__
-                root->val = root->left->val;  // HERE
-                delete root->left;
-                root->left = nullptr;
+                // root->val = root->left->val;  // HERE
+                swap_pos(root, root->left);
+                // delete root->left;
+                // root->left = nullptr;
+                root->parent->left = nullptr;
+                delete root;
             } else {
 #ifdef __RBTREE_EXP_DEBUG__
                 std::cout << "erase black node 2\n";
@@ -279,7 +285,7 @@ public:
     }
 
 private:
-    void copy(const rbtree& rbt) {
+    void copy(const rbtree_exp& rbt) {
         root_ = copy_tree(rbt.root_);
     }
     static node* copy_tree(node* root) {
@@ -318,12 +324,56 @@ private:
     //     dst->left->parent = src;
     //     dst->right->parent = src;
     // }
-    void connect(node* node1, node* node2, direction dir) {
-        if (node1 == nullptr) ...
+    static void connect(node* node1, node* node2, bool is_left) {
+        if (node1 == nullptr && node2 == nullptr) {
+            return ;
+        }
+        if (node1 == nullptr) {
+            node2->parent = nullptr;
+            return ;
+        } else if (is_left) {
+            node1->left = node2;
+        } else {
+            node1->right = node2;
+        }
+        if (node2) node2->parent = node1;
+    }
+    static void swap_prs(node* p, node* s) {
+        node* pp = p->parent;
+        node* pl = p->left;
+        node* sl = s->left;
+        node* sr = s->right;
+        if (pp) {
+            connect(pp, s, pp->left == p);
+        } else {
+            s->parent = nullptr;
+        }
+        connect(s, pl, true);
+        connect(s, p, false);
+        connect(p, sl, true);
+        connect(p, sr, false);
+    }
+    static void swap_pls(node* p, node* s) {
+        node* pp = p->parent;
+        node* pr = p->right;
+        node* sl = s->left;
+        node* sr = s->right;
+        if (pp) {
+            connect(pp, s, pp->left == p);
+        } else {
+            s->parent = nullptr;
+        }
+        connect(s, pr, false);
+        connect(s, p, true);
+        connect(p, sl, true);
+        connect(p, sr, false);
     }
     // note: to replace the src->val = dst->val
     //       we ensure src & dst are not null
     void swap_pos(node* src, node* dst) {
+        // std::cout << src->val << " " << dst->val << "\n";
+        if (src == root_) root_ = dst;  // CHECK
+        mfwu::swap(src->color, dst->color);
         if (src->right == dst) {
             return swap_prs(src, dst);
         } else if (src->left == dst) {
@@ -333,6 +383,7 @@ private:
         } else if (dst->left == src) {
             return swap_pls(dst, src);
         }
+        // std::cout << "?\n";
         node* sp = src->parent;
         node* sl = src->left;
         node* sr = src->right;
@@ -340,21 +391,20 @@ private:
         node* dl = dst->left;
         node* dr = dst->right;
 
-        connect(sp)
-
-        
-        dst->parent = temp->parent;
-        dst->left = temp->left;
-        dst->right = temp->right;
-        if (temp->parent->left == src) {  // ! 1203/24
-            temp->parent->left = dst;
+        if (sp) {
+            connect(sp, dst, sp->left == src);
         } else {
-            temp->parent->right = dst;
+            dst->parent = nullptr;
         }
-        temp->left->parent = dst;
-        temp->right->parent = dst;
-
-        delete temp;
+        connect(dst, sl, true);
+        connect(dst, sr, false);
+        if (dp) {
+            connect(dp, src, dp->left == dst);
+        } else {
+            src->parent = nullptr;
+        }
+        connect(src, dl, true);
+        connect(src, dr, false);
         // return src;  // may be deleted later
     }
     node* insert(node* root, const value_type& val) {
@@ -603,22 +653,21 @@ private:
 #ifdef __RBTREE_EXP_DEBUG__
         std::cout << "brb: " << root->val << "\n";
 #endif  // __RBTREE_EXP_DEBUG__
-        root->val = next->val;  // HERE
-        erase_node(next, nullptr);  // or erase(next), whatever
+        // root->val = next->val;  // HERE
+        swap_pos(root, next);
+        erase_node(root, nullptr);
     }
     void bbr(node* root, node* next, node* nnext) {
 #ifdef __RBTREE_EXP_DEBUG__
         std::cout << "bbr: " << root->val << "\n";
 #endif  // __RBTREE_EXP_DEBUG__
         // 'r' must be a leaf
-        root->val = next->val;  // HERE
-        next->val = nnext->val;
-        next->color = black;
-        erase_node(nnext, nullptr);
-        // or (TODO)
-        // root->val = next->val;
-        // erase_node(next, nnext);
-        // nnext->color = black;
+        // root->val = next->val;  // HERE
+        // next->val = nnext->val;
+        swap_pos(root, next);
+        swap_pos(root, nnext);
+        nnext->color = black;
+        erase_node(root, nullptr);
     }
     void bbb(node* root, node* next, node* nnext) {
 #ifdef __RBTREE_EXP_DEBUG__
@@ -652,9 +701,12 @@ private:
                 }
             }
         } else {
-            root->val = next->val;  // HERE
+            // root->val = next->val;  // HERE
+            swap_pos(root, next);
             // next is leaf
-            bbb(next, nullptr, nullptr);
+            bbb(root, nullptr, nullptr);  // CHECK
+            // may be right
+            // bcz in bbb, root->val will always be useless
         }
         
     }
@@ -832,12 +884,10 @@ private:
     }
 
     node* root_;
-    static CmpFunctor cmp;  // TODO: CHECK ALL COMPARISON
-                            //       AND FOCUS ON == senario
-                            //       FIX THE 'INVALID TREE' PROBLEM
-                            // 24.11.12 X
+    constexpr static CmpFunctor cmp = {};  
+    // constexpr  1204/24
 
-};  // endof class rbtree
+};  // endof class rbtree_exp
 
 // template <typename T, typename CmpFunctor>
 // CmpFunctor rbtree_exp<T, CmpFunctor>::cmp = {};
