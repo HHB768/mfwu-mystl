@@ -1,3 +1,4 @@
+#ifndef __UNIT_TEST_RBTREE_EXP__
 #define __UNIT_TEST_RBTREE_EXP__
 
 #include "ut_rbtree.hpp"
@@ -8,6 +9,12 @@ namespace mfwu {
 class unit_test_rbtree_exp {
 public:
     bool use_rbtree_exp();
+
+    template <typename T, typename Compare>
+    static void print_and_check(const rbtree_exp<T, Compare>& rbt) {
+        unit_test_rbtree::print_colored_struct(rbt.get_tree());
+        unit_test_rbtree::is_valid_rbtree(rbt.get_tree(), rbt.cmp);
+    }
 
 private:
     template <typename T, typename Compare>
@@ -102,3 +109,5 @@ bool unit_test_rbtree_exp::use_rbtree_exp() {
 
 
 }
+
+#endif  // __UNIT_TEST_RBTREE_EXP__

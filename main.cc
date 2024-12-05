@@ -19,6 +19,7 @@
 #   define __UNIT_TEST_QUEUE_BRIEF__
 #   define __UNIT_TEST_SET_BRIEF__
 #   define __UNIT_TEST_MAP_BRIEF__
+#   define __UNIT_TEST_MULTISET_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -46,6 +47,7 @@
 #include "ut_set.hpp"
 #include "ut_map.hpp"
 #include "ut_rbtree_exp.hpp"
+#include "ut_multiset.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -94,6 +96,7 @@ int main() {
     mfwu::unit_test_set ut_set;
     mfwu::unit_test_map ut_map;
     mfwu::unit_test_rbtree_exp ut_rbte; 
+    mfwu::unit_test_multiset ut_mtset;
 
     size_t score = 0;
     size_t total = 0;
@@ -235,6 +238,13 @@ int main() {
     unit_test(
         "Rbtree_exp",
         ut_func(mfwu::unit_test_rbtree_exp::use_rbtree_exp, ut_rbte)
+    );
+
+    unit_test(
+        "Multiset",
+        ut_func(mfwu::unit_test_multiset::use_mfwu_multiset, ut_mtset),
+        ut_func(mfwu::unit_test_multiset::use_modifier_and_lookup, ut_mtset),
+        ut_func(mfwu::unit_test_multiset::use_other_interface, ut_mtset)
     );
     
     std::cout << "\n---------- test result -----------\n";

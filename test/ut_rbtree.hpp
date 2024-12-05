@@ -159,9 +159,9 @@ private:
         int black_cnt = 1;
     };  // endof class minmax
     template <typename Node, typename Compare>
-    static minmax<decltype(Node::val)> 
+    static minmax<typename std::remove_const<decltype(Node::val)>::type> 
     is_valid_rbtree_aux(Node* root, Compare cmp) {
-        using return_type = minmax<decltype(Node::val)>;
+        using return_type = minmax<typename std::remove_const<decltype(Node::val)>::type>;
         
         return_type mm = {};
         if (root == nullptr) { return mm; }
