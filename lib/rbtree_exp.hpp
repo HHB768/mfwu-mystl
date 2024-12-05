@@ -18,10 +18,13 @@
 
 namespace mfwu {
 
+class unit_test_rbtree_exp;
+
 template <typename T, typename CmpFunctor=mfwu::less<T>>
 class rbtree_exp {
 public:
-    
+    friend class unit_test_rbtree_exp;
+
     using value_type = T;
     using size_type = size_t;
     
@@ -110,7 +113,7 @@ public:
     bool empty() const { return root_ == nullptr; }
     size_type size() const { return size(root_); }
     size_type height() const { return height(root_); }
-    value_type& root() const { return root_->val; }
+    const value_type& root() const { return root_->val; }
     node* get_tree() const { return root_; }
     
     node* insert(const value_type& val) {
