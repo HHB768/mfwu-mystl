@@ -37,6 +37,7 @@ bool unit_test_rbtree_exp::use_rbtree_exp() {
     mfwu::rbtree_exp<int> rbte = {1, 3, 5, 4, 2, 6, 9, 7, 8};
 
     srand(time(0));
+    // srand(42);
 
     std::cout << "testing random push/pop\n";
     for (int test_num = 0; test_num < 20; test_num++) {
