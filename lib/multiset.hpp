@@ -136,12 +136,12 @@ public:
     void clear() { rbt_.clear(); }  // TODO: O(n) -> ?
 
     mfwu::pair<iterator, bool> insert(const value_type& val) {
-        node* ret = rbt_.search(val);
+        // node* ret = rbt_.search(val);
         // if (ret != nullptr) {
         //     // ret->val = val;  // meaningless in set
         //     return {iterator(ret), false};
         // }
-        ret = rbt_.insert(val);
+        node* ret = rbt_.insert(val);
         return {iterator(ret), true};
     }
     template <typename InputIterator,
@@ -250,3 +250,4 @@ private:
 #endif  // __MULTISET_HPP__
 
 // TODO: update rbtree til it wnot have value-assgin, but node adjustment only
+// ANS: has been finished 241204

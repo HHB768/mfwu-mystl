@@ -9,7 +9,7 @@
 #   define __UNIT_TEST_HEAP_BRIEF__
 #   define __UNIT_TEST_BST_BRIEF__
 #   define __UNIT_TEST_AVL_TREE_BRIEF__
-// #   define __UNIT_TEST_RBTREE_BRIEF__
+#   define __UNIT_TEST_RBTREE_BRIEF__
 #   define __UNIT_TEST_RBF_BRIEF__
 #   define __UNIT_TEST_HASHTABLE_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MAP_BRIEF__
@@ -20,6 +20,7 @@
 #   define __UNIT_TEST_SET_BRIEF__
 #   define __UNIT_TEST_MAP_BRIEF__
 #   define __UNIT_TEST_MULTISET_BRIEF__
+#   define __UNIT_TEST_MULTIMAP_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -48,6 +49,8 @@
 #include "ut_map.hpp"
 #include "ut_rbtree_exp.hpp"
 #include "ut_multiset.hpp"
+#include "ut_multimap.hpp"
+#include "ut_hashtable_exp.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -97,6 +100,8 @@ int main() {
     mfwu::unit_test_map ut_map;
     mfwu::unit_test_rbtree_exp ut_rbte; 
     mfwu::unit_test_multiset ut_mtset;
+    mfwu::unit_test_multimap ut_mtmap;
+    mfwu::unit_test_hashtable_exp ut_htble;
 
     size_t score = 0;
     size_t total = 0;
@@ -245,6 +250,19 @@ int main() {
         ut_func(mfwu::unit_test_multiset::use_mfwu_multiset, ut_mtset),
         ut_func(mfwu::unit_test_multiset::use_modifier_and_lookup, ut_mtset),
         ut_func(mfwu::unit_test_multiset::use_other_interface, ut_mtset)
+    );
+
+    unit_test(
+        "Multimap",
+        ut_func(mfwu::unit_test_multimap::use_mfwu_multimap, ut_mtmap),
+        ut_func(mfwu::unit_test_multimap::use_modifier_and_lookup, ut_mtmap),
+        ut_func(mfwu::unit_test_multimap::use_other_interface, ut_mtmap)
+    );
+
+    unit_test(
+        "Hashtable_exp",
+        ut_func(mfwu::unit_test_hashtable_exp::use_mfwu_hashtable_exp, ut_htble),
+        ut_func(mfwu::unit_test_hashtable_exp::use_mfwu_shashtable_exp, ut_htble)
     );
     
     std::cout << "\n---------- test result -----------\n";
