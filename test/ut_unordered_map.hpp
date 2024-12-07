@@ -198,4 +198,7 @@ bool unit_test_unordered_map::use_other_interface() {
     return 0;
 }
 
+// TODO: we need more insert/erase tests
+//       and ranged insert/erase support
+
 }  // endof namespace mfwu

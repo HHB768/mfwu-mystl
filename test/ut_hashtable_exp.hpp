@@ -95,7 +95,7 @@ std::ostream& operator<<(std::ostream& os,
 }
 
 bool unit_test_hashtable_exp::use_mfwu_hashtable_exp() {
-    std::cout << "\n------- Test: use mfwu::hashtable -------\n";
+    std::cout << "\n------- Test: use mfwu::hashtable_exp -------\n";
     std::cout << "testing hashtable\n";
     mfwu::hashtable_exp<data, int, data_hash> htbl1(5);
     htbl1[data{1}] = 1;

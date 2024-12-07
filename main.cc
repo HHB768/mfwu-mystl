@@ -21,6 +21,9 @@
 #   define __UNIT_TEST_MAP_BRIEF__
 #   define __UNIT_TEST_MULTISET_BRIEF__
 #   define __UNIT_TEST_MULTIMAP_BRIEF__
+#   define __UNIT_TEST_HASHTABLE_EXP_BRIEF__
+#   define __UNIT_TEST_UNORDERED_MULTIMAP_BRIEF__
+#   define __UNIT_TEST_UNORDERED_MULTISET_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -51,6 +54,8 @@
 #include "ut_multiset.hpp"
 #include "ut_multimap.hpp"
 #include "ut_hashtable_exp.hpp"
+#include "ut_unordered_multimap.hpp"
+#include "ut_unordered_multiset.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -102,6 +107,8 @@ int main() {
     mfwu::unit_test_multiset ut_mtset;
     mfwu::unit_test_multimap ut_mtmap;
     mfwu::unit_test_hashtable_exp ut_htble;
+    mfwu::unit_test_unordered_multimap ut_uod_mmap;
+    mfwu::unit_test_unordered_multiset ut_uod_mset;
 
     size_t score = 0;
     size_t total = 0;
@@ -263,6 +270,20 @@ int main() {
         "Hashtable_exp",
         ut_func(mfwu::unit_test_hashtable_exp::use_mfwu_hashtable_exp, ut_htble),
         ut_func(mfwu::unit_test_hashtable_exp::use_mfwu_shashtable_exp, ut_htble)
+    );
+
+    unit_test(
+        "Unordered_multimap",
+        ut_func(mfwu::unit_test_unordered_multimap::use_mfwu_unordered_multimap, ut_uod_mmap),
+        ut_func(mfwu::unit_test_unordered_multimap::use_modifier_and_lookup, ut_uod_mmap),
+        ut_func(mfwu::unit_test_unordered_multimap::use_other_interface, ut_uod_mmap)
+    );
+
+    unit_test(
+        "Unordered_multiset",
+        ut_func(mfwu::unit_test_unordered_multiset::use_mfwu_unordered_multiset, ut_uod_mset),
+        ut_func(mfwu::unit_test_unordered_multiset::use_modifier_and_lookup, ut_uod_mset),
+        ut_func(mfwu::unit_test_unordered_multiset::use_other_interface, ut_uod_mset)
     );
     
     std::cout << "\n---------- test result -----------\n";

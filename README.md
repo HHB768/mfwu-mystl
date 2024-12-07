@@ -23,15 +23,15 @@ Progress:
 * ringbuffer 75%
 * set 90%
 * stack 100%
-* string 70%
+* string 80%
 * unordered_map 100%
 * unordered_set 100%
 * vector 95%
 * Trie 20%
-* multiset/map 0%
+* multiset/map 90%
 
 Env:
 * ubuntu 22.04 -> 24.04.1
 * g++11.4.0 -> g++13.2.0
 
-X-mfwu / 24.11.24<br>
+X-mfwu / 24.12.08<br>

@@ -16,6 +16,7 @@ class bucket_exp {
 public:
     struct bucket_node {
         mfwu::pair<const key_type, value_type> value;
+        // not a good idea 24.12.08
         bucket_node* next;
 
         // TODO: i found many class lacks one or more
@@ -84,7 +85,7 @@ public:
         head_->next = next->next;
         delete next;
     }
-    bool pop(const value_type& val) {
+    bool pop(const mfwu::pair<const key_type, value_type>& val) {
         node* prev = head_;
         while (prev->next) {
             if (prev->next->value == val) {
@@ -109,7 +110,7 @@ public:
             prev = prev->next;
         }
         return false;
-    }
+    }  // TODO: remove all elements with .key == key
     bool pop(node* cur) {
         node* prev = head_;
         while (prev->next) {
