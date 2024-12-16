@@ -350,18 +350,37 @@ class tiny_string {
 public:
     using value_type = C;
     using size_type = size_t;
-    using iterator = C*;
+    using iterator = value_type*;
 
-    string(size_type n, const C& c) {
-        if (n > BuffSize) {
-            begin_ = new Alloc::allocate(n);
-            last_ = buf_ + BuffSize;
+    tiny_string() : begin_(&buf_), end_(&buf_), 
+                    last_(&buf_ + BuffSize), is_tiny(true) {}
+    tiny_string(size_type n, const value_type& val=value_type{}) {
+        init_iterator(n);
+        if (is_tiny_) {
+            mfwu::fill(begin_, end_, val);
         } else {
-            begin_ = buf_;
-            last_ = begin_ + n;
+            mfwu::uninitialized_fill(begin_, end_, val);
         }
-        end_ = begin_ + n;
-        mfwu::fill(begin_, end_, c);
+    }
+    tiny_string(const std::initializer_list<value_type>& vals) {
+        init_iterator(vals.size());
+        copy_init(vals.begin(), vals.end());
+    }
+    tiny_string(const char* c_str) {
+        size_type n = strlen(c_str);
+        init_iterator(n);
+        copy_init(c_str, c_str + n);
+    }
+    template <typename InputIterator,
+              typename = typename std::enable_if_t<
+                  is_input_iterator<InputIterator>::value>
+             >
+    tiny_string(InputIterator first, InputIterator last) {
+        init_iterator(mfwu::distance(first, last));
+        copy_init(first, last, begin_);
+    }
+    tiny_string(const tiny_string& str, size_type start_idx=0) {
+        
     }
 
     template <size_t Buf>
@@ -370,6 +389,27 @@ public:
     }
 
 private:
+    bool init_iterator(size_type n) {
+        if (n > BuffSize) {
+            is_tiny_ = false;
+            begin_ = new Alloc::allocate(n);
+            last_ = begin_ + n;
+        } else {
+            is_tiny_ = true;
+            begin_ = &buf_;
+            last_ = &buf_ + BuffSize;
+        }
+        end_ = begin_ + n;
+        return is_tiny_;
+    }
+    template <typename InputIterator>
+    void copy_init(InputIterator first, InputIterator last) {
+        if (is_tiny_) {
+            mfwu::copy(first, last, begin_);
+        } else {
+            mfwu::uninitialized_copy(first, last, begin_);
+        }
+    }
     void switch(bool toHeapMem=true, size_type n=2*BuffSize) {
         if (toHeapMem) {
             is_tiny = false;
@@ -389,8 +429,8 @@ private:
     }
 
     iterator begin_, end_, last_;
-    bool is_tiny;
-    C[BuffSize] buf_;
+    bool is_tiny_;
+    value_type[BuffSize] buf_ = {};
 };  // endof class tiny_string
 
 }
