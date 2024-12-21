@@ -789,10 +789,27 @@ equal_range(ForwardIt first, ForwardIt last, const T& val) {
 // 10. copy copy_backward remove remove_if remove_copy remove_copy_if
 //     replace replace_copy replace_if replace_copy_if
 template <typename InputIt, typename OutputIt>
-OutputIt copy(InputIt first, InputIt last, OutputIt res) {
+inline OutputIt copy(InputIt first, InputIt last, OutputIt res) {
     return copy_aux(first, last, res, 
         typename mfwu::iterator_traits<InputIt>::iterator_category{});
 }
+
+template <typename InputIterator, typename Size, typename OutputIterator>
+inline OutputIterator copy_n(InputIterator first, Size n, OutputIterator res) {
+    if (n > 0) {
+        *res = *first;
+        ++res;
+        for (Size i = 1; i != n; ++i, ++res) {
+            *res = *++first;
+        }
+    }
+    return res;
+    // from cppreference, but why not do this:
+    // for (; n > 0; --n) {
+    //     *res++ = *first++;
+    // }
+}
+
 
 template <typename It1, typename It2>
 inline void copy_backward(It1 first, 
