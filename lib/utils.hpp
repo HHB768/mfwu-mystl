@@ -324,12 +324,15 @@ inline void destroy(ForwardIterator first, ForwardIterator last) {
 
 // 3 uninitialized_copy
 template <typename InputIterator, typename OutputIterator>
-inline OutputIterator copy_aux(InputIterator first, InputIterator last, OutputIterator res, mfwu::random_access_iterator_tag) {
+inline OutputIterator copy_aux(InputIterator first, InputIterator last,
+                               OutputIterator res, mfwu::random_access_iterator_tag) {
     for ( ; first < last; ++first, ++res) {
         *res = *first;
     }
     return res;
-}
+}  
+// what is the meaning of this implementation?  241220
+// oh, i found it after i comment it...  241220
 
 template <typename InputIterator, typename OutputIterator, typename other_iterator_tag>
 inline OutputIterator copy_aux(InputIterator first, InputIterator last,
@@ -342,6 +345,9 @@ inline OutputIterator copy_aux(InputIterator first, InputIterator last,
 
 template <typename InputIterator, typename OutputIterator>
 inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator res);
+
+template <typename InputIterator, typename Size, typename OutputIterator>
+inline OutputIterator copy_n(InputIterator first, Size n, OutputIterator res);
 
 template <typename InputIteraor, typename ForwardIterator>
 inline ForwardIterator uninitialized_copy_aux(
@@ -373,6 +379,26 @@ inline char* uninitialized_copy(const char* first, const char* last, char* res) 
 inline wchar_t* uninitialized_copy(const wchar_t* first, const wchar_t* last, wchar_t* res) {
     memmove(res, first, sizeof(wchar_t) * (last - first));
     return res + (last - first);
+}
+
+// from cppreference 24.12.20
+template<class InputIt, class Size, class NoThrowForwardIt>
+inline NoThrowForwardIt uninitialized_copy_n(InputIt first, Size count, NoThrowForwardIt d_first)
+{
+    using T = typename std::iterator_traits<NoThrowForwardIt>::value_type;
+    NoThrowForwardIt current = d_first;
+    try
+    {
+        for (; count > 0; ++first, (void) ++current, --count)
+            ::new (static_cast<void*>(std::addressof(*current))) T(*first);
+    }
+    catch (...)
+    {
+        for (; d_first != current; ++d_first)
+            d_first->~T();
+        throw;
+    }
+    return current;
 }
 
 // 4 uninitialized_fill

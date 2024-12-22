@@ -56,6 +56,7 @@
 #include "ut_hashtable_exp.hpp"
 #include "ut_unordered_multimap.hpp"
 #include "ut_unordered_multiset.hpp"
+#include "ut_string.hpp"
 #include "ut_trie.hpp"
 
 static size_t ttotal = 0;
@@ -110,6 +111,7 @@ int main() {
     mfwu::unit_test_hashtable_exp ut_htble;
     mfwu::unit_test_unordered_multimap ut_uod_mmap;
     mfwu::unit_test_unordered_multiset ut_uod_mset;
+    mfwu::unit_test_string ut_string;
     mfwu::unit_test_trie ut_trie;
 
     size_t score = 0;
@@ -286,6 +288,12 @@ int main() {
         ut_func(mfwu::unit_test_unordered_multiset::use_mfwu_unordered_multiset, ut_uod_mset),
         ut_func(mfwu::unit_test_unordered_multiset::use_modifier_and_lookup, ut_uod_mset),
         ut_func(mfwu::unit_test_unordered_multiset::use_other_interface, ut_uod_mset)
+    );
+
+    unit_test(
+        "String",
+        ut_func(mfwu::unit_test_string::use_mfwu_string, ut_string),
+        ut_func(mfwu::unit_test_string::use_mfwu_tiny_string, ut_string)
     );
 
     unit_test(
