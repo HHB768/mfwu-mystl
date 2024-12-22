@@ -14,10 +14,14 @@ namespace mfwu {
 
 // try to implement a basic_string
 
+class unit_test_string;
+
 template <typename C=char, 
           typename Alloc=mfwu::DefaultAllocator<C, mfwu::malloc_alloc>>
 class string {
 public:
+    friend class unit_test_string;
+
     using value_type = C;
     using size_type = size_t;
 
@@ -37,8 +41,8 @@ public:
         mfwu::uninitialized_copy(vals.begin(), vals.end(), begin_);
     }
     string(const char* c_str) {
-        size_type n = strlen(c_str);
-        begin_ = c_str == nullptr ? nullptr : allocator_.alllocate();
+        size_type n = strlen(c_str);  // use strlen here
+        begin_ = c_str == nullptr ? nullptr : allocator_.allocate();
         last_ = end_ = c_str == nullptr ? nullptr : begin_ + n;
         mfwu::uninitialized_copy(c_str, c_str + n, begin_);
     }
@@ -295,7 +299,7 @@ private:
     iterator begin_;
     iterator end_;
     iterator last_;
-    Alloc allocator_;
+    Alloc allocator_ = {};
 
     void _destroy() {
         if(&*begin_) {
@@ -349,12 +353,14 @@ template <typename C=char, size_t BuffSize=8,
           typename Alloc=mfwu::DefaultAllocator<C, mfwu::malloc_alloc>>
 class tiny_string {
 public:
+    friend class unit_test_string;
+
     using value_type = C;
     using size_type = size_t;
     using iterator = value_type*;
 
-    tiny_string() : begin_(&buf_), end_(&buf_), 
-                    last_(&buf_ + BuffSize), is_tiny_(true) {}  
+    tiny_string() : begin_(buf_), end_(buf_), 
+                    last_(buf_ + BuffSize), is_tiny_(true) {}  
                     // = empty_init()
     tiny_string(size_type n, const value_type& val=value_type{}) {
         init_iterator(n);
@@ -655,16 +661,16 @@ private:
             last_ = begin_ + n;
         } else {
             is_tiny_ = true;
-            begin_ = &buf_;
-            last_ = &buf_ + BuffSize;
+            begin_ = buf_;
+            last_ = buf_ + BuffSize;
         }
         end_ = begin_ + n;
         return is_tiny_;
     }
     void empty_init() {
-        begin_ = &buf_;
-        end_ = &buf_;
-        last_ = &buf_ + BuffSize;
+        begin_ = buf_;
+        end_ = buf_;
+        last_ = buf_ + BuffSize;
         is_tiny_ = true;
     }
     template <typename InputIterator>
@@ -686,7 +692,7 @@ private:
     void _destroy() {
         if (is_tiny_ == false) {
             mfwu::destroy(begin_, end_);
-            Alloc::deallocate(mfwu::distance(begin_, last_));
+            Alloc::deallocate(begin_, mfwu::distance(begin_, last_));
         }
     }
     void req_mem() {

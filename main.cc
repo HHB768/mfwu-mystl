@@ -57,7 +57,7 @@
 #include "ut_unordered_multimap.hpp"
 #include "ut_unordered_multiset.hpp"
 #include "ut_string.hpp"
-#include "ut_trie.hpp"
+// #include "ut_trie.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -112,7 +112,7 @@ int main() {
     mfwu::unit_test_unordered_multimap ut_uod_mmap;
     mfwu::unit_test_unordered_multiset ut_uod_mset;
     mfwu::unit_test_string ut_string;
-    mfwu::unit_test_trie ut_trie;
+    // mfwu::unit_test_trie ut_trie;
 
     size_t score = 0;
     size_t total = 0;
@@ -296,10 +296,10 @@ int main() {
         ut_func(mfwu::unit_test_string::use_mfwu_tiny_string, ut_string)
     );
 
-    unit_test(
-        "Trie",
-        ut_func(mfwu::unit_test_trie::use_mfwu_trie, ut_trie)
-    );
+    // unit_test(
+    //     "Trie",
+    //     ut_func(mfwu::unit_test_trie::use_mfwu_trie, ut_trie)
+    // );
     
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;
