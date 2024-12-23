@@ -3,6 +3,7 @@
 #include "trie.hpp"
 #include "vector.hpp"
 #include "queue.hpp"
+#include "string.hpp"
 
 namespace mfwu {
 
@@ -24,6 +25,7 @@ private:
         q.emplace(cur);
         int count = 0;
         rec[count].emplace_back(cur);
+        std::cout << "0\n";
         while (!q.empty()) {
             size_t sz = q.size();
             count++;
@@ -31,12 +33,19 @@ private:
                 node* cur = q.front();
                 q.pop();
                 size_t num_child = cur->children.size();
-                for (int j = 0; j < num_child; j++) {
-                    q.emplace(cur->children[j]);
-                    rec[count].emplace_back(cur->children[j]);
+                for (auto&& [val, child] : cur->children) {
+                    q.emplace(child);
+                    rec[count].emplace_back(child);
                 }
             }
         }
+        for (int i = 0; i < rec.size(); i++) {
+            for (int j = 0; j < rec[i].size(); j++) {
+                std::cout << rec[i][j]->val << ", ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "1\n";
         using value_type = typename ContainerType::value_type;
         mfwu::vector<mfwu::vector<value_type>> cache(
             depth, mfwu::vector<value_type>(width)
@@ -50,6 +59,7 @@ private:
                 now_w += ww;
             }
         }
+        std::cout << "2\n";
         for (int d = 0; d < depth; d++) {
             for (int w = 0; w < width; w++) {
                 std::cout << cache[d][w];
@@ -72,10 +82,10 @@ private:
 };  // endof class unit_test_trie
 
 bool unit_test_trie::use_mfwu_trie() {
-    mfwu::vector<std::string> strs = {
-        "niganma", "niganma-aiyo", "aiyo", "ninini"
+    mfwu::vector<mfwu::string<char>> strs = {
+        "aaa", "aab", "aabc", "bcd"
     };
-    mfwu::trie<std::string> data(strs.begin(), strs.end());
+    mfwu::trie<mfwu::string<char>> data(strs.begin(), strs.end());
     print_trie(data);
 
     return 0;

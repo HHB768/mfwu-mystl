@@ -34,7 +34,7 @@ public:
     };  // endof struct bucket_node
     using node = bucket_node;
 
-    bucket() : head_(new node(key_type{主}, 6)) {}
+    bucket() : head_(new node(/*key_type{主}, 6*/)) {}
     bucket(const bucket& bkt) {
         bucket_copy(bkt);
     }

@@ -13,7 +13,10 @@ struct trie_node<T, 0> {
     T val = {};
     size_t path_count = 0;
     size_t end_count = 0;
-    mfwu::unordered_map<T, trie_node*> children = {};    
+    mfwu::unordered_map<T, trie_node*> children = {};
+
+    trie_node() = default;
+    trie_node(const T& v) : val(v) {}
 };  // endof struct trie_node<T, 0>
 
 template <typename T>
