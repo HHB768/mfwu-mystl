@@ -178,6 +178,7 @@ public:
         mfwu::uninitialized_copy(first, last, begin_);
     }
     ~vector() {
+        std::cout << "31\n";
         reinit();
         // TODO: how to ensure allocators free their memory
         // is it necessary to reset_iterator? no? lets try:

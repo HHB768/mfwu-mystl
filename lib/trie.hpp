@@ -204,7 +204,16 @@ private:
         }
         return ret;
     }
-    void reset() {} // TODO
+    void reset() {
+        std::cout << "3\n";
+        reset(root_);
+    } // TODO
+    void reset(node* cur) {
+        for (auto&& [val, child] : cur->children) {
+            reset(child);
+        }
+        delete cur;
+    }
     void get_suc(node* cur, mfwu::vector<ContainerType>& ret,
                  ContainerType& container) {
         for (auto&& [val, child] : cur->children) {

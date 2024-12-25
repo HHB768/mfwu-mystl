@@ -99,6 +99,12 @@ private:
             }
             std::cout << "\n";
         }
+        // q.~queue();
+        // std::cout << "0\n";
+        // rec.~vector();
+        // std::cout << "1\n";
+        cache.clear();
+        std::cout << "2\n";
     }
     template <typename Node>
     static int get_width(Node* cur) {
@@ -116,12 +122,18 @@ private:
 };  // endof class unit_test_trie
 
 bool unit_test_trie::use_mfwu_trie() {
-    mfwu::vector<mfwu::string<char>> strs = {
+    using data_type = mfwu::vector<mfwu::string<char>>;
+    data_type strs = {
         "aaa", "aab", "aabc", "bcd", "acd", "e", "acd", "ace", "aba"
     };
-    mfwu::trie<mfwu::string<char>> data(strs.begin(), strs.end());
-    print_trie(data);
+    using trie = mfwu::trie<mfwu::string<char>>;
+    trie data1(strs.begin(), strs.end());
+    print_trie(data1);
+    trie data2;
+    print_trie(data2);
 
+    data2.insert("niganma");
+    print_trie(data2);    
     return 0;
 }
 
