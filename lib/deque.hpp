@@ -8,7 +8,12 @@
 
 namespace mfwu {
 
+template <typename T, size_t BLK_SIZE, typename Alloc>
+class deque;
+
 class unit_test_deque;
+template <typename T, typename Container>
+class queue;
 
 // TODO: test 16 first
 template <typename T, size_t BLK_SIZE=512,
@@ -16,6 +21,7 @@ template <typename T, size_t BLK_SIZE=512,
 class deque {
 public:
     friend class mfwu::unit_test_deque;
+    friend class queue<T, deque<T, BLK_SIZE, Alloc>>;
 
     // you can declare a alloc for pblock here and replace malloc
     // using Allocator = mfwu::DefaultAllocator<void*, mfwu::malloc_alloc>;
@@ -543,16 +549,35 @@ private:
     void pop_front_block() {
         if (begin_ < end_) {
             // ~block() // or delete? // or destroy?
-            mfwu::destroy(*begin_);
-            ++begin_;
+            if (end_ - begin_ == 1) {
+                // pop_back_block();
+                // lol i forget to fix this
+                // so it costs 4 days now to find it
+                // 24.12.30
+                // well, it seems all right...
+                // bug remains... 12.31
+                mfwu::destroy(*begin_);
+                ++begin_;
+            } else {
+                mfwu::destroy(*begin_);
+                ++begin_;
+            }
         }
     }
     void pop_back_block() {
         if (begin_ < end_) {
-            mfwu::destroy(*end_);
-            --end_;
-            mfwu::destroy(*end_);
-            init_dummy_block();
+            if (end_ - begin_ == 1) {
+                // pop_front_block();  // 12.31
+                mfwu::destroy(*end_);
+                --end_;
+                mfwu::destroy(*end_);
+                init_dummy_block();
+            } else {
+                mfwu::destroy(*end_);
+                --end_;
+                mfwu::destroy(*end_);
+                init_dummy_block();
+            }
         }
     }
     void erase_block(pblock* blk) {
@@ -640,10 +665,14 @@ private:
         size_type begin_idx = begin_ - ctrl_;
         size_type end_idx = end_ - ctrl_;
         size_type new_capacity = original_capacity * 2 + 1;
-        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity);
+        pblock* new_ctrl = (pblock*)malloc(sizeof(pblock) * new_capacity + 1);
+        // FORGET THIS "+1", COST ME 4 DAYS!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // 12.31 FINISHED CONGRAS! WELCOME TO 2025!
         mfwu::uninitialized_copy(  // copy all these pblocks to new ctrl
             begin_, end_ + 1, new_ctrl + begin_idx);
         mfwu::destroy(*end_);
+        // std::cout << "original_ctrl: " << ctrl_ << "\n";
+        // std::cout << "new_ctrl: " << new_ctrl << "\n";
         free(ctrl_);
         ctrl_ = new_ctrl;
         last_ = new_ctrl + new_capacity;
@@ -804,7 +833,10 @@ public:
     block(int n=BLK_SIZE, bool reverse=false) 
         : blk_(Alloc::allocate(n ? BLK_SIZE : 0)),
           last_(n ? blk_ + BLK_SIZE : blk_), 
-          begin_(reverse ? last_ : blk_), end_(reverse ? last_ : blk_) {}
+          begin_(reverse ? last_ : blk_), end_(reverse ? last_ : blk_) {
+            // std::cout << "dummy blk_: " << blk_ << "\n";
+            // in this compiler, blk_ may and may not be nullptr
+          }
     // if n == 0, blk_ may be a nullptr, then this block is dummy block
     // malloc(0) might return NULL or a non-NULL pointer, 
     // depending on your system’s implementation. 

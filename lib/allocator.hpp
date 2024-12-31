@@ -169,6 +169,8 @@ public:
     static void* allocate(size_t n) {
         void* res = malloc(n);
         if (0 == res) res = oom_malloc(n);
+        // what if i wanna malloc(0) 241230
+        // from trie::queue::deque::block::init_dummy_block()
         return res;
     }
 

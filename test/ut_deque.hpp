@@ -1,3 +1,4 @@
+#ifndef __UNIT_TEST_DEQUE__
 #define __UNIT_TEST_DEQUE__
 
 #include "deque.hpp"
@@ -14,7 +15,7 @@ public:
     using deque8 = mfwu::deque<int, 8>;
 private:
     template <typename T, size_t size, typename Alloc>
-    void print_block(const typename mfwu::deque<T, size, Alloc>::block& blk) {
+    static void print_block(const typename mfwu::deque<T, size, Alloc>::block& blk) {
         for (auto it = blk.start(); it != blk.finish(); ++it) {
             if (blk.begin() <= it && it < blk.end()) {
 #ifdef __UNIT_TEST_DEQUE__
@@ -43,7 +44,7 @@ private:
     // they are all member functions, not related ones
     // sorted from GPT answers 0813:2145
     // template <>
-    void print_block(const typename mfwu::deque<int, 16UL,
+    static void print_block(const typename mfwu::deque<int, 16UL,
         mfwu::DefaultAllocator<int, mfwu::malloc_alloc>>::block& blk) {
         for (auto it = blk.start(); it != blk.finish(); ++it) {
             if (blk.begin() <= it && it < blk.end()) {
@@ -67,7 +68,7 @@ private:
 #endif  // __UNIT_TEST_DEQUE__
     }
     template <typename T, size_t size, typename Alloc>
-    void print_deque(const mfwu::deque<T, size, Alloc>& deq) {
+        static void print_deque(const mfwu::deque<T, size, Alloc>& deq) {
 #ifdef __UNIT_TEST_DEQUE__
 #ifndef  __UNIT_TEST_DEQUE_BRIEF__
         std::cout << "size: " << deq.size() << "\n";
@@ -222,3 +223,6 @@ bool unit_test_deque::use_ranged_insert_erase() {
 
 }  // endof namespace mfwu
 
+
+
+#endif  // __UNIT_TEST_DEQUE__

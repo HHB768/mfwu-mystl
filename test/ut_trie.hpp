@@ -23,7 +23,9 @@ private:
         );
         // std::cout << "depth: " << depth << "\n";
         mfwu::queue<node*> q;
+        // 打印一下q来看看
         q.emplace(cur);
+        // q.show_queue();
         int count = 0;
         // rec[count].emplace_back(cur);
         // std::cout << "0\n";
@@ -33,30 +35,41 @@ private:
             // std::cout << "count: " << count << "\n";
             if (count >= depth) break;
             size_t sz = q.size();
+            // std::cout << "size: " << sz << "\n";
             for (int i = 0; i < sz; i++) {
                 node* cur = q.front();
-                q.pop();
+                // q.pop();
+                // q.show_queue();
                 if (cur == nullptr) {
                     q.emplace(nullptr);
                     rec[count].emplace_back(nullptr);
+                    // q.show_queue();
                 } else {
                     // std::cout << cur->val << ", ";
                     size_t num_child = cur->children.size();
+                    // std::cout << "num child: " << num_child << "\n";
                     for (auto&& [val, child] : cur->children) {
+                        // std::cout << "val: " << val << "\n";
                         q.emplace(child);
                         rec[count].emplace_back(child);
+                        // q.show_queue();
                         // flag = true;
                     }
                     if (num_child == 0) {
+                        // std::cout << "no child\n";
                         q.emplace(nullptr);
                         rec[count].emplace_back(nullptr);
+                        // q.show_queue();
                     }
                 }
+                q.pop();  // genius debug trial! 24.12.30
+                // q.show_queue();
             }
             count++;
             // std::cout << "\n";
             // if (flag == false) break;
         }
+        // q.show_queue();
         // for (int i = 0; i < rec.size(); i++) {
         //     for (int j = 0; j < rec[i].size(); j++) {
         //         if (rec[i][j] == nullptr) {
@@ -67,7 +80,6 @@ private:
         //     }
         //     std::cout << "\n";
         // }
-        // std::cout << "1\n";
         using value_type = typename ContainerType::value_type;
         mfwu::vector<mfwu::vector<value_type>> cache(
             depth, mfwu::vector<value_type>(width, ' ')
@@ -86,7 +98,6 @@ private:
                 now_w += ww;
             }
         }
-        // std::cout << "2\n";
         for (int d = 0; d < depth; d++) {
             for (int w = 0; w < width; w++) {
                 std::cout << cache[d][w];
@@ -99,12 +110,11 @@ private:
             }
             std::cout << "\n";
         }
-        // q.~queue();
-        // std::cout << "0\n";
+        // rec.clear();
+        // cache.clear();
         // rec.~vector();
-        // std::cout << "1\n";
-        cache.clear();
-        std::cout << "2\n";
+        // cache.~vector();
+        // q.~queue();
     }
     template <typename Node>
     static int get_width(Node* cur) {
@@ -124,16 +134,22 @@ private:
 bool unit_test_trie::use_mfwu_trie() {
     using data_type = mfwu::vector<mfwu::string<char>>;
     data_type strs = {
-        "aaa", "aab", "aabc", "bcd", "acd", "e", "acd", "ace", "aba"
+        "aaa", "aab", "aabc", "bcd", 
+        "acd", "e", "acd", "ace", "aba"
     };
     using trie = mfwu::trie<mfwu::string<char>>;
     trie data1(strs.begin(), strs.end());
     print_trie(data1);
+
     trie data2;
     print_trie(data2);
-
     data2.insert("niganma");
-    print_trie(data2);    
+    print_trie(data2);
+    data2.insert("ninini");
+    data2.insert("aiyo");
+    data2.insert("yoo~");
+    data2.insert("niganshenmo");
+    print_trie(data2);
     return 0;
 }
 

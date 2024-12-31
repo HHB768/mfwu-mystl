@@ -10,7 +10,7 @@ struct trie_node;
 
 template <typename T>
 struct trie_node<T, 0> {
-    T val = {};
+    T val = 'r';
     size_t path_count = 0;
     size_t end_count = 0;
     mfwu::unordered_map<T, trie_node*> children = {};
@@ -21,7 +21,7 @@ struct trie_node<T, 0> {
 
 template <typename T>
 struct trie_node<T, 1> {
-    T val = {};
+    T val = 'r';
     size_t path_count = 0;
     size_t end_count = 0;
     trie_node* children[128] = {};
@@ -205,7 +205,6 @@ private:
         return ret;
     }
     void reset() {
-        std::cout << "3\n";
         reset(root_);
     } // TODO
     void reset(node* cur) {

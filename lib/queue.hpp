@@ -5,8 +5,9 @@
 
 namespace mfwu {
 
-template <typename T, typename Container=deque<T, 512UL, 
+template <typename T, typename Container=deque<T, 8UL, 
     mfwu::DefaultAllocator<T, mfwu::malloc_alloc>>>
+// template <typename T, typename Container=std::deque<T>>
 class queue {
 public:
     friend class unit_test_queue;
@@ -24,7 +25,7 @@ public:
     queue(const std::initializer_list<value_type>& vals) : q_(vals) {}
     queue(const queue& q) : q_(q.q_) {}
     queue(queue&& q) : q_(mfwu::move(q.q_)) {}
-    ~queue() {std::cout << "32\n";}
+    ~queue() {}
 
     queue& operator=(const queue& q) {
         q_ = q.q_;
@@ -60,7 +61,38 @@ public:
         q_.pop_front();
     }
 
+    // void clear() {
+    //     q_.clear();
+    // }
+
     // operator<>
+
+    // debug deque only 12.30
+    void show_queue() const {
+        std::cout << "size: " << q_.size() << "\n";
+        std::cout << "ctrl: " << q_.ctrl_
+                  << "  last: " << q_.last_  << "\n";
+        std::cout << "begin: " << q_.begin_
+                  << "  end: " << q_.end_  << "\n";
+        for (auto blk = q_.begin_; blk != q_.end_; ++blk) {
+            print_block(**blk);
+        }
+        std::cout << "\n";
+    }
+    static void print_block(const typename Container::block& blk) {
+        for (auto it = blk.start(); it != blk.finish(); ++it) {
+            if (blk.begin() <= it && it < blk.end()) {
+                if (*it) {
+                    std::cout << (*it)->val << " ";
+                } else {
+                    std::cout << "*" << " ";
+                }
+            } else {
+                std::cout << "_" << " ";
+            }
+        }
+        std::cout << "\n";
+    }
     
 private:
     container_type q_;

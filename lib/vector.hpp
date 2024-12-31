@@ -178,7 +178,6 @@ public:
         mfwu::uninitialized_copy(first, last, begin_);
     }
     ~vector() {
-        std::cout << "31\n";
         reinit();
         // TODO: how to ensure allocators free their memory
         // is it necessary to reset_iterator? no? lets try:
@@ -492,7 +491,9 @@ private:
     }
     static void reset_and_move(vector& src, vector& dst) {
         dst.reinit();
-        dst.init_iterator(&*src.begin_, src.size(), src.capacity());
+        if (src.begin_ != iterator{}) {
+            dst.init_iterator(&*src.begin_, src.size(), src.capacity());
+        }
         src.reset_iterator();
     }
     // static void fill(const vector& src, vector& dst) {
@@ -539,19 +540,38 @@ private:
         reset_iterator();
     }
 
-    void destroy() { if(&*begin_) mfwu::destroy(begin_, end_); }
-    void deallocate() { if(&*begin_) allocator_.deallocate(&*begin_, capacity()); }
+    // these &*iterator is dangerous bcz there may be iter.ptr_ == nullptr
+    void destroy() { if(begin_ != iterator{}) mfwu::destroy(begin_, end_); }
+    void deallocate() { 
+        if(begin_ != iterator{}) {
+            allocator_.deallocate(&*begin_, capacity()); 
+        }
+    }
     void reset_iterator() { begin_ = end_ = last_ = iterator(); }
 
     void request_mem() {
         // TODO: refer to string::req_mem, is it too complicated? 0927
-        vector tmp;
-        size_type capacity = (this->capacity() ? 2 * this->capacity() : 1);
-        value_type* start = tmp.allocator_.allocate(capacity);
-        tmp.init_iterator(start, size(), capacity);
-        // std::cout << "capacity: " << capacity << "\n";
-        mfwu::uninitialized_copy(begin_, end_, start);
-        reset_and_move(tmp, *this);
+        // vector tmp;
+        // size_type capacity = (this->capacity() ? 2 * this->capacity() : 1);
+        // value_type* start = tmp.allocator_.allocate(capacity);
+        // if (begin_ != iterator{}) 
+        //     std::cout << "original_start: " << &*begin_ << "\n";
+        // std::cout << "new_start: " << start << "\n";
+        // tmp.init_iterator(start, size(), capacity);
+        // // std::cout << "capacity: " << capacity << "\n";
+        // mfwu::uninitialized_copy(begin_, end_, start);
+        // reset_and_move(tmp, *this);
+
+        size_type capacity = this->capacity();
+        size_type new_capacity = capacity ? 2 * capacity : 1;
+        value_type* start = allocator_.allocate(new_capacity);
+        // if (begin_ != iterator{}) 
+        //     std::cout << "original_start: " << &*begin_ << "\n";
+        // std::cout << "new_start: " << start << "\n";
+        end_ = mfwu::uninitialized_copy(begin_, end_, start);
+        allocator_.deallocate(&*begin_, capacity);
+        begin_ = start;
+        last_ = start + new_capacity;
     }
 
     bool cmp_aux(const vector& vec, bool is_larger = true) const {
