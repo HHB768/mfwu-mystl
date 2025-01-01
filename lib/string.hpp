@@ -63,7 +63,9 @@ public:
         _copy(str, start_idx, len);
     }
     string(string&& str) 
-        : begin_(str.begin_), end_(str.end_), last_(str.last_) {}
+        : begin_(str.begin_), end_(str.end_), last_(str.last_) {
+        str.begin_ = str.end_ = str.last_ = nullptr;
+    }
     ~string() {
         _destroy();
     }
@@ -244,6 +246,7 @@ public:
     }
     string& operator+=(const value_type& val) {
         append(val);
+        return *this;
     }
     string operator+(const value_type& val) const {
         string temp = *this;
@@ -324,6 +327,7 @@ private:
         begin_ = str.begin_;
         end_ = str.end_;
         last_ = str.last_;
+        str.begin_ = str.end_ = str.last_ = nullptr;
     }
     void reset_and_copy(const string& str) {
         _destroy();
@@ -348,6 +352,13 @@ private:
     
 };  // endof class string
 
+template <typename C, typename Alloc>
+std::ostream& operator<<(std::ostream& os, const mfwu::string<C, Alloc>& str) {
+    for (auto it = str.begin(); it != str.end(); ++it) {
+        os << *it;
+    }
+    return os;
+}
 
 template <typename C=char, size_t BuffSize=8, 
           typename Alloc=mfwu::DefaultAllocator<C, mfwu::malloc_alloc>>
@@ -404,7 +415,9 @@ public:
     }
     tiny_string(tiny_string&& str) 
         : begin_(str.begin_), end_(str.end_),
-          last_(str.last_), is_tiny_(str.is_tiny_) {}
+          last_(str.last_), is_tiny_(str.is_tiny_) {
+        // TODO: bug fix: reset str ptr 25.01.01
+    }
     // TODO: implement tiny_string(tiny_string&&, size_type, size_type)
     // TODO: implement tiny_string(string) and string(tiny_string)
     ~tiny_string() {
@@ -413,10 +426,12 @@ public:
 
     tiny_string& operator=(const tiny_string& str) {
         reset_and_copy(str);
+        // TODO: implement this 25.01.01
         return *this;
     }
     tiny_string& operator=(tiny_string&& str) {
         reset_and_copy(mfwu::move(str));
+        // TODO: implement this and reset str ptr 25.01.01
         return *this;
     }
 

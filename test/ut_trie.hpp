@@ -98,6 +98,12 @@ private:
                 now_w += ww;
             }
         }
+#ifdef __UNIT_TEST_TRIE__
+#ifndef __UNIT_TEST_TRIE_BRIEF__
+        for (int w = 0; w < width; w++) {
+            std::cout << "-";
+        }
+        std::cout << "\n";
         for (int d = 0; d < depth; d++) {
             for (int w = 0; w < width; w++) {
                 std::cout << cache[d][w];
@@ -110,6 +116,12 @@ private:
             }
             std::cout << "\n";
         }
+        for (int w = 0; w < width; w++) {
+            std::cout << "-";
+        }
+        std::cout << "\n";
+#endif  // __UNIT_TEST_TRIE_BRIEF__
+#endif  // __UNIT_TEST_TRIE__
         // rec.clear();
         // cache.clear();
         // rec.~vector();
@@ -132,6 +144,8 @@ private:
 };  // endof class unit_test_trie
 
 bool unit_test_trie::use_mfwu_trie() {
+    std::cout << "\n------- Test: use mfwu::trie -------\n";
+    std::cout << "constructing & inserting & erasing\n";
     using data_type = mfwu::vector<mfwu::string<char>>;
     data_type strs = {
         "aaa", "aab", "aabc", "bcd", 
@@ -150,7 +164,28 @@ bool unit_test_trie::use_mfwu_trie() {
     data2.insert("yoo~");
     data2.insert("niganshenmo");
     print_trie(data2);
+
+    trie data3 = data1;
+    print_trie(data3);
+    data3.erase("aaa");
+    print_trie(data3);
+    data3.erase("zzz");
+    data3.insert("aba");
+    data3.insert("abdd");
+    print_trie(data3);
+    std::cout << "counting & getting res with prefix\n";
+    std::cout << "count 'abd': " << data3.count("aba") << "\n";
+    std::cout << "count 'a' as prefix: " << data3.count_pref("a") << "\n";
+    data_type res = data3.get_pref_with("a");
+    // for (auto str: res) {
+    //     std::cout << str << "\n";
+    // }
+    trie data4(mfwu::move(data1));
+    data4 = trie(res.begin(), res.end());
+    print_trie(data4);
+
     return 0;
 }
+// TODO: fully ut 1.1/25
 
 }  // endof namespace mfwu

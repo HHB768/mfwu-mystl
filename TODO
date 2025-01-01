@@ -30,6 +30,7 @@
     24.12.03 X-H
 */
 
+/*
 1. tiny_string                          2 days
 2. ringbuffer                           3 days
 3. sort                                 -
@@ -38,3 +39,10 @@
 6. webserver & logger & postman         30+ days
 
 24.12.08 X-H
+
+*/
+
+1. tiny_string & trie ut                2 days
+2. same as last update
+
+25.01.01 X-H

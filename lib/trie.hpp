@@ -57,6 +57,7 @@ public:
             insert(*first);
         }
     }
+    // TODO: IMPLEMENT THIS:
     // template <typename InputIterator,
     //           typename = typename std::enable_if<
     //               mfwu::is_input_iterator<InputIterator>::value
@@ -89,8 +90,10 @@ public:
         return *this;
     }
     trie& operator=(trie&& t) {
+        reset();
         root_ = t.root_;
         t.root_ = nullptr;
+        return *this;
     }
 
     int depth() const {
@@ -128,13 +131,13 @@ public:
              >
     void erase(InputIterator first, InputIterator last) {
         node* cur = root_;
-        for ( ; first != last; ++first) {
+        for (auto it = first ; it != last; ++it) {
             cur->path_count--;
-            if (!cur->children.count(*first)) {
-                // no such res that can be erased
-                // TODO: restore path_count
+            if (!cur->children.count(*it)) {
+                rollback(first, it);
+                return ;
             }
-            cur = cur->children[*first];
+            cur = cur->children[*it];
         }
         cur->path_count--;
         cur->end_count--;
@@ -188,10 +191,12 @@ public:
             cur = cur->children[*first];
         }
         mfwu::vector<ContainerType> ret = {};
-        get_suc(cur, ret);
-        for (auto&& suc : ret) {
-            suc = container + suc;
-        }
+        ContainerType c = container.copy();
+        // std::cout << c << "\n";
+        get_suc(cur, ret, c);
+        // for (auto& suc : ret) {
+        //     suc = container + suc;
+        // }
         return ret;
     }
 
@@ -208,6 +213,7 @@ private:
         reset(root_);
     } // TODO
     void reset(node* cur) {
+        if (cur == nullptr) return ;
         for (auto&& [val, child] : cur->children) {
             reset(child);
         }
@@ -217,11 +223,21 @@ private:
                  ContainerType& container) {
         for (auto&& [val, child] : cur->children) {
             container += val;
-            if (cur->end_count > 0) {
+            // std::cout << container << "\n";
+            for (int i = 0; i < child->end_count; i++) {
                 ret.emplace_back(container);
             }
-            get_suc(cur, ret, container);
+            get_suc(child, ret, container);
             container.pop_back();
+        }
+    }
+
+    template <typename InputIterator>
+    void rollback(InputIterator first, InputIterator last) {
+        node* cur = root_;
+        for ( ; first != last; ++first) {
+            cur->path_count++;
+            cur = cur->children[*first];
         }
     }
 

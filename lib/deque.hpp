@@ -8,12 +8,12 @@
 
 namespace mfwu {
 
-template <typename T, size_t BLK_SIZE, typename Alloc>
-class deque;
+// template <typename T, size_t BLK_SIZE, typename Alloc>
+// class deque;
 
 class unit_test_deque;
-template <typename T, typename Container>
-class queue;
+// template <typename T, typename Container>
+// class queue;
 
 // TODO: test 16 first
 template <typename T, size_t BLK_SIZE=512,
@@ -21,7 +21,7 @@ template <typename T, size_t BLK_SIZE=512,
 class deque {
 public:
     friend class mfwu::unit_test_deque;
-    friend class queue<T, deque<T, BLK_SIZE, Alloc>>;
+    // friend class queue<T, deque<T, BLK_SIZE, Alloc>>;
 
     // you can declare a alloc for pblock here and replace malloc
     // using Allocator = mfwu::DefaultAllocator<void*, mfwu::malloc_alloc>;

@@ -68,31 +68,31 @@ public:
     // operator<>
 
     // debug deque only 12.30
-    void show_queue() const {
-        std::cout << "size: " << q_.size() << "\n";
-        std::cout << "ctrl: " << q_.ctrl_
-                  << "  last: " << q_.last_  << "\n";
-        std::cout << "begin: " << q_.begin_
-                  << "  end: " << q_.end_  << "\n";
-        for (auto blk = q_.begin_; blk != q_.end_; ++blk) {
-            print_block(**blk);
-        }
-        std::cout << "\n";
-    }
-    static void print_block(const typename Container::block& blk) {
-        for (auto it = blk.start(); it != blk.finish(); ++it) {
-            if (blk.begin() <= it && it < blk.end()) {
-                if (*it) {
-                    std::cout << (*it)->val << " ";
-                } else {
-                    std::cout << "*" << " ";
-                }
-            } else {
-                std::cout << "_" << " ";
-            }
-        }
-        std::cout << "\n";
-    }
+    // void show_queue() const {
+    //     std::cout << "size: " << q_.size() << "\n";
+    //     std::cout << "ctrl: " << q_.ctrl_
+    //               << "  last: " << q_.last_  << "\n";
+    //     std::cout << "begin: " << q_.begin_
+    //               << "  end: " << q_.end_  << "\n";
+    //     for (auto blk = q_.begin_; blk != q_.end_; ++blk) {
+    //         print_block(**blk);
+    //     }
+    //     std::cout << "\n";
+    // }
+    // static void print_block(const typename Container::block& blk) {
+    //     for (auto it = blk.start(); it != blk.finish(); ++it) {
+    //         if (blk.begin() <= it && it < blk.end()) {
+    //             if (*it) {
+    //                 std::cout << (*it)->val << " ";
+    //             } else {
+    //                 std::cout << "*" << " ";
+    //             }
+    //         } else {
+    //             std::cout << "_" << " ";
+    //         }
+    //     }
+    //     std::cout << "\n";
+    // }
     
 private:
     container_type q_;
