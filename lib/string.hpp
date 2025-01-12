@@ -417,6 +417,13 @@ public:
         : begin_(str.begin_), end_(str.end_),
           last_(str.last_), is_tiny_(str.is_tiny_) {
         // TODO: bug fix: reset str ptr 25.01.01
+        if (str.is_tiny_) {
+            size_type sz = str.size();
+            init_iterator(sz);
+            copy_init_n(str.begin_, sz);  // check
+        } else {
+            begin_ = end_ = last_ = nullptr;
+        }
     }
     // TODO: implement tiny_string(tiny_string&&, size_type, size_type)
     // TODO: implement tiny_string(string) and string(tiny_string)
@@ -710,6 +717,28 @@ private:
             Alloc::deallocate(begin_, mfwu::distance(begin_, last_));
         }
     }
+
+    void reset_and_copy(const tiny_string& str) {
+        _destroy();
+        init_iterator(str.size());
+        mfwu::copy(str.begin_, str.end_, begin_);
+        is_tiny_ = str.is_tiny_;
+    }
+    void reset_and_copy(tiny_string&& str) {
+        _destroy();
+        if (str.is_tiny_) {
+            size_type sz = str.size();
+            init_iterator(sz);
+            copy_init_n(str.begin_, sz);  // check
+        } else {
+            begin_ = str.begin_;
+            end_ = str.end_;
+            last_ = str.last_;
+            is_tiny_ = str.is_tiny_;
+            begin_ = end_ = last_ = nullptr;
+        }
+    }
+
     void req_mem() {
         size_type capacity = this->capacity();
         size_type new_capacity = capacity ? 2 * capacity : 1;
