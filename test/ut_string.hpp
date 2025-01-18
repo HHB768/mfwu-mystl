@@ -55,7 +55,7 @@ private:
         }
 #ifdef __UNIT_TEST_STRING__
 #ifndef __UNIT_TEST_STRING_BRIEF__
-        std::cout << "\n";
+        std::cout << "\n\n";
 #endif  // __UNIT_TEST_STRING_BRIEF__
 #endif  // __UNIT_TEST_STRING__
     }
@@ -94,6 +94,7 @@ private:
 
 bool unit_test_string::use_mfwu_string() {
     std::cout << "\n------- Test: use mfwu::string -------\n";
+    std::cout << "constructing string\n";
     mfwu::string str1;
     print_detailed_info(str1);
     mfwu::string str2 = "niganma-aiyo";  // const char[13]
@@ -105,10 +106,33 @@ bool unit_test_string::use_mfwu_string() {
     mfwu::string<char> str6 = mfwu::move(str5);
     str4 = mfwu::move(str6);
     print_detailed_info(str4);
-    // TODO: test
+    std::cout << "random pushing/poping/inserting/erasing\n";
+    str3.emplace_back(0x31);
+    str3.push_back('*');
+    str3.pop_back();
+    str3.append('q');
+    str3 += "hello";
+    print_detailed_info(str3);
+    mfwu::string<char> str7 = str3.copy();
+    str7.clear();
+    str7.reserve(20);
+    str7.append(str3.begin() + 2, str3.end());
+    str7.replace('a', '&');
+    print_detailed_info(str7);
+    str7.insert(str7.begin(), str3.begin() + 4, str3.end());
+    str7.erase(str7.begin(), str7.begin() + 5);
+    print_detailed_info(str7);
+    str7.at(6);
+    char* cstr = str7.c_str();   
+    std::cout << (void*)cstr << "\n";
+    str5 = mfwu::string<char>(cstr);
+    str7 = str5.substr(6, 20);
+    print_detailed_info(str7);
+    delete[] cstr;
+
     return 0;
 }
-
+// 
 bool unit_test_string::use_mfwu_tiny_string() {
     std::cout << "\n------- Test: use mfwu::tiny_string -------\n";
     mfwu::tiny_string str1;

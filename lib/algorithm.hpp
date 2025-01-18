@@ -870,9 +870,16 @@ template <typename ForwardIt,
           typename T = typename mfwu::iterator_traits<ForwardIt>::value_type>
 inline void replace(ForwardIt first, ForwardIt last,
                     const T& oldv, const T& newv) {
+    // for ( ; first != last; ++first) {
+    //     std::cout << (int)*first << " " << (int)oldv << "\n";
+    //     if ((int)*first == (int)oldv) {
+    //         *first == newv;
+    //         std::cout << (int)newv << "\n";
+    //     }
+    // }  // =================== 25.01.18
     for ( ; first != last; ++first) {
-        if (*first == oldv) {
-            *first == newv;
+        if ((int)*first == (int)oldv) {
+            *first = newv;
         }
     }
 }

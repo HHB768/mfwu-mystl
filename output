@@ -1,1 +1,693 @@
-g++ -std=c++17 main.cc -I ./lib/ -I ./test/ -o app
+
+------- Test: use_malloc_allocator -------
+In malloc_alloc
+allocating 0
+deallocating 0
+setting dummy oom_handler
+allocating 1024^3
+reallocating 1.5*1024^3
+deallocating 1.5*1024^3
+allocating and deallocating 10 times
+allocating 1000 times
+setting invalid oom_handler
+oom malloc failure testing: 
+
+------- Test: use_default_allocator -------
+In default_alloc
+malloc_allocating large block
+malloc_deallocating large block
+allocating and deallocating random units
+end of random tests
+
+----------- Alloc test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use_list_iterator -------
+printing list nodes with node*
+doing some list operations
+modifying and printing list nodes with iterator
+
+------- Test: use_input_iterator -------
+testing input_iterator reading
+reading complete
+
+------- Test: use_output_iterator -------
+testing output_iterator writing
+
+------- Test: use_forward_iterator -------
+testing forward_iterator writing
+
+------- Test: use_bidirectional_iterator -------
+testing bidirectional_iterator moving and writing
+
+------- Test: use_random_access_iterator -------
+testing random_access_iterator moving and writing
+
+----------- Iterator test result -----------
+Pass/Total: 6/6
+
+
+
+------- Test: use construct destroy -------
+constructing pod data
+destroying pod data
+constructing non-pod data
+destroying non-pod data
+constructing pod data with iterator
+destroying pod data with iterator
+constructing non-pod data with iterator
+destroying non-pod data with iterator
+
+------- Test: use uninitialized operations -------
+filling pod data with iterator
+filling non-pod data with iterator
+filling pod data n times
+filling non-pod data n times
+copying pod data with iterator
+copying non-pod data with iterator
+
+------- Test: use uninitialized operations -------
+testing distance of iterator
+testing advance of iterator
+
+----------- Utils test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use vector_iterator -------
+moving and derefering iterator
+0 : 1  2 : 3  4 : 5  
+
+------- Test: use mfwu::vector -------
+constructing pod data
+
+constructing non-pod data
+
+reserving
+
+resizing
+
+clearing
+
+emplacing/pushing back
+
+poping back
+
+inserting
+
+erasing
+
+shrinking
+
+indexing
+
+comparing
+
+----------- Vector test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use forward_list_iterator -------
+moving and derefering iterator
+
+
+------- Test: use mfwu::forward_list -------
+constructing & copying & moving
+
+geting basic/detailed infos
+
+resizing
+
+pushing & poping
+
+inserting
+
+erasing
+
+------- Test: use list_iterator -------
+moving and derefering iterator
+
+
+------- Test: use mfwu::list -------
+constructing & copying & moving
+
+geting basic/detailed infos
+
+resizing
+
+pushing & poping
+
+inserting
+
+erasing
+
+----------- List test result -----------
+Pass/Total: 4/4
+
+
+
+------- Test: use mfwu::heap -------
+making heap
+random pushing/poping test: part 1
+random pushing/poping test: part 2
+sorting
+
+------- Test: use cmp functor -------
+making heap and sorting with default mfwu::less<int>
+sorting
+making heap and sorting with new mfwu::greater<int>
+sorting
+
+----------- Heap test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use mfwu::binary_search_tree -------
+building binary search tree
+random pushing/poping test: part 1
+random pushing/poping test: part 2
+searching
+traversing
+
+----------- BST test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use mfwu::avl_tree -------
+building Adelson-Velskii-Landis tree
+random pushing test
+random poping test
+traversing
+
+----------- AVL_tree test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use mfwu::rbtree::insert -------
+constructing rbtree
+random inserting test: part 1
+random inserting test: part 2
+
+------- Test: use mfwu::rbtree::erase -------
+random inserting/erasing test: part 1
+random inserting/eraseing test: part 2
+
+----------- Rbtree test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::ringbuffer -------
+constructing & copying & moving
+
+write/read ops
+
+read/write ptr pos ctrl
+
+----------- Rbf test result -----------
+Pass/Total: 1/1
+
+
+
+------- Test: use mfwu::hashtable -------
+testing hashtable
+
+------- Test: use mfwu::shashtable -------
+testing shashtable
+
+----------- Hashtable test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use mfwu::unordered_map -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+
+------- Test: use other interfaces -------
+allocating & deallocating
+hashing
+testing interfaces
+rehashing capacity = 50...
+reserving size = 50...
+clearing...
+
+----------- Unordered_map test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::unordered_set -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+
+------- Test: use other interfaces -------
+allocating & deallocating
+hashing
+testing interfaces
+rehashing capacity = 50...
+reserving size = 50...
+clearing...
+
+----------- Unordered_set test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use deque block -------
+
+------- Test: use deque iterator -------
+
+------- Test: use mfwu::deque -------
+constructing
+push/pop/insert/erasing
+
+------- Test: use deque ranged insert/erase -------
+
+----------- Deque test result -----------
+Pass/Total: 4/4
+
+
+
+------- Test: use mfwu::stack -------
+building & copying & moving
+
+----------- Stack test result -----------
+Pass/Total: 1/1
+
+
+
+------- Test: use mfwu::queue -------
+building & copying & moving
+
+----------- Queue test result -----------
+Pass/Total: 1/1
+
+
+
+------- Test: use mfwu::set -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+inserting & erasing
+clearing & ranged_inserting & ranged_erasing & swapping & merging
+finding & counting & containing & calcing equal_range
+
+------- Test: use other interfaces -------
+
+----------- Set test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::map -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+inserting & erasing
+clearing & ranged_inserting & ranged_erasing & swapping & merging
+finding & counting & containing & calcing equal_range
+
+------- Test: use other interfaces -------
+
+----------- Map test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::rbtree_exp -------
+testing random push/pop
+validated, test num: 1
+validated, test num: 2
+validated, test num: 3
+validated, test num: 4
+validated, test num: 5
+validated, test num: 6
+validated, test num: 7
+validated, test num: 8
+validated, test num: 9
+validated, test num: 10
+validated, test num: 11
+validated, test num: 12
+validated, test num: 13
+validated, test num: 14
+validated, test num: 15
+validated, test num: 16
+validated, test num: 17
+validated, test num: 18
+validated, test num: 19
+validated, test num: 20
+insane random push/pop test!
+validated, iter_num: 1000
+
+----------- Rbtree_exp test result -----------
+Pass/Total: 1/1
+
+
+
+------- Test: use mfwu::multiset -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+inserting & erasing
+clearing & ranged_inserting & ranged_erasing & swapping & merging
+finding & counting & containing & calcing equal_range
+
+------- Test: use other interfaces -------
+
+----------- Multiset test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::multimap -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+inserting & erasing
+clearing & ranged_inserting & ranged_erasing & swapping & merging
+finding & counting & containing & calcing equal_range
+
+------- Test: use other interfaces -------
+
+----------- Multimap test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::hashtable_exp -------
+testing hashtable
+
+------- Test: use mfwu::shashtable -------
+testing shashtable
+
+----------- Hashtable_exp test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use mfwu::unordered_multimap -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+
+------- Test: use other interfaces -------
+allocating & deallocating
+hashing
+testing interfaces
+rehashing capacity = 50...
+reserving size = 50...
+clearing...
+
+----------- Unordered_multimap test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::unordered_multiset -------
+constructing & copying & moving & destroying
+
+------- Test: use modifiers and lookups -------
+
+------- Test: use other interfaces -------
+allocating & deallocating
+hashing
+testing interfaces
+rehashing capacity = 50...
+reserving size = 50...
+clearing...
+
+----------- Unordered_multiset test result -----------
+Pass/Total: 3/3
+
+
+
+------- Test: use mfwu::string -------
+constructing string
+size: 0
+capacity: 0
+empty: true
+
+
+0x60bb3dfa00a0
+size: 12
+size: 12
+capacity: 12
+empty: false
+front: n
+back: o
+niganma-aiyo
+
+0x60bb3dfa1020
+size: 12
+size: 12
+capacity: 12
+empty: false
+front: n
+back: o
+niagnma-aiyo
+
+size: 3
+capacity: 3
+empty: false
+front: a
+back: c
+abc
+
+random pushing/poping/inserting/erasing
+0x60bb3dfa1020
+size: 5
+size: 19
+capacity: 24
+empty: false
+front: n
+back: o
+niagnma-aiyo1qhello_____
+
+size: 17
+capacity: 20
+empty: false
+front: &
+back: o
+&gnm&-&iyo1qhello___
+
+size: 27
+capacity: 40
+empty: false
+front: i
+back: o
+iyo1qhellog&nm&-&iyo1qhello_____________
+
+0x60bb3df9f3f0
+0x60bb3df9def0
+size: 27
+size: 20
+capacity: 20
+empty: false
+front: e
+back: l
+ellog&nm&-&iyo1qhell
+
+
+------- Test: use mfwu::tiny_string -------
+size: 0
+capacity: 8
+empty: true
+is_tiny ? true
+________
+size: 12
+capacity: 16
+empty: false
+front: n
+back: o
+is_tiny ? true
+niganma-aiyo____
+size: 12
+capacity: 16
+empty: false
+front: n
+back: o
+is_tiny ? true
+niagnma-aiyo____
+
+----------- String test result -----------
+Pass/Total: 2/2
+
+
+
+------- Test: use mfwu::trie -------
+constructing & inserting & erasing
+0x60bb3dfa00a0
+size: 3
+0x60bb3dfa04e0
+size: 3
+0x60bb3dfa0f00
+size: 4
+0x60bb3dfa1020
+size: 3
+0x60bb3dfa0400
+size: 3
+0x60bb3df9fc60
+size: 1
+0x60bb3dfa0b20
+size: 3
+0x60bb3df9ff40
+size: 3
+0x60bb3dfa0140
+size: 3
+here
+-------------------------------------------------
+|  e  ||                a                ||  b  |
+       |      a     ||  b  ||      c     ||  c  |
+       |  a  ||  b  ||  a  ||  d  ||  e  ||  d  |
+              |  c  |                            
+                                                 
+                                                 
+              |  c  |                            
+       |  a  ||  b  ||  a  ||  d  ||  e  ||  d  |
+       |      a     ||  b  ||      c     ||  c  |
+|  e  ||                a                ||  b  |
+-------------------------------------------------
+-------
+       
+       
+-------
+0x60bb3dfa08c0
+size: 7
+-------
+|  n  |
+|  i  |
+|  g  |
+|  a  |
+|  n  |
+|  m  |
+|  a  |
+       
+       
+|  a  |
+|  m  |
+|  n  |
+|  a  |
+|  g  |
+|  i  |
+|  n  |
+-------
+0x60bb3dfa1950
+size: 6
+0x60bb3dfa1950
+size: 4
+0x60bb3dfa1950
+size: 4
+0x60bb3dfa1950
+size: 11
+-----------------------------------
+|         n         ||  y  ||  a  |
+|         i         ||  o  ||  i  |
+|  n  ||      g     ||  o  ||  y  |
+|  i  ||      a     ||  ~  ||  o  |
+|  n  ||      n     |              
+|  i  ||  s  ||  m  |              
+       |  h  ||  a  |              
+       |  e  |                     
+       |  n  |                     
+       |  m  |                     
+       |  o  |                     
+                                   
+                                   
+       |  o  |                     
+       |  m  |                     
+       |  n  |                     
+       |  e  |                     
+       |  h  ||  a  |              
+|  i  ||  s  ||  m  |              
+|  n  ||      n     |              
+|  i  ||      a     ||  ~  ||  o  |
+|  n  ||      g     ||  o  ||  y  |
+|         i         ||  o  ||  i  |
+|         n         ||  y  ||  a  |
+-----------------------------------
+-------------------------------------------------
+|  e  ||                a                ||  b  |
+       |      a     ||  b  ||      c     ||  c  |
+       |  a  ||  b  ||  a  ||  d  ||  e  ||  d  |
+              |  c  |                            
+                                                 
+                                                 
+              |  c  |                            
+       |  a  ||  b  ||  a  ||  d  ||  e  ||  d  |
+       |      a     ||  b  ||      c     ||  c  |
+|  e  ||                a                ||  b  |
+-------------------------------------------------
+0x60bb3dfa5340
+size: 3
+-------------------------------------------------
+|  e  ||                a                ||  b  |
+       |      a     ||  b  ||      c     ||  c  |
+       |  a  ||  b  ||  a  ||  d  ||  e  ||  d  |
+              |  c  |                            
+                                                 
+                                                 
+              |  c  |                            
+       |  a  ||  b  ||  a  ||  d  ||  e  ||  d  |
+       |      a     ||  b  ||      c     ||  c  |
+|  e  ||                a                ||  b  |
+-------------------------------------------------
+0x60bb3dfa5340
+size: 3
+0x60bb3dfa5340
+size: 3
+0x60bb3dfa5340
+size: 4
+--------------------------------------------------------
+|  e  ||                    a                   ||  b  |
+       |      a     ||      b     ||      c     ||  c  |
+       |  a  ||  b  ||  d  ||  a  ||  d  ||  e  ||  d  |
+              |  c  ||  d  |                            
+                                                        
+                                                        
+              |  c  ||  d  |                            
+       |  a  ||  b  ||  d  ||  a  ||  d  ||  e  ||  d  |
+       |      a     ||      b     ||      c     ||  c  |
+|  e  ||                    a                   ||  b  |
+--------------------------------------------------------
+counting & getting res with prefix
+count 'abd': 0x60bb3dfa5340
+size: 3
+2
+count 'a' as prefix: 0x60bb3dfa5340
+size: 1
+9
+0x60bb3dfa5340
+size: 1
+-----------------------------------
+|                a                |
+|  a  ||      b     ||      c     |
+|  b  ||  d  ||  a  ||  d  ||  e  |
+|  c  ||  d  |                     
+                                   
+                                   
+|  c  ||  d  |                     
+|  b  ||  d  ||  a  ||  d  ||  e  |
+|  a  ||      b     ||      c     |
+|                a                |
+-----------------------------------
+
+----------- Trie test result -----------
+Pass/Total: 1/1
+
+
+
+---------- test result -----------
+
+Total number of unit tests: 66
+Endof unit tests
++++++++++++++++++++++++++++++++++++++++++++++

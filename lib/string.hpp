@@ -36,15 +36,17 @@ public:
     }
     string(const std::initializer_list<value_type>& vals) {
         size_type n = vals.size();
-        begin_ = n == 0 ? nullptr : allocator_.allocate(n);
-        last_ = end_ = n == 0 ? nullptr : begin_ + n;
-        mfwu::uninitialized_copy(vals.begin(), vals.end(), begin_);
+        begin_ = (n == 0 ? nullptr : allocator_.allocate(n));
+        last_ = end_ = (n == 0 ? nullptr : begin_ + n);
+        if (n) mfwu::uninitialized_copy(vals.begin(), vals.end(), begin_);
     }
     string(const char* c_str) {
         size_type n = strlen(c_str);  // use strlen here
-        begin_ = c_str == nullptr ? nullptr : allocator_.allocate();
-        last_ = end_ = c_str == nullptr ? nullptr : begin_ + n;
-        mfwu::uninitialized_copy(c_str, c_str + n, begin_);
+        begin_ = (n == 0 ? nullptr : allocator_.allocate(n));
+        std::cout << (void*)begin_ << "\n";
+        std::cout << "size: " << n << "\n";
+        last_ = end_ = (n == 0 ? nullptr : begin_ + n);
+        if (n) mfwu::uninitialized_copy(c_str, c_str + n, begin_);
     }
     template <typename InputIterator,
               typename = typename std::enable_if_t<
@@ -71,7 +73,10 @@ public:
     }
     
     string& operator=(const string& str) {
-        reset_and_copy(str);
+        if (&str != this) {
+            reset_and_copy(str);
+        }
+        
         return *this;
     }
     string& operator=(string&& str) {
@@ -79,7 +84,9 @@ public:
         // begin_ = str.begin_;
         // end_ = str.end_;
         // last_ = str.last_;
-        reset_and_copy(mfwu::move(str));
+        if (&str != this) {
+            reset_and_copy(mfwu::move(str));
+        }
         return *this;
     }
 
@@ -105,11 +112,11 @@ public:
     }
     void emplace_back(value_type&& val) {
         if (end_ != last_) {
-            mfwu::construct(&*end_, mfwu::forward(val));
+            mfwu::construct(&*end_, mfwu::move(val));
             ++end_;
         } else {
             req_mem();
-            emplace_back(mfwu::forward(val));
+            emplace_back(mfwu::move(val));
         }
     }
     void push_back(const value_type& val) {
@@ -214,18 +221,42 @@ public:
         value_type* start = allocator_.reallocate(&*begin_, capacity(), cap);
         if (start == nullptr) return ;
         if (start == &*begin_) { last_ = begin_ + cap; return ; }
-        mfwu::uninitialized_copy(begin_, end_, start);
-        size_type sz = size();
-        begin_ = start; end_ = begin_ + sz; last_ = begin_ + cap;
+        end_ = mfwu::uninitialized_copy(begin_, end_, start);
+        // size_type sz = size();
+        begin_ = start; /*end_ = begin_ + sz;*/ last_ = begin_ + cap;
     }
     string copy() const {
         return string(*this);
     }
     value_type* c_str() const {
-        value_type* cstr = new value_type(size() + 1);
+        // value_type* cstr = new value_type(size() + 1);  // cost me 3 hours to get this
+                                                           // thanks to the mention of delete[] by GPT
+                                                           // 2025.01.18
+        value_type* cstr = new value_type[size() + 1];
         value_type* cstr_end = uninitialized_copy(begin_, end_, cstr);
         mfwu::construct(cstr_end, '\0');
         return cstr;
+        /*
+            GPT:
+            Option 1: Return a View into Internal Memory
+            const value_type* c_str() const noexcept {
+                if (begin_ && (end_ == last_ || *(end_) != '\0')) {
+                    mfwu::construct(end_, '\0');  // Add null-terminator if missing.
+                }
+                return begin_;
+            }
+
+            Option 2: Use std::unique_ptr for Safe Dynamic Memory
+            std::unique_ptr<value_type[]> c_str() const {
+                auto cstr = std::make_unique<value_type[]>(size() + 1);
+                mfwu::uninitialized_copy(begin_, end_, cstr.get());
+                cstr[size()] = '\0';
+                return cstr;
+            }
+
+            Option 3: Explicit Documentation of Ownership
+            /// Returns a null-terminated string. Caller must delete[] the returned pointer.
+        */
     }
     // is it const ?
     // value_type[] data() const {
@@ -305,23 +336,24 @@ private:
     Alloc allocator_ = {};
 
     void _destroy() {
-        if(&*begin_) {
+        if(begin_) {
             mfwu::destroy(begin_, end_);
             allocator_.deallocate(&*begin_, capacity());
         }
     }
     void _copy(const string& str, size_type start_idx=0) {
-        // TODO: what if start_idx > str.size()?
         size_type size = str.size() - start_idx;
-        begin_ = size == 0 ? nullptr : allocator_.allocate(size);
-        last_ = end_ = size == 0 ? nullptr : begin_ + size;
-        mfwu::uninitialized_copy(str.begin() + start_idx, str.end(), begin_);
+        if (str.size() < start_idx) { size = 0; }
+        begin_ = (size == 0 ? nullptr : allocator_.allocate(size));
+        last_ = end_ = (size == 0 ? nullptr : begin_ + size);
+        if (size) mfwu::uninitialized_copy(str.begin() + start_idx, str.end(), begin_);
     }
     void _copy(const string& str, size_type start_idx, size_type len) {
         size_type size = mfwu::min(str.size() - start_idx, len);
-        begin_ = size == 0 ? nullptr : allocator_.allocate(size);
-        last_ = end_ = size == 0 ? nullptr : begin_ + size;
-        mfwu::uninitialized_copy_n(str.begin() + start_idx, size, begin_);
+        if (str.size() < start_idx) { size = 0; }
+        begin_ = (size == 0 ? nullptr : allocator_.allocate(size));
+        last_ = end_ = (size == 0 ? nullptr : begin_ + size);
+        if (size) mfwu::uninitialized_copy_n(str.begin() + start_idx, size, begin_);
     }
     void _copy(string&& str) {
         begin_ = str.begin_;
@@ -340,12 +372,13 @@ private:
     void req_mem() {
         size_type capacity = this->capacity();
         size_type new_capacity = capacity ? 2 * capacity : 1;
-        
         iterator new_begin = allocator_.allocate(new_capacity);
-        end_ = mfwu::uninitialized_copy(begin_, end_, new_begin);
-        allocator_.deallocate(begin_, capacity);
+        mfwu::uninitialized_copy(begin_, end_, new_begin);
+        size_type size_ = size();
+        _destroy();
         begin_ = new_begin;
-        last_ = new_begin + new_capacity;
+        end_ = new_begin + size_;
+        last_ = new_begin + new_capacity;  // TODO: double check
     }
     // TODO: private funcs with commonly-used name
     //       should start with '_'

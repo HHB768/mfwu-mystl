@@ -159,7 +159,6 @@ public:
         size_type n = values.size();
         value_type* start = allocator_.allocate(n);
         init_iterator(start, n);
-
         mfwu::uninitialized_copy(values.begin(), values.end(), begin_);
     }
     vector(const vector& vec) {
@@ -568,9 +567,15 @@ private:
         // if (begin_ != iterator{}) 
         //     std::cout << "original_start: " << &*begin_ << "\n";
         // std::cout << "new_start: " << start << "\n";
-        end_ = mfwu::uninitialized_copy(begin_, end_, start);
-        allocator_.deallocate(&*begin_, capacity);
+        mfwu::uninitialized_copy(begin_, end_, start);
+        size_type size_ = size();
+        destroy();
+        deallocate();
         begin_ = start;
+        end_ = start + size_;  // TODO: double check
+        // not true, fixed on 25.01.18:
+        // end_ = mfwu::uninitialized_copy(begin_, end_, new_begin);
+        // allocator_.deallocate(begin_, capacity);
         last_ = start + new_capacity;
     }
 

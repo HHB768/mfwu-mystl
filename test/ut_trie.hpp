@@ -151,6 +151,24 @@ bool unit_test_trie::use_mfwu_trie() {
         "aaa", "aab", "aabc", "bcd", 
         "acd", "e", "acd", "ace", "aba"
     };
+    // data_type strs = { 
+    //     mfwu::string<char>("aaa"), mfwu::string<char>("aab"),
+    //     mfwu::string<char>("aabc"), mfwu::string<char>("bcd"),
+    //     mfwu::string<char>("acd"), mfwu::string<char>("e"),
+    //     mfwu::string<char>("acd"), mfwu::string<char>("ace"),
+    //     mfwu::string<char>("aba")
+    // };
+    // strs.emplace_back("aaa");
+    // strs.emplace_back("aab");
+    // strs.emplace_back("aabc");
+    // strs.emplace_back("bcd");
+    // strs.emplace_back("acd");
+    // strs.emplace_back("e");
+    // strs.emplace_back("acd");
+    // strs.emplace_back("ace");
+    // strs.emplace_back("aba");
+
+    std::cout << "here\n";
     using trie = mfwu::trie<mfwu::string<char>>;
     trie data1(strs.begin(), strs.end());
     print_trie(data1);
