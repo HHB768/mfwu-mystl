@@ -24,7 +24,7 @@
 #   define __UNIT_TEST_HASHTABLE_EXP_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MULTIMAP_BRIEF__
 #   define __UNIT_TEST_UNORDERED_MULTISET_BRIEF__
-// #   define __UNIT_TEST_STRING_BRIEF__
+#   define __UNIT_TEST_STRING_BRIEF__
 #   define __UNIT_TEST_TRIE_BRIEF__
 #endif  // __ALL_BRIEF__
 

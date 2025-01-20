@@ -415,7 +415,7 @@ public:
     using iterator = value_type*;
 
     tiny_string() : begin_(buf_), end_(buf_), 
-                    last_(buf_ + BuffSize), is_tiny_(true) { std::cout << "-1\n"; }  
+                    last_(buf_ + BuffSize), is_tiny_(true) {}  
                     // = empty_init()
     tiny_string(size_type n, const value_type& val=value_type{}) {
         init_iterator(n);
@@ -786,7 +786,7 @@ private:
         // if (begin_ == nullptr) { return ; }
         if (is_tiny_ == false) {
             mfwu::destroy(begin_, end_);
-            std::cout << (void*)begin_ << "\n";
+            // std::cout << (void*)begin_ << "\n";
             Alloc::deallocate(begin_, mfwu::distance(begin_, last_));
             empty_init();
         }
