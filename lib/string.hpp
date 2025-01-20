@@ -43,8 +43,6 @@ public:
     string(const char* c_str) {
         size_type n = strlen(c_str);  // use strlen here
         begin_ = (n == 0 ? nullptr : allocator_.allocate(n));
-        std::cout << (void*)begin_ << "\n";
-        std::cout << "size: " << n << "\n";
         last_ = end_ = (n == 0 ? nullptr : begin_ + n);
         if (n) mfwu::uninitialized_copy(c_str, c_str + n, begin_);
     }
@@ -58,7 +56,13 @@ public:
         begin_ = allocator_.allocate(n);
         last_ = end_ = mfwu::uninitialized_copy(first, last, begin_);
     }
-    string(const string& str, size_type start_idx=0) {
+    string(const string& str) {
+        _copy(str, 0);
+    }  
+    string(const string& str, size_type start_idx) {  // if start_idx has default value, the overload is ambiguous
+                                                      // but if we dont define the default constructor
+                                                      // copy() will have a dangerous default constructor
+                                                      // see tiny_string  25.01.21 X-Q3
         _copy(str, start_idx);
     }
     string(const string& str, size_type start_idx, size_type len) {
@@ -221,14 +225,15 @@ public:
         value_type* start = allocator_.reallocate(&*begin_, capacity(), cap);
         if (start == nullptr) return ;
         if (start == &*begin_) { last_ = begin_ + cap; return ; }
-        end_ = mfwu::uninitialized_copy(begin_, end_, start);
-        // size_type sz = size();
-        begin_ = start; /*end_ = begin_ + sz;*/ last_ = begin_ + cap;
+        mfwu::uninitialized_copy(begin_, end_, start);
+        size_type sz = size();
+        _destroy();
+        begin_ = start; end_ = begin_ + sz; last_ = begin_ + cap;
     }
     string copy() const {
         return string(*this);
     }
-    value_type* c_str() const {
+    const value_type* c_str() const {
         // value_type* cstr = new value_type(size() + 1);  // cost me 3 hours to get this
                                                            // thanks to the mention of delete[] by GPT
                                                            // 2025.01.18
@@ -346,14 +351,18 @@ private:
         if (str.size() < start_idx) { size = 0; }
         begin_ = (size == 0 ? nullptr : allocator_.allocate(size));
         last_ = end_ = (size == 0 ? nullptr : begin_ + size);
-        if (size) mfwu::uninitialized_copy(str.begin() + start_idx, str.end(), begin_);
+        if (size) {
+            mfwu::uninitialized_copy(str.begin() + start_idx, str.end(), begin_);
+        }
     }
     void _copy(const string& str, size_type start_idx, size_type len) {
         size_type size = mfwu::min(str.size() - start_idx, len);
         if (str.size() < start_idx) { size = 0; }
         begin_ = (size == 0 ? nullptr : allocator_.allocate(size));
         last_ = end_ = (size == 0 ? nullptr : begin_ + size);
-        if (size) mfwu::uninitialized_copy_n(str.begin() + start_idx, size, begin_);
+        if (size) {
+            mfwu::uninitialized_copy_n(str.begin() + start_idx, size, begin_);
+        }
     }
     void _copy(string&& str) {
         begin_ = str.begin_;
@@ -398,13 +407,15 @@ template <typename C=char, size_t BuffSize=8,
 class tiny_string {
 public:
     friend class unit_test_string;
+    template <typename C1, size_t Bufsz, typename Al>
+    friend class tiny_string;
 
     using value_type = C;
     using size_type = size_t;
     using iterator = value_type*;
 
     tiny_string() : begin_(buf_), end_(buf_), 
-                    last_(buf_ + BuffSize), is_tiny_(true) {}  
+                    last_(buf_ + BuffSize), is_tiny_(true) { std::cout << "-1\n"; }  
                     // = empty_init()
     tiny_string(size_type n, const value_type& val=value_type{}) {
         init_iterator(n);
@@ -431,14 +442,27 @@ public:
         init_iterator(mfwu::distance(first, last));
         copy_init(first, last);
     }
-    tiny_string(const tiny_string& str, size_type start_idx=0) {
+    tiny_string(const tiny_string& str) {
+        init_iterator(str.size());
+        copy_init(str.begin_, str.end_);
+    }   // defualt copy constructor leads to double free in copy() X-Q3 [0121]
+        // and you cannot delete the copy constructor, bcz
+        // tiny_string(*this) will not accept:
+        // template <size_t Bufsz>
+        // tiny_string(const tiny_string<C, Bufsz, Alloc>& str,
+        //             size_type start_idx=0)
+    template <size_t Bufsz>
+    tiny_string(const tiny_string<C, Bufsz, Alloc>& str,
+                size_type start_idx) {
         if (str.size() < start_idx) {
             empty_init(); return ;
         }
         init_iterator(str.size() - start_idx);
         copy_init(str.begin_ + start_idx, str.end_);
     }
-    tiny_string(const tiny_string& str, size_type start_idx, size_type len) {
+    template <size_t Bufsz>
+    tiny_string(const tiny_string<C, Bufsz, Alloc>& str, 
+                size_type start_idx, size_type len) {
         if (str.size() < start_idx) {
             empty_init(); return ;
         }
@@ -446,16 +470,17 @@ public:
         init_iterator(sz);
         copy_init_n(str.begin_ + start_idx, sz);
     }
-    tiny_string(tiny_string&& str) 
-        : begin_(str.begin_), end_(str.end_),
-          last_(str.last_), is_tiny_(str.is_tiny_) {
+    template <size_t Bufsz>
+    tiny_string(tiny_string<C, Bufsz, Alloc>&& str) 
+        : is_tiny_(str.is_tiny_) {
         // TODO: bug fix: reset str ptr 25.01.01
         if (str.is_tiny_) {
             size_type sz = str.size();
             init_iterator(sz);
             copy_init_n(str.begin_, sz);  // check
         } else {
-            begin_ = end_ = last_ = nullptr;
+            begin_ = str.begin_; end_ = str.end_; last_ = str.last_;
+            str.empty_init();
         }
     }
     // TODO: implement tiny_string(tiny_string&&, size_type, size_type)
@@ -464,12 +489,14 @@ public:
         _destroy();
     }
 
-    tiny_string& operator=(const tiny_string& str) {
+    template <size_t Bufsz>
+    tiny_string& operator=(const tiny_string<C, Bufsz, Alloc>& str) {
         reset_and_copy(str);
         // TODO: implement this 25.01.01
         return *this;
     }
-    tiny_string& operator=(tiny_string&& str) {
+    template <size_t Bufsz>
+    tiny_string& operator=(tiny_string<C, Bufsz, Alloc>&& str) {
         reset_and_copy(mfwu::move(str));
         // TODO: implement this and reset str ptr 25.01.01
         return *this;
@@ -507,11 +534,11 @@ public:
             ++end_;
         } else {
             req_mem();
-            emplace_back(val);
+            emplace_back(mfwu::move(val));
         } 
     }
     void push_back(const value_type& val) {
-        emplace_back(val);\
+        emplace_back(val);
     }
     void push_back(value_type&& val) {
         emplace_back(mfwu::move(val));
@@ -606,6 +633,9 @@ public:
         insert(end_, str.begin_, str.end_);
         return *this;
     }
+    tiny_string& append(const char* cstr) {
+        return append(tiny_string<char, BuffSize, Alloc>(cstr));
+    }
     template <typename InputIterator,
               typename = typename std::enable_if_t<
                    mfwu::is_input_iterator<InputIterator>::value>>
@@ -626,25 +656,25 @@ public:
     void reserve(size_type cap) {
         if (cap < capacity()) return ;
         if (is_tiny_) {
-            iterator ori_begin = begin_;
-            iterator ori_end = end_;
-            init_iterator(cap);
-            copy_init(ori_begin, ori_end);
+            // DO NOTHING
         } else {
             iterator start = Alloc::reallocate(&*begin_, capacity(), cap);
             if (start == nullptr) return ;
             if (start == &*begin_) { last_ = begin_ + cap; return ; }
             mfwu::uninitialized_copy(begin_, end_, start);
             size_type sz = size();
+            _destroy();
             begin_ = start; end_ = begin_ + sz; last_ = begin_ + cap;
+            is_tiny_ = false;
         }
     }
     tiny_string copy() const {
-        return tiny_string(*this);
+        return tiny_string(*this);  // use tiny_string(const tiny_string&)
+                                    // never use ...(const tiny_string&, size_t)
     }
     const value_type* c_str() const {
-        const value_type* cstr = new value_type(size() + 1);
-        const value_type* cstr_end = uninitialized_copy(begin_, end_, cstr);
+        value_type* cstr = new value_type[size() + 1];
+        value_type* cstr_end = uninitialized_copy(begin_, end_, cstr);
         mfwu::construct(cstr_end, '\0');
         return cstr;
     }
@@ -670,7 +700,7 @@ public:
         append(val);
     }
     tiny_string operator+(const value_type& val) const {
-        string temp = *this;
+        tiny_string temp = *this;
         temp += val;
         return temp;
     }
@@ -678,10 +708,18 @@ public:
     tiny_string& operator+=(const tiny_string<C, Bufsz, Alloc>& str) {
         return append(str);
     }
+    tiny_string& operator+=(const char* cstr) {
+        return append(cstr);
+    }
     template <size_t Bufsz>
-    tiny_string& operator+(const tiny_string<C, Bufsz, Alloc>& str) {
+    tiny_string operator+(const tiny_string<C, Bufsz, Alloc>& str) {
         tiny_string temp = *this;
         temp += str;
+        return temp;
+    }
+    tiny_string operator+(const char* cstr) {
+        tiny_string temp = *this;
+        temp += cstr;
         return temp;
     }
 
@@ -745,17 +783,20 @@ private:
         }
     }
     void _destroy() {
+        // if (begin_ == nullptr) { return ; }
         if (is_tiny_ == false) {
             mfwu::destroy(begin_, end_);
+            std::cout << (void*)begin_ << "\n";
             Alloc::deallocate(begin_, mfwu::distance(begin_, last_));
+            empty_init();
         }
     }
 
     void reset_and_copy(const tiny_string& str) {
         _destroy();
         init_iterator(str.size());
-        mfwu::copy(str.begin_, str.end_, begin_);
-        is_tiny_ = str.is_tiny_;
+        copy_init(str.begin_, str.end_);
+        // is_tiny_ = str.is_tiny_;
     }
     void reset_and_copy(tiny_string&& str) {
         _destroy();
@@ -767,41 +808,41 @@ private:
             begin_ = str.begin_;
             end_ = str.end_;
             last_ = str.last_;
-            is_tiny_ = str.is_tiny_;
-            begin_ = end_ = last_ = nullptr;
+            is_tiny_ = false;
         }
+        str.empty_init();
     }
 
     void req_mem() {
         size_type capacity = this->capacity();
-        size_type new_capacity = capacity ? 2 * capacity : 1;
+        size_type new_capacity = 2 * capacity;  // capacity >= BufSize
         
         iterator new_begin = Alloc::allocate(new_capacity);
-        end_ = mfwu::uninitialized_copy(begin_, end_, new_begin);
-        if (is_tiny_ == false) {
-            Alloc::deallocate(begin_, capacity);
-        }
+        mfwu::uninitialized_copy(begin_, end_, new_begin);
+        size_type size_ = size();
+        _destroy();
         begin_ = new_begin;
+        end_ = new_begin + size_;
         last_ = new_begin + new_capacity;
-        is_tiny_ = true;  // Check
+        is_tiny_ = false;  // Check
     }
-    void _switch(bool toHeapMem=true, size_type n=2*BuffSize) {
-        if (toHeapMem) {
-            is_tiny_ = false;
-            begin_ = Alloc::allocate(n);
-            end_ = last_ = begin_ + n;
-            end_ = mfwu::copy(buf_, end_, begin_);
-        } else {
-            if (is_tiny_) return ;
-            if (size() > BuffSize) return ;
-            mfwu::copy(begin_, end_, buf_);
-            begin_ = buf_;
-            end_ = buf_ + size();
-            last_ = begin_ + BuffSize;
-            Alloc::deallocate(buf_, size());
-        }
-        // check
-    }
+    // void _switch(bool toHeapMem=true, size_type n=2*BuffSize) {
+    //     if (toHeapMem) {
+    //         is_tiny_ = false;
+    //         begin_ = Alloc::allocate(n);
+    //         end_ = last_ = begin_ + n;
+    //         end_ = mfwu::copy(buf_, end_, begin_);
+    //     } else {
+    //         if (is_tiny_) return ;
+    //         if (size() > BuffSize) return ;
+    //         mfwu::copy(begin_, end_, buf_);
+    //         begin_ = buf_;
+    //         end_ = buf_ + size();
+    //         last_ = begin_ + BuffSize;
+    //         Alloc::deallocate(buf_, size());
+    //     }
+    //     // check
+    // }
 
     iterator begin_, end_, last_;
     bool is_tiny_;

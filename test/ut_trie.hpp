@@ -168,7 +168,6 @@ bool unit_test_trie::use_mfwu_trie() {
     // strs.emplace_back("ace");
     // strs.emplace_back("aba");
 
-    std::cout << "here\n";
     using trie = mfwu::trie<mfwu::string<char>>;
     trie data1(strs.begin(), strs.end());
     print_trie(data1);

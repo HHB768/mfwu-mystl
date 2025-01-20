@@ -2,12 +2,25 @@
 ------- Test: use_malloc_allocator -------
 In malloc_alloc
 allocating 0
+ptr: 0x5b4d5afc7300
 deallocating 0
 setting dummy oom_handler
 allocating 1024^3
+ptr: 0x7d78f1400010
 reallocating 1.5*1024^3
+ptr: 0x7d7891200010
 deallocating 1.5*1024^3
 allocating and deallocating 10 times
+ptr: 0x5b4d5afc7300
+ptr: 0x5b4d5afc7300
+ptr: 0x5b4d5afc7320
+ptr: 0x5b4d5afc7350
+ptr: 0x5b4d5afc7390
+ptr: 0x5b4d5afc73e0
+ptr: 0x5b4d5afc7440
+ptr: 0x5b4d5afc74b0
+ptr: 0x5b4d5afc7530
+ptr: 0x5b4d5afc75c0
 allocating 1000 times
 setting invalid oom_handler
 oom malloc failure testing: 
@@ -15,8 +28,118 @@ oom malloc failure testing:
 ------- Test: use_default_allocator -------
 In default_alloc
 malloc_allocating large block
+memory pool: 
+heap size: 0 start-end: 0 - 0
+free lists: 
+[ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+
 malloc_deallocating large block
+memory pool: 
+heap size: 0 start-end: 0 - 0
+free lists: 
+[ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+
 allocating and deallocating random units
+memory pool: 
+heap size: 320 start-end: 0x5b4d5afd3460 - 0x5b4d5afd3500
+free lists: 
+[ 19 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 320 start-end: 0x5b4d5afd3460 - 0x5b4d5afd3500
+free lists: 
+[ 18 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 320 start-end: 0x5b4d5afd3500 - 0x5b4d5afd3500
+free lists: 
+[ 18 9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 2904 start-end: 0x5b4d5afd3a10 - 0x5b4d5afd3f28
+free lists: 
+[ 18 9 0 0 0 0 0 19 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 2904 start-end: 0x5b4d5afd3bf0 - 0x5b4d5afd3f28
+free lists: 
+[ 18 9 19 0 0 0 0 19 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 2904 start-end: 0x5b4d5afd3e70 - 0x5b4d5afd3f28
+free lists: 
+[ 18 9 19 19 0 0 0 19 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 2904 start-end: 0x5b4d5afd3e70 - 0x5b4d5afd3f28
+free lists: 
+[ 18 10 19 19 0 0 0 19 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 2904 start-end: 0x5b4d5afd3f10 - 0x5b4d5afd3f28
+free lists: 
+[ 18 10 19 19 3 0 0 19 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 2904 start-end: 0x5b4d5afd3f10 - 0x5b4d5afd3f28
+free lists: 
+[ 18 10 19 19 3 0 0 20 0 0 0 0 0 0 0 0 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd4930 - 0x5b4d5afd53e8
+free lists: 
+[ 18 10 20 19 3 0 0 20 0 0 0 0 0 0 0 19 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd4ed0 - 0x5b4d5afd53e8
+free lists: 
+[ 18 10 20 19 3 0 0 20 19 0 0 0 0 0 0 19 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd4ed0 - 0x5b4d5afd53e8
+free lists: 
+[ 19 10 20 19 3 0 0 20 19 0 0 0 0 0 0 19 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd4ed0 - 0x5b4d5afd53e8
+free lists: 
+[ 19 10 20 19 3 0 0 20 20 0 0 0 0 0 0 19 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd4ed0 - 0x5b4d5afd53e8
+free lists: 
+[ 19 10 20 19 3 0 0 20 20 0 0 0 0 0 0 20 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd4ed0 - 0x5b4d5afd53e8
+free lists: 
+[ 19 10 21 19 3 0 0 20 20 0 0 0 0 0 0 20 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd53d0 - 0x5b4d5afd53e8
+free lists: 
+[ 19 10 21 19 3 0 0 20 20 15 0 0 0 0 0 20 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd53d0 - 0x5b4d5afd53e8
+free lists: 
+[ 19 10 21 20 3 0 0 20 20 15 0 0 0 0 0 20 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd53d0 - 0x5b4d5afd53e8
+free lists: 
+[ 20 10 21 20 3 0 0 20 20 15 0 0 0 0 0 20 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd53d0 - 0x5b4d5afd53e8
+free lists: 
+[ 20 10 21 20 4 0 0 20 20 15 0 0 0 0 0 20 ]
+
+memory pool: 
+heap size: 8208 start-end: 0x5b4d5afd53d0 - 0x5b4d5afd53e8
+free lists: 
+[ 20 10 21 20 4 0 0 20 20 16 0 0 0 0 0 20 ]
+
 end of random tests
 
 ----------- Alloc test result -----------
@@ -26,24 +149,30 @@ Pass/Total: 2/2
 
 ------- Test: use_list_iterator -------
 printing list nodes with node*
+0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> nullptr
 doing some list operations
 modifying and printing list nodes with iterator
+1 -> 2 -> 3 -> 5 -> 6 -> 9 -> 7 -> 8 -> nullptr
 
 ------- Test: use_input_iterator -------
 testing input_iterator reading
-reading complete
+1 1 1 1 1 1 1 1 
 
 ------- Test: use_output_iterator -------
 testing output_iterator writing
+2 0 0 0 0 0 0 0 
 
 ------- Test: use_forward_iterator -------
 testing forward_iterator writing
+3 3 3 3 3 3 3 3 
 
 ------- Test: use_bidirectional_iterator -------
 testing bidirectional_iterator moving and writing
+4 4 4 4 4 4 4 4 
 
 ------- Test: use_random_access_iterator -------
 testing random_access_iterator moving and writing
+5 0 5 0 5 0 5 6 
 
 ----------- Iterator test result -----------
 Pass/Total: 6/6
@@ -52,25 +181,48 @@ Pass/Total: 6/6
 
 ------- Test: use construct destroy -------
 constructing pod data
+1 _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
 destroying pod data
+1 _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
 constructing non-pod data
+2 _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
 destroying non-pod data
+. _ _ _ b c d e _ _ _ _ _ _ _ _ _ 
 constructing pod data with iterator
+3 _ _ _ b c d e 3 _ _ _ b c d e _ 
 destroying pod data with iterator
+3 _ _ _ b c d e 3 _ _ _ b c d e _ 
 constructing non-pod data with iterator
+4 _ _ _ 4 _ _ _ 4 _ _ _ 4 _ _ _ _ 
 destroying non-pod data with iterator
+. _ _ _ . _ _ _ . _ _ _ . _ _ _ _ 
 
 ------- Test: use uninitialized operations -------
 filling pod data with iterator
+calling std::fill (or mfwu::fill)
+3 _ _ _ b c d e 3 _ _ _ b c d e _ 
 filling non-pod data with iterator
+calling construct in loop
+4 _ _ _ 4 _ _ _ 4 _ _ _ 4 _ _ _ _ 
 filling pod data n times
+5 _ _ _ e d c b 5 _ _ _ e d c b _ 
 filling non-pod data n times
+6 _ _ _ 6 _ _ _ 6 _ _ _ 6 _ _ _ _ 
 copying pod data with iterator
+7 _ _ _ Q E W R 7 _ _ _ Q E W R _ 
 copying non-pod data with iterator
+8 _ _ _ 8 _ _ _ 8 _ _ _ 8 _ _ _ _ 
 
 ------- Test: use uninitialized operations -------
 testing distance of iterator
+distance(first, last) = 2
+distance(rlast, rfirst) = -2
+distance(nfirst, nlast) = 4
+distance(nrlast, nrfirst) = -4
 testing advance of iterator
+after proper advance, we have: 
+first == last : true
+nfirst == nlast : true
 
 ----------- Utils test result -----------
 Pass/Total: 3/3
@@ -83,28 +235,146 @@ moving and derefering iterator
 
 ------- Test: use mfwu::vector -------
 constructing pod data
+&vec.begin() = 0, vec.size() = 0, vec.capacity() = 0
+calling std::fill (or mfwu::fill)
+&vec.begin() = 0x5b4d5afd54f0, vec.size() = 1, vec.capacity() = 1
+calling std::fill (or mfwu::fill)
+&vec.begin() = 0x5b4d5afd5510, vec.size() = 1, vec.capacity() = 1
+&vec.begin() = 0x5b4d5afd5510, vec.size() = 1, vec.capacity() = 1
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 2, vec.capacity() = 2
+&vec.begin() = 0x5b4d5afd5550, vec.size() = 1, vec.capacity() = 1
 
 constructing non-pod data
+&vec.begin() = 0, vec.size() = 0, vec.capacity() = 0
+calling construct in loop
+&vec.begin() = 0x5b4d5afd5570, vec.size() = 1, vec.capacity() = 1
+calling construct in loop
+&vec.begin() = 0x5b4d5afd5590, vec.size() = 1, vec.capacity() = 1
+&vec.begin() = 0, vec.size() = 0, vec.capacity() = 0
+&vec.begin() = 0x5b4d5afd55b0, vec.size() = 2, vec.capacity() = 2
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 1, vec.capacity() = 1
 
 reserving
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 2, vec.capacity() = 5
+{1, 97, 98, 99, 100} {2, 101, 102, 103, 104} 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 2, vec.capacity() = 5
+{1, 97, 98, 99, 100} {2, 101, 102, 103, 104} 
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 2, vec.capacity() = 5
+1 2 
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 2, vec.capacity() = 5
+1 2 
 
 resizing
+calling std::fill (or mfwu::fill)
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 5, vec.capacity() = 5
+{1, 97, 98, 99, 100} {0, 0, 0, 0, 0} {0, 0, 0, 0, 0} {0, 0, 0, 0, 0} {0, 0, 0, 0, 0} 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 1, vec.capacity() = 5
+{1, 97, 98, 99, 100} 
+calling construct in loop
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 5, vec.capacity() = 5
+1 0 0 0 0 
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 1, vec.capacity() = 5
+1 
 
 clearing
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 0, vec.capacity() = 5
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 0, vec.capacity() = 5
 
 emplacing/pushing back
+&vec.begin() = 0x5b4d5afd55b0, vec.size() = 2, vec.capacity() = 2
+{0, 0, 0, 0, 0} {2, 97, 99, 101, 115} 
+&vec.begin() = 0x5b4d5afd5620, vec.size() = 3, vec.capacity() = 4
+{0, 0, 0, 0, 0} {2, 97, 99, 101, 115} {0, 0, 0, 0, 0} 
+&vec.begin() = 0x5b4d5afd5620, vec.size() = 4, vec.capacity() = 4
+{0, 0, 0, 0, 0} {2, 97, 99, 101, 115} {0, 0, 0, 0, 0} {3, 104, 97, 99, 101} 
+&vec.begin() = 0x5b4d5afd55b0, vec.size() = 2, vec.capacity() = 2
+0 2 
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 3, vec.capacity() = 4
+0 2 4 
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 4, vec.capacity() = 4
+0 2 4 3 
 
 poping back
+&vec.begin() = 0x5b4d5afd5620, vec.size() = 3, vec.capacity() = 4
+{0, 0, 0, 0, 0} {2, 97, 99, 101, 115} {0, 0, 0, 0, 0} 
+&vec.begin() = 0x5b4d5afd5620, vec.size() = 2, vec.capacity() = 4
+{0, 0, 0, 0, 0} {2, 97, 99, 101, 115} 
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 3, vec.capacity() = 4
+0 2 4 
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 2, vec.capacity() = 4
+0 2 
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 1, vec.capacity() = 4
+0 
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 0, vec.capacity() = 4
+
+&vec.begin() = 0x5b4d5afd55d0, vec.size() = 0, vec.capacity() = 4
+
 
 inserting
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 1, vec.capacity() = 5
+{1, 113, 119, 101, 114} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 6, vec.capacity() = 10
+{1, 113, 119, 101, 114} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 6, vec.capacity() = 10
+{1, 113, 119, 101, 114} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 6, vec.capacity() = 10
+{1, 113, 119, 101, 114} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 8, vec.capacity() = 10
+{1, 113, 119, 101, 114} {2, 116, 121, 116, 121} {0, 0, 0, 0, 0} {2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afd5530, vec.size() = 1, vec.capacity() = 5
+1 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 10
+1 2 2 2 2 2 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 10
+1 2 2 2 2 2 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 10
+1 2 2 2 2 2 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 10, vec.capacity() = 10
+1 2 3 4 4 7 2 2 2 2 
 
 erasing
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 7, vec.capacity() = 10
+{1, 113, 119, 101, 114} {2, 116, 121, 116, 121} {0, 0, 0, 0, 0} {2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 6, vec.capacity() = 10
+{1, 113, 119, 101, 114} {2, 116, 121, 116, 121} {2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 4, vec.capacity() = 10
+{2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 9, vec.capacity() = 10
+1 2 3 4 4 2 2 2 2 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 8, vec.capacity() = 10
+1 2 4 4 2 2 2 2 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 10
+4 4 2 2 2 2 
 
 shrinking
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 4, vec.capacity() = 8
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 4, vec.capacity() = 4
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 8
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 8
 
 indexing
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 4, vec.capacity() = 4
+__idx_out_of_range__ {2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} __idx_out_of_range__ __idx_out_of_range__ 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 8
+__idx_out_of_range__ 4 4 2 2 2 2 
 
 comparing
+&vec.begin() = 0x5b4d5afd5620, vec.size() = 4, vec.capacity() = 4
+{2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+&vec.begin() = 0x5b4d5afc73e0, vec.size() = 4, vec.capacity() = 4
+{2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+vec6 ==/!=/>=/<=/>/< vec4 : true/false/true/true/false/false
+&vec.begin() = 0x5b4d5afc7410, vec.size() = 6, vec.capacity() = 8
+4 4 2 2 2 2 
+&vec.begin() = 0x5b4d5afd55f0, vec.size() = 6, vec.capacity() = 8
+4 4 2 2 2 2 
+nvec6 ==/!=/>=/<=/>/< nvec4 : true/false/true/true/false/false
+&vec.begin() = 0x5b4d5afd5650, vec.size() = 3, vec.capacity() = 4
+{2, 97, 99, 101, 115} {2, 116, 121, 116, 121} {2, 116, 121, 116, 121} 
+vec6 >/< vec7 : true/false
+&vec.begin() = 0x5b4d5afd5680, vec.size() = 6, vec.capacity() = 8
+4 4 2 2 2 1 
+nvec6 >/< nvec7 : true/false
 
 ----------- Vector test result -----------
 Pass/Total: 3/3
@@ -113,37 +383,84 @@ Pass/Total: 3/3
 
 ------- Test: use forward_list_iterator -------
 moving and derefering iterator
-
+0:1 1:2 2:3 3:4 4:5 5:6 
 
 ------- Test: use mfwu::forward_list -------
 constructing & copying & moving
+z= -> =6
+z= -> 0 -> 0 -> =6
+z= -> 3 -> 3 -> 3 -> =6
+z= -> 3 -> 3 -> 3 -> =6
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
+z= -> 3 -> 3 -> 3 -> =6
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
 
 geting basic/detailed infos
+front = 1, back = 5, size = 5
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
 
 resizing
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> 0 -> 0 -> =6
+z= -> 1 -> 2 -> 3 -> =6
 
 pushing & poping
+z= -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
+z= -> 6 -> 1 -> 2 -> 3 -> 4 -> 5 -> =6
+z= -> 6 -> 1 -> 2 -> 3 -> 4 -> =6
+z= -> 6 -> 1 -> 2 -> 3 -> 4 -> 6 -> =6
+z= -> 1 -> 2 -> 3 -> 4 -> 6 -> =6
 
 inserting
+z= -> 1 -> 2 -> 3 -> 4 -> 6 -> 1 -> =6
+z= -> 1 -> 2 -> 3 -> 4 -> 6 -> 1 -> 1 -> =6
+z= -> 42 -> 42 -> 1 -> 2 -> 3 -> 4 -> 6 -> 1 -> 1 -> =6
+z= -> 42 -> 1 -> 2 -> 42 -> 1 -> 2 -> 3 -> 4 -> 6 -> 1 -> 1 -> =6
 
 erasing
+z= -> 1 -> 2 -> 42 -> 1 -> 2 -> 3 -> 4 -> 6 -> 1 -> 1 -> =6
+z= -> 1 -> 1 -> 2 -> 3 -> 4 -> 6 -> 1 -> 1 -> =6
 
 ------- Test: use list_iterator -------
 moving and derefering iterator
-
+0:1 2:3 4:5 
 
 ------- Test: use mfwu::list -------
 constructing & copying & moving
+z= <-> =6
+z= <-> 0 <-> 0 <-> =6
+z= <-> 3 <-> 3 <-> 3 <-> =6
+z= <-> 3 <-> 3 <-> 3 <-> =6
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
+z= <-> 3 <-> 3 <-> 3 <-> =6
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
 
 geting basic/detailed infos
+front = 1, back = 5, size = 5
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
 
 resizing
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> 0 <-> 0 <-> =6
+z= <-> 1 <-> 2 <-> 3 <-> =6
 
 pushing & poping
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
+z= <-> 6 <-> 1 <-> 2 <-> 3 <-> 4 <-> 5 <-> =6
+z= <-> 6 <-> 1 <-> 2 <-> 3 <-> 4 <-> =6
+z= <-> 6 <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> =6
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> =6
 
 inserting
+z= <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> 1 <-> =6
+z= <-> 42 <-> 42 <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> 1 <-> =6
+z= <-> 42 <-> 1 <-> 2 <-> 42 <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> 1 <-> =6
 
 erasing
+z= <-> 1 <-> 2 <-> 42 <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> 1 <-> =6
+z= <-> 1 <-> 1 <-> 2 <-> 3 <-> 4 <-> 6 <-> 1 <-> =6
 
 ----------- List test result -----------
 Pass/Total: 4/4
@@ -152,15 +469,133 @@ Pass/Total: 4/4
 
 ------- Test: use mfwu::heap -------
 making heap
+size(): 15, top(): 8
+arr_: 8 6 8 4 5 6 7 2 2 2 5 3 6 1 3 
+                8               
+        6               8       
+    4       5       6       7   
+  2   2   2   5   3   6   1   3 
+size(): 5, top(): 5
+arr_: 5 2 4 1 1 
+        5       
+    2       4   
+  1   1 
+size(): 15, top(): 8
+arr_: 8 6 8 4 5 6 7 2 2 2 5 3 6 1 3 
+                8               
+        6               8       
+    4       5       6       7   
+  2   2   2   5   3   6   1   3 
+size(): 5, top(): 5
+arr_: 5 2 4 1 1 
+        5       
+    2       4   
+  1   1 
+size(): 15, top(): 8
+arr_: 8 6 8 4 5 6 7 2 2 2 5 3 6 1 3 
+                8               
+        6               8       
+    4       5       6       7   
+  2   2   2   5   3   6   1   3 
 random pushing/poping test: part 1
+ 3
+  5 
+ 3
+    5   
+  3   4 
+    5   
+  4   4 
+ 3
+    4   
+  3   4 
+    8   
+  4   4 
+ 3
+    4   
+  3   4 
 random pushing/poping test: part 2
+                8               
+        6               8       
+    4       5       6       7   
+  2   2   2   5   3   6   1   3 
+ 1
+                                9                               
+                8                               8               
+        6               5               6               7       
+    4       2       2       5       3       6       1       3   
+  1   2 
+                                9                               
+                8                               8               
+        6               5               6               7       
+    4       2       2       5       3       6       1       3   
+  1   2   2 
+                                8                               
+                6                               8               
+        4               5               6               7       
+    2       2       2       5       3       6       1       3   
+  1   2 
+                8               
+        6               7       
+    4       5       6       3   
+  2   2   2   5   3   6   1   2 
+ 1
+                7               
+        6               6       
+    4       5       6       3   
+  2   2   2   5   3   1   1   2 
+                6               
+        5               6       
+    4       5       6       3   
+  2   2   2   2   3   1   1 
+                6               
+        5               6       
+    4       5       6       5   
+  2   2   2   2   3   1   1   3 
 sorting
+size(): 3, top(): 3
+arr_: 3 4 4 
+    3   
+  4   4 
+size(): 15, top(): 1
+arr_: 1 1 2 2 2 2 3 3 4 5 5 5 6 6 6 
+                1               
+        1               2       
+    2       2       2       3   
+  3   4   5   5   5   6   6   6 
 
 ------- Test: use cmp functor -------
 making heap and sorting with default mfwu::less<int>
+size(): 16, top(): 8
+arr_: 8 8 7 4 5 6 7 2 1 3 5 3 2 4 6 1 
+                8               
+        8               7       
+    4       5       6       7   
+  2   1   3   5   3   2   4   6 
+ 1
 sorting
+size(): 16, top(): 1
+arr_: 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 
+                1               
+        1               2       
+    2       3       3       4   
+  4   5   5   6   6   7   7   8 
+ 8
 making heap and sorting with new mfwu::greater<int>
+size(): 16, top(): 1
+arr_: 1 1 2 2 3 3 4 8 4 5 5 7 6 7 6 8 
+                1               
+        1               2       
+    2       3       3       4   
+  8   4   5   5   7   6   7   6 
+ 8
 sorting
+size(): 16, top(): 8
+arr_: 8 8 7 7 6 6 5 5 4 4 3 3 2 2 1 1 
+                8               
+        8               7       
+    7       6       6       5   
+  5   4   4   3   3   2   2   1 
+ 1
 
 ----------- Heap test result -----------
 Pass/Total: 2/2
@@ -169,10 +604,158 @@ Pass/Total: 2/2
 
 ------- Test: use mfwu::binary_search_tree -------
 building binary search tree
+size(): 0 height(): 0
+
+size(): 8 height(): 5
+1 2 1 4 1 3 5 6 
+                                1                               
+                .                               2               
+        .               .               1               4       
+    .       .       .       .       .       1       3       5   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   6 
+size(): 0 height(): 0
+
+size(): 8 height(): 5
+1 2 1 4 1 3 5 6 
+                                1                               
+                .                               2               
+        .               .               1               4       
+    .       .       .       .       .       1       3       5   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   6 
+size(): 10 height(): 5
+8 4 9 1 5 3 7 2 6 7 
+                                8                               
+                4                               9               
+        1               5               .               .       
+    .       3       .       7       .       .       .       .   
+  .   .   2   .   .   .   6   7   .   .   .   .   .   .   .   . 
+size(): 10 height(): 5
+8 4 9 1 5 3 7 2 6 7 
+                                8                               
+                4                               9               
+        1               5               .               .       
+    .       3       .       7       .       .       .       .   
+  .   .   2   .   .   .   6   7   .   .   .   .   .   .   .   . 
+size(): 8 height(): 5
+1 2 1 4 1 3 5 6 
+                                1                               
+                .                               2               
+        .               .               1               4       
+    .       .       .       .       .       1       3       5   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   6 
+size(): 0 height(): 0
+
 random pushing/poping test: part 1
+size(): 11 height(): 6
+8 4 9 1 5 3 7 2 6 7 1 
+                                                                8                                                               
+                                4                                                               9                               
+                1                               5                               .                               .               
+        .               3               .               7               .               .               .               .       
+    .       .       2       .       .       .       6       7       .       .       .       .       .       .       .       .   
+  .   .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 14 height(): 6
+8 4 9 1 5 3 4 7 2 6 7 1 2 6 
+                                                                8                                                               
+                                4                                                               9                               
+                1                               5                               .                               .               
+        .               3               4               7               .               .               .               .       
+    .       .       2       .       .       .       6       7       .       .       .       .       .       .       .       .   
+  .   .   .   .   1   2   .   .   .   .   .   .   .   6   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 17 height(): 7
+8 4 9 1 5 3 4 7 2 3 6 7 1 2 6 7 7 
+                                                                                                                                8                                                                                                                               
+                                                                4                                                                                                                               9                                                               
+                                1                                                               5                                                               .                                                               .                               
+                .                               3                               4                               7                               .                               .                               .                               .               
+        .               .               2               3               .               .               6               7               .               .               .               .               .               .               .               .       
+    .       .       .       .       1       2       .       .       .       .       .       .       .       6       .       7       .       .       .       .       .       .       .       .       .       .       .       .       .       .       .       .   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 16 height(): 7
+9 4 1 5 3 4 7 2 3 6 7 1 2 6 7 7 
+                                                                                                                                9                                                                                                                               
+                                                                4                                                                                                                               .                                                               
+                                1                                                               5                                                               .                                                               .                               
+                .                               3                               4                               7                               .                               .                               .                               .               
+        .               .               2               3               .               .               6               7               .               .               .               .               .               .               .               .       
+    .       .       .       .       1       2       .       .       .       .       .       .       .       6       .       7       .       .       .       .       .       .       .       .       .       .       .       .       .       .       .       .   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 15 height(): 7
+9 4 1 5 3 7 2 3 6 7 1 2 6 7 7 
+                                                                                                                                9                                                                                                                               
+                                                                4                                                                                                                               .                                                               
+                                1                                                               5                                                               .                                                               .                               
+                .                               3                               .                               7                               .                               .                               .                               .               
+        .               .               2               3               .               .               6               7               .               .               .               .               .               .               .               .       
+    .       .       .       .       1       2       .       .       .       .       .       .       .       6       .       7       .       .       .       .       .       .       .       .       .       .       .       .       .       .       .       .   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 14 height(): 6
+9 5 1 7 3 6 7 2 3 6 7 1 2 7 
+                                                                9                                                               
+                                5                                                               .                               
+                1                               7                               .                               .               
+        .               3               6               7               .               .               .               .       
+    .       .       2       3       .       6       .       7       .       .       .       .       .       .       .       .   
+  .   .   .   .   1   2   .   .   .   .   .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 13 height(): 6
+9 6 1 7 3 6 7 2 3 7 1 2 7 
+                                                                9                                                               
+                                6                                                               .                               
+                1                               7                               .                               .               
+        .               3               6               7               .               .               .               .       
+    .       .       2       3       .       .       .       7       .       .       .       .       .       .       .       .   
+  .   .   .   .   1   2   .   .   .   .   .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
 random pushing/poping test: part 2
+size(): 1 height(): 1
+1 
+ 1
+size(): 4 height(): 4
+1 9 2 8 
+                1               
+        .               9       
+    .       .       2       .   
+  .   .   .   .   .   8   .   . 
+size(): 7 height(): 6
+1 9 2 8 3 8 7 
+                                                                1                                                               
+                                .                                                               9                               
+                .                               .                               2                               .               
+        .               .               .               .               .               8               .               .       
+    .       .       .       .       .       .       .       .       .       .       3       8       .       .       .       .   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   . 
+size(): 6 height(): 5
+9 2 8 3 8 7 
+                                9                               
+                2                               .               
+        .               8               .               .       
+    .       .       3       8       .       .       .       .   
+  .   .   .   .   .   7   .   .   .   .   .   .   .   .   .   . 
+size(): 5 height(): 4
+9 8 3 8 7 
+                9               
+        8               .       
+    3       8       .       .   
+  .   7   .   .   .   .   .   . 
+size(): 5 height(): 4
+9 8 3 8 7 
+                9               
+        8               .       
+    3       8       .       .   
+  .   7   .   .   .   .   .   . 
+size(): 4 height(): 4
+9 8 3 7 
+                9               
+        8               .       
+    3       .       .       .   
+  .   7   .   .   .   .   .   . 
 searching
+ans->val: 3
+ans->left->val: null
+ans->right->val: 7
 traversing
+9 6 1 3 2 1 2 3 7 6 7 7 7 
+1 1 2 2 3 3 6 6 7 7 7 7 9 
+1 2 2 3 3 1 6 7 7 7 7 6 9 
 
 ----------- BST test result -----------
 Pass/Total: 2/2
@@ -181,9 +764,240 @@ Pass/Total: 2/2
 
 ------- Test: use mfwu::avl_tree -------
 building Adelson-Velskii-Landis tree
+size(): 0 height(): 0
+
+size(): 27 height(): 6
+6 3 8 2 5 7 9 1 2 4 5 6 7 8 9 1 1 2 2 3 4 5 5 6 9 1 3 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               4               5               6               7               8               9       
+    1       1       2       2       3       4       5       5       .       6       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   3   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 27 height(): 6
+6 3 8 2 5 7 9 1 2 4 5 6 7 8 9 1 1 2 2 3 4 5 5 6 9 1 3 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               4               5               6               7               8               9       
+    1       1       2       2       3       4       5       5       .       6       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   3   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 27 height(): 6
+6 3 8 2 5 7 9 1 2 4 5 6 7 8 9 1 1 2 2 3 4 5 5 6 9 1 3 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               4               5               6               7               8               9       
+    1       1       2       2       3       4       5       5       .       6       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   3   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 10 height(): 4
+3 1 5 1 1 4 5 4 5 9 
+                3               
+        1               5       
+    1       1       4       5   
+  .   .   .   .   .   4   5   9 
+size(): 10 height(): 4
+3 1 5 1 1 4 5 4 5 9 
+                3               
+        1               5       
+    1       1       4       5   
+  .   .   .   .   .   4   5   9 
+size(): 0 height(): 0
+
 random pushing test
+size(): 15 height(): 5
+3 1 5 1 1 4 5 0 1 2 4 4 5 9 9 
+                                3                               
+                1                               5               
+        1               1               4               5       
+    0       .       1       2       4       4       5       9   
+  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   9 
+size(): 35 height(): 6
+0 0 3 0 0 1 5 0 0 0 0 0 1 4 5 0 0 0 0 0 0 0 1 1 2 4 4 5 9 0 0 0 0 0 9 
+                                                                0                                                               
+                                0                                                               3                               
+                0                               0                               1                               5               
+        0               0               0               0               0               1               4               5       
+    0       0       0       0       0       0       .       .       0       1       1       2       4       4       5       9   
+  0   0   .   .   0   0   .   .   .   .   .   .   .   .   .   .   .   .   0   .   .   .   .   .   .   .   .   .   .   .   .   9 
 random poping test
+size(): 27 height(): 6
+6 3 8 2 5 7 9 1 2 4 5 6 7 8 9 1 1 2 2 3 4 5 5 6 9 1 3 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               4               5               6               7               8               9       
+    1       1       2       2       3       4       5       5       .       6       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   3   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 26 height(): 6
+6 3 8 2 5 7 9 1 2 4 5 6 7 8 9 1 1 2 2 3 4 5 5 9 1 3 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               4               5               6               7               8               9       
+    1       1       2       2       3       4       5       5       .       .       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   3   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 25 height(): 6
+6 3 8 2 5 7 9 1 2 3 5 6 7 8 9 1 1 2 2 3 4 5 5 9 1 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               3               5               6               7               8               9       
+    1       1       2       2       3       4       5       5       .       .       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 24 height(): 6
+6 3 8 2 5 7 9 1 2 3 5 6 7 8 9 1 1 2 2 3 5 5 9 1 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               3               5               6               7               8               9       
+    1       1       2       2       3       .       5       5       .       .       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 24 height(): 6
+6 3 8 2 5 7 9 1 2 3 5 6 7 8 9 1 1 2 2 3 5 5 9 1 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               3               5               6               7               8               9       
+    1       1       2       2       3       .       5       5       .       .       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 24 height(): 6
+6 3 8 2 5 7 9 1 2 3 5 6 7 8 9 1 1 2 2 3 5 5 9 1 
+                                                                6                                                               
+                                3                                                               8                               
+                2                               5                               7                               9               
+        1               2               3               5               6               7               8               9       
+    1       1       2       2       3       .       5       5       .       .       .       .       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 22 height(): 5
+3 2 7 1 2 5 9 1 1 2 2 3 5 8 9 1 3 5 5 7 8 9 
+                                3                               
+                2                               7               
+        1               2               5               9       
+    1       1       2       2       3       5       8       9   
+  .   .   .   1   .   .   .   .   3   .   5   5   7   8   .   9 
+size(): 21 height(): 5
+3 2 7 1 2 5 9 1 1 2 2 3 5 8 9 1 5 5 7 8 9 
+                                3                               
+                2                               7               
+        1               2               5               9       
+    1       1       2       2       3       5       8       9   
+  .   .   .   1   .   .   .   .   .   .   5   5   7   8   .   9 
+size(): 20 height(): 5
+3 2 7 1 2 5 9 1 1 2 2 5 5 8 9 1 5 7 8 9 
+                                3                               
+                2                               7               
+        1               2               5               9       
+    1       1       2       2       5       5       8       9   
+  .   .   .   1   .   .   .   .   .   5   .   .   7   8   .   9 
+size(): 19 height(): 5
+5 2 7 1 2 5 9 1 1 2 2 5 5 8 9 1 7 8 9 
+                                5                               
+                2                               7               
+        1               2               5               9       
+    1       1       2       2       5       5       8       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   7   8   .   9 
+size(): 18 height(): 5
+5 2 7 1 2 5 9 1 1 2 2 5 8 9 1 7 8 9 
+                                5                               
+                2                               7               
+        1               2               5               9       
+    1       1       2       2       .       5       8       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   7   8   .   9 
+size(): 17 height(): 5
+5 2 9 1 2 7 9 1 1 2 2 5 8 9 1 7 8 
+                                5                               
+                2                               9               
+        1               2               7               9       
+    1       1       2       2       5       8       .       9   
+  .   .   .   1   .   .   .   .   .   .   7   8   .   .   .   . 
+size(): 16 height(): 5
+5 2 9 1 2 8 9 1 1 2 2 7 8 9 1 7 
+                                5                               
+                2                               9               
+        1               2               8               9       
+    1       1       2       2       7       8       .       9   
+  .   .   .   1   .   .   .   .   .   7   .   .   .   .   .   . 
+size(): 15 height(): 5
+7 2 9 1 2 8 9 1 1 2 2 7 8 9 1 
+                                7                               
+                2                               9               
+        1               2               8               9       
+    1       1       2       2       7       8       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 14 height(): 5
+7 2 9 1 2 8 9 1 1 2 2 8 9 1 
+                                7                               
+                2                               9               
+        1               2               8               9       
+    1       1       2       2       .       8       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 13 height(): 5
+8 2 9 1 2 8 9 1 1 2 2 9 1 
+                                8                               
+                2                               9               
+        1               2               8               9       
+    1       1       2       2       .       .       .       9   
+  .   .   .   1   .   .   .   .   .   .   .   .   .   .   .   . 
+size(): 12 height(): 4
+2 1 8 1 1 2 9 1 2 2 9 9 
+                2               
+        1               8       
+    1       1       2       9   
+  .   .   .   1   2   2   9   9 
+size(): 11 height(): 4
+2 1 8 1 1 2 9 1 2 9 9 
+                2               
+        1               8       
+    1       1       2       9   
+  .   .   .   1   .   2   9   9 
+size(): 10 height(): 4
+2 1 8 1 1 2 9 1 9 9 
+                2               
+        1               8       
+    1       1       2       9   
+  .   .   .   1   .   .   9   9 
+size(): 9 height(): 4
+2 1 9 1 1 8 9 1 9 
+                2               
+        1               9       
+    1       1       8       9   
+  .   .   .   1   .   9   .   . 
+size(): 8 height(): 4
+8 1 9 1 1 9 9 1 
+                8               
+        1               9       
+    1       1       9       9   
+  .   .   .   1   .   .   .   . 
+size(): 7 height(): 4
+9 1 9 1 1 9 1 
+                9               
+        1               9       
+    1       1       .       9   
+  .   .   .   1   .   .   .   . 
+size(): 6 height(): 3
+1 1 9 1 1 9 
+        1       
+    1       9   
+  1   .   1   9 
+size(): 5 height(): 3
+1 1 9 1 9 
+        1       
+    1       9   
+  1   .   .   9 
+size(): 4 height(): 3
+9 1 9 1 
+        9       
+    1       9   
+  1   .   .   . 
+size(): 3 height(): 2
+1 1 9 
+    1   
+  1   9 
 traversing
+6 3 2 1 1 1 1 2 2 2 5 4 3 3 4 5 5 5 8 7 6 6 7 9 8 9 9 
+1 1 1 1 2 2 2 2 3 3 3 4 4 5 5 5 5 6 6 6 7 7 8 8 9 9 9 
+1 1 1 1 2 2 2 2 3 3 4 4 5 5 5 5 3 6 6 7 7 8 9 9 9 8 6 
 
 ----------- AVL_tree test result -----------
 Pass/Total: 2/2
@@ -192,12 +1006,567 @@ Pass/Total: 2/2
 
 ------- Test: use mfwu::rbtree::insert -------
 constructing rbtree
+size() : 0  height(): 0
+empty tree
+size() : 36  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;31m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;31m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;31m5[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m7[0m       [0;32m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m2[0m   [0;31m3[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 36  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;31m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;31m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;31m5[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m7[0m       [0;32m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m2[0m   [0;31m3[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 36  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;31m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;31m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;31m5[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m7[0m       [0;32m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m2[0m   [0;31m3[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 36  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;31m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;31m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;31m5[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m7[0m       [0;32m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m2[0m   [0;31m3[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 36  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;31m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;31m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;31m5[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m7[0m       [0;32m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m2[0m   [0;31m3[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
 random inserting test: part 1
+size() : 11  height(): 4
+                [0;32m6[0m               
+        [0;31m1[0m               [0;31m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;31m0[0m   [0;32m.[0m   [0;31m1[0m   [0;31m5[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 12  height(): 4
+                [0;32m6[0m               
+        [0;31m1[0m               [0;31m9[0m       
+    [0;32m0[0m       [0;32m4[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;31m1[0m   [0;31m5[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 13  height(): 4
+                [0;32m6[0m               
+        [0;31m1[0m               [0;31m9[0m       
+    [0;32m0[0m       [0;32m4[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;31m1[0m   [0;31m5[0m   [0;31m6[0m   [0;31m8[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 14  height(): 5
+                                [0;32m6[0m                               
+                [0;32m1[0m                               [0;32m9[0m               
+        [0;32m0[0m               [0;32m4[0m               [0;31m7[0m               [0;32m9[0m       
+    [0;31m0[0m       [0;31m1[0m       [0;31m1[0m       [0;31m5[0m       [0;32m6[0m       [0;32m8[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 15  height(): 5
+                                [0;32m6[0m                               
+                [0;32m1[0m                               [0;32m9[0m               
+        [0;32m0[0m               [0;31m4[0m               [0;31m7[0m               [0;32m9[0m       
+    [0;31m0[0m       [0;31m1[0m       [0;32m1[0m       [0;32m5[0m       [0;32m6[0m       [0;32m8[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 16  height(): 5
+                                [0;32m6[0m                               
+                [0;32m1[0m                               [0;32m9[0m               
+        [0;32m0[0m               [0;31m4[0m               [0;31m7[0m               [0;32m9[0m       
+    [0;31m0[0m       [0;31m1[0m       [0;32m1[0m       [0;32m5[0m       [0;32m6[0m       [0;32m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
 random inserting test: part 2
+size() : 1  height(): 1
+ [0;32m2[0m
+rbtree validated
+info: 
+min: 2
+max: 2
+black cnt in each path: 2
+size() : 2  height(): 2
+    [0;32m2[0m   
+  [0;32m.[0m   [0;31m8[0m 
+rbtree validated
+info: 
+min: 2
+max: 8
+black cnt in each path: 2
+size() : 3  height(): 2
+    [0;32m8[0m   
+  [0;31m2[0m   [0;31m8[0m 
+rbtree validated
+info: 
+min: 2
+max: 8
+black cnt in each path: 2
+size() : 4  height(): 3
+        [0;32m8[0m       
+    [0;32m2[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 2
+max: 8
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;32m2[0m       [0;32m8[0m   
+  [0;31m1[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 6  height(): 4
+                [0;32m8[0m               
+        [0;31m2[0m               [0;32m8[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 7  height(): 4
+                [0;32m8[0m               
+        [0;31m2[0m               [0;32m8[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 8  height(): 4
+                [0;32m8[0m               
+        [0;31m2[0m               [0;32m8[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;31m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 9  height(): 4
+                [0;32m6[0m               
+        [0;31m2[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m7[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 10  height(): 4
+                [0;32m6[0m               
+        [0;31m2[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m7[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 11  height(): 4
+                [0;32m6[0m               
+        [0;31m2[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m7[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;31m1[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 12  height(): 4
+                [0;32m6[0m               
+        [0;31m2[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m7[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;31m1[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m   [0;31m8[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 3
+size() : 13  height(): 5
+                                [0;32m6[0m                               
+                [0;32m2[0m                               [0;32m8[0m               
+        [0;32m1[0m               [0;31m4[0m               [0;32m7[0m               [0;32m8[0m       
+    [0;32m.[0m       [0;31m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m       [0;31m8[0m       [0;31m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 8
+black cnt in each path: 4
+size() : 14  height(): 5
+                                [0;32m6[0m                               
+                [0;32m2[0m                               [0;32m8[0m               
+        [0;32m1[0m               [0;31m4[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;31m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 4
+size() : 15  height(): 5
+                                [0;32m6[0m                               
+                [0;32m2[0m                               [0;32m8[0m               
+        [0;32m1[0m               [0;31m4[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;31m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 4
+size() : 16  height(): 5
+                                [0;32m6[0m                               
+                [0;32m2[0m                               [0;32m8[0m               
+        [0;32m1[0m               [0;31m4[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;31m1[0m       [0;32m3[0m       [0;32m5[0m       [0;32m.[0m       [0;32m.[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 4
+size() : 17  height(): 5
+                                [0;32m6[0m                               
+                [0;32m2[0m                               [0;32m8[0m               
+        [0;32m1[0m               [0;31m4[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;31m1[0m       [0;32m3[0m       [0;32m5[0m       [0;32m.[0m       [0;31m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 4
+size() : 18  height(): 5
+                                [0;32m6[0m                               
+                [0;32m2[0m                               [0;32m8[0m               
+        [0;32m1[0m               [0;31m4[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;31m1[0m       [0;32m3[0m       [0;32m5[0m       [0;31m6[0m       [0;31m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 4
+size() : 19  height(): 5
+                                [0;32m6[0m                               
+                [0;32m4[0m                               [0;32m8[0m               
+        [0;31m2[0m               [0;31m5[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m5[0m       [0;31m6[0m       [0;31m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 4
+size() : 20  height(): 5
+                                [0;32m6[0m                               
+                [0;32m4[0m                               [0;32m8[0m               
+        [0;31m2[0m               [0;31m5[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m5[0m       [0;31m6[0m       [0;31m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 21  height(): 5
+                                [0;32m6[0m                               
+                [0;32m4[0m                               [0;32m8[0m               
+        [0;31m2[0m               [0;31m5[0m               [0;32m7[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m5[0m       [0;31m6[0m       [0;31m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;31m2[0m   [0;31m3[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 22  height(): 5
+                                [0;32m6[0m                               
+                [0;32m4[0m                               [0;32m8[0m               
+        [0;31m2[0m               [0;31m5[0m               [0;31m7[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m5[0m       [0;32m6[0m       [0;32m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;31m2[0m   [0;31m3[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 22  height(): 5
+                                [0;32m6[0m                               
+                [0;32m4[0m                               [0;32m8[0m               
+        [0;31m2[0m               [0;31m5[0m               [0;31m7[0m               [0;31m8[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m4[0m       [0;32m5[0m       [0;32m6[0m       [0;32m7[0m       [0;32m8[0m       [0;32m8[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;31m2[0m   [0;31m3[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 23  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;32m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;31m7[0m                               [0;31m8[0m               
+        [0;31m1[0m               [0;32m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;32m7[0m               [0;32m8[0m               [0;32m8[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;31m2[0m       [0;31m3[0m       [0;32m.[0m       [0;31m4[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 24  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;32m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;31m7[0m                               [0;31m8[0m               
+        [0;31m1[0m               [0;32m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;32m7[0m               [0;32m8[0m               [0;32m8[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;31m2[0m       [0;31m3[0m       [0;32m.[0m       [0;31m4[0m       [0;32m.[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 25  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;32m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;31m7[0m                               [0;31m8[0m               
+        [0;31m1[0m               [0;32m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;32m7[0m               [0;32m8[0m               [0;32m8[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;31m2[0m       [0;31m3[0m       [0;31m4[0m       [0;31m4[0m       [0;32m.[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 26  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;32m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;31m7[0m                               [0;31m8[0m               
+        [0;31m1[0m               [0;32m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;32m7[0m               [0;32m8[0m               [0;32m8[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;31m2[0m       [0;31m3[0m       [0;31m4[0m       [0;31m4[0m       [0;32m.[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m8[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 27  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;32m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;31m7[0m                               [0;31m8[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;32m7[0m               [0;32m8[0m               [0;32m8[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;32m.[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m8[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
 
 ------- Test: use mfwu::rbtree::erase -------
 random inserting/erasing test: part 1
+size() : 10  height(): 5
+                                [0;32m3[0m                               
+                [0;32m1[0m                               [0;32m5[0m               
+        [0;32m0[0m               [0;32m2[0m               [0;32m4[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 10  height(): 4
+                [0;32m4[0m               
+        [0;32m1[0m               [0;32m7[0m       
+    [0;32m0[0m       [0;32m2[0m       [0;31m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m5[0m   [0;32m6[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 10  height(): 4
+                [0;32m6[0m               
+        [0;32m4[0m               [0;32m7[0m       
+    [0;32m1[0m       [0;32m5[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;31m0[0m   [0;32m.[0m   [0;32m.[0m   [0;31m5[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 10  height(): 4
+                [0;32m6[0m               
+        [0;32m4[0m               [0;32m7[0m       
+    [0;32m1[0m       [0;32m5[0m       [0;32m6[0m       [0;32m9[0m   
+  [0;31m0[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 10  height(): 4
+                [0;32m6[0m               
+        [0;32m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 8  height(): 4
+                [0;32m5[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
 random inserting/eraseing test: part 2
+size() : 36  height(): 6
+                                                                [0;32m6[0m                                                               
+                                [0;31m4[0m                                                               [0;31m8[0m                               
+                [0;32m2[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m1[0m               [0;31m3[0m               [0;32m4[0m               [0;32m5[0m               [0;32m6[0m               [0;31m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m2[0m       [0;32m3[0m       [0;31m4[0m       [0;31m4[0m       [0;31m5[0m       [0;31m5[0m       [0;32m.[0m       [0;31m6[0m       [0;32m7[0m       [0;32m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;31m0[0m   [0;31m1[0m   [0;32m.[0m   [0;31m1[0m   [0;32m.[0m   [0;31m2[0m   [0;31m3[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+size() : 47  height(): 7
+                                                                                                                                [0;32m6[0m                                                                                                                               
+                                                                [0;32m4[0m                                                                                                                               [0;31m7[0m                                                               
+                                [0;32m2[0m                                                               [0;32m5[0m                                                               [0;32m6[0m                                                               [0;32m8[0m                               
+                [0;31m1[0m                               [0;31m3[0m                               [0;32m4[0m                               [0;32m5[0m                               [0;32m6[0m                               [0;32m6[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;32m2[0m               [0;32m3[0m               [0;31m4[0m               [0;31m4[0m               [0;31m5[0m               [0;31m5[0m               [0;32m6[0m               [0;31m6[0m               [0;32m6[0m               [0;31m6[0m               [0;32m7[0m               [0;32m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;31m0[0m       [0;31m1[0m       [0;32m.[0m       [0;31m1[0m       [0;32m.[0m       [0;31m2[0m       [0;31m3[0m       [0;31m3[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m6[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 5
+size() : 47  height(): 7
+                                                                                                                                [0;32m6[0m                                                                                                                               
+                                                                [0;32m4[0m                                                                                                                               [0;31m7[0m                                                               
+                                [0;32m2[0m                                                               [0;32m5[0m                                                               [0;32m6[0m                                                               [0;32m8[0m                               
+                [0;31m1[0m                               [0;31m3[0m                               [0;31m4[0m                               [0;32m5[0m                               [0;32m6[0m                               [0;32m6[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;32m2[0m               [0;32m3[0m               [0;32m4[0m               [0;32m4[0m               [0;31m5[0m               [0;31m5[0m               [0;32m6[0m               [0;31m6[0m               [0;32m6[0m               [0;31m6[0m               [0;32m7[0m               [0;32m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;31m0[0m       [0;31m1[0m       [0;32m.[0m       [0;31m1[0m       [0;32m.[0m       [0;31m2[0m       [0;31m3[0m       [0;31m3[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m6[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;31m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 5
+size() : 47  height(): 7
+                                                                                                                                [0;32m6[0m                                                                                                                               
+                                                                [0;32m4[0m                                                                                                                               [0;31m7[0m                                                               
+                                [0;32m2[0m                                                               [0;32m5[0m                                                               [0;32m6[0m                                                               [0;32m8[0m                               
+                [0;31m1[0m                               [0;31m3[0m                               [0;31m4[0m                               [0;32m5[0m                               [0;32m6[0m                               [0;32m6[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;32m2[0m               [0;32m3[0m               [0;32m4[0m               [0;32m4[0m               [0;31m5[0m               [0;31m5[0m               [0;32m6[0m               [0;31m6[0m               [0;32m6[0m               [0;31m6[0m               [0;32m7[0m               [0;32m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;31m0[0m       [0;31m1[0m       [0;32m.[0m       [0;31m1[0m       [0;32m.[0m       [0;31m2[0m       [0;31m3[0m       [0;31m3[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m6[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;31m7[0m       [0;31m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 5
+size() : 47  height(): 7
+                                                                                                                                [0;32m6[0m                                                                                                                               
+                                                                [0;32m4[0m                                                                                                                               [0;31m7[0m                                                               
+                                [0;31m2[0m                                                               [0;32m5[0m                                                               [0;32m6[0m                                                               [0;32m8[0m                               
+                [0;32m1[0m                               [0;32m3[0m                               [0;31m4[0m                               [0;32m5[0m                               [0;32m6[0m                               [0;32m6[0m                               [0;32m7[0m                               [0;32m9[0m               
+        [0;31m0[0m               [0;32m1[0m               [0;32m2[0m               [0;32m3[0m               [0;32m4[0m               [0;32m4[0m               [0;31m5[0m               [0;31m5[0m               [0;32m6[0m               [0;31m6[0m               [0;32m6[0m               [0;31m6[0m               [0;32m7[0m               [0;32m7[0m               [0;32m8[0m               [0;32m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m2[0m       [0;31m3[0m       [0;31m3[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m6[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m       [0;31m7[0m       [0;31m7[0m       [0;31m8[0m       [0;31m8[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m0[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 5
+size() : 33  height(): 7
+                                                                                                                                [0;32m7[0m                                                                                                                               
+                                                                [0;32m4[0m                                                                                                                               [0;32m8[0m                                                               
+                                [0;31m2[0m                                                               [0;32m5[0m                                                               [0;32m7[0m                                                               [0;32m9[0m                               
+                [0;32m1[0m                               [0;32m3[0m                               [0;31m4[0m                               [0;32m5[0m                               [0;32m7[0m                               [0;32m7[0m                               [0;31m8[0m                               [0;32m9[0m               
+        [0;31m0[0m               [0;32m1[0m               [0;32m2[0m               [0;32m3[0m               [0;32m4[0m               [0;32m4[0m               [0;31m5[0m               [0;31m5[0m               [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m8[0m               [0;32m8[0m               [0;32m.[0m               [0;31m9[0m       
+    [0;32m0[0m       [0;32m1[0m       [0;32m.[0m       [0;32m.[0m       [0;31m2[0m       [0;31m2[0m       [0;32m.[0m       [0;31m3[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;31m8[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m0[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 5
 
 ----------- Rbtree test result -----------
 Pass/Total: 3/3
@@ -208,6 +1577,17 @@ Pass/Total: 3/3
 constructing & copying & moving
 
 write/read ops
+!_______|
+#_______|
+
+#_______|
+
+abcdefg___|
+hello ngmay___|
+
+hello ngmay___|
+
+abcdefg
 
 read/write ptr pos ctrl
 
@@ -218,9 +1598,42 @@ Pass/Total: 1/1
 
 ------- Test: use mfwu::hashtable -------
 testing hashtable
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | 1 | - | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 6
+| - | 6 | 2 | 3 | - | 6 | 6 | - | - | - | - | 
+| - | 1 | - | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 6
+| - | 6 | 2 | 3 | - | 6 | 7 | - | - | - | - | 
+| - | 1 | - | - | - | - | - | - | - | - | - | 
+
 
 ------- Test: use mfwu::shashtable -------
 testing shashtable
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | 11 | - | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| 11 | - | 2 | 3 | - | 5 | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 5
+| 22 | - | 2 | 3 | - | 5 | - | - | - | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
 
 ----------- Hashtable test result -----------
 Pass/Total: 2/2
@@ -229,16 +1642,134 @@ Pass/Total: 2/2
 
 ------- Test: use mfwu::unordered_map -------
 constructing & copying & moving & destroying
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 0
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| - | 2 | 3 | 4 | - | 6 | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 2
+| - | 2 | - | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 2
+| - | 2 | - | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
 
 ------- Test: use modifiers and lookups -------
+*it = [10, 5]
+is new: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| 7 | - | 3 | - | - | - | - | - | - | 6 | 5 | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 5
+| 7 | 1 | 2 | - | - | - | - | - | - | 6 | 5 | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| 7 | 1 | 5 | - | - | 8 | - | - | - | 6 | 3 | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+*it = [10, 9]
+is new: false
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| 7 | 1 | 5 | - | - | 8 | - | - | - | 6 | 9 | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+is successful: true
+is successful: false
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 8 | - | - | 5 | - | 
+| 3 | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 6
+| 7 | 1 | 5 | - | - | - | - | - | - | 6 | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+true
+*it = [20, 6]
+6
 
 ------- Test: use other interfaces -------
 allocating & deallocating
 hashing
+18446744073709551610
 testing interfaces
+key: 66, val: 7
+key: 12, val: 4
+key: 2, val: 3
+key: 51, val: 4
+key: 20, val: 6
+empty: false
+size: 5
+load_factor: 0.454545
+max_size: 4294967291
+max_load_factor: 0.7
 rehashing capacity = 50...
+key: 2, val: 3
+key: 12, val: 4
+key: 66, val: 7
+key: 20, val: 6
+key: 51, val: 4
+empty: false
+size: 5
+load_factor: 0.0943396
+max_size: 4294967291
+max_load_factor: 0.7
 reserving size = 50...
+key: 2, val: 3
+key: 12, val: 4
+key: 20, val: 6
+key: 51, val: 4
+key: 66, val: 7
+empty: false
+size: 5
+load_factor: 0.0515464
+max_size: 4294967291
+max_load_factor: 0.7
 clearing...
+empty: true
+size: 0
+load_factor: 0
+max_size: 4294967291
+max_load_factor: 0.7
 
 ----------- Unordered_map test result -----------
 Pass/Total: 3/3
@@ -247,16 +1778,126 @@ Pass/Total: 3/3
 
 ------- Test: use mfwu::unordered_set -------
 constructing & copying & moving & destroying
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 0
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| - | 1 | 2 | 3 | - | 5 | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
 
 ------- Test: use modifiers and lookups -------
+*it = 7
+is new: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| - | - | 2 | - | - | - | 6 | 7 | 8 | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 5
+| 11 | - | 2 | - | - | - | 6 | 7 | 8 | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| 22 | - | 2 | - | - | 5 | 6 | 7 | 8 | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
+*it = 7
+is new: false
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| 22 | - | 2 | - | - | 5 | 6 | 7 | 8 | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
+*it = 8
+is successful: true
+is successful: false
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 2
+| 5 | - | 22 | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 6
+| 22 | - | 2 | - | - | - | 6 | - | 8 | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
+true
+*it = 6
 
 ------- Test: use other interfaces -------
 allocating & deallocating
 hashing
+18446744073709551610
 testing interfaces
+key: 1
+key: 23
+key: 12
+key: 2
+key: 60
+key: 53
+empty: false
+size: 6
+load_factor: 0.545455
+max_size: 4294967291
+max_load_factor: 0.7
 rehashing capacity = 50...
+key: 53
+key: 1
+key: 2
+key: 60
+key: 12
+key: 23
+empty: false
+size: 6
+load_factor: 0.113208
+max_size: 4294967291
+max_load_factor: 0.7
 reserving size = 50...
+key: 1
+key: 2
+key: 12
+key: 23
+key: 53
+key: 60
+empty: false
+size: 6
+load_factor: 0.0618557
+max_size: 4294967291
+max_load_factor: 0.7
 clearing...
+empty: true
+size: 0
+load_factor: 0
+max_size: 4294967291
+max_load_factor: 0.7
 
 ----------- Unordered_set test result -----------
 Pass/Total: 3/3
@@ -264,14 +1905,167 @@ Pass/Total: 3/3
 
 
 ------- Test: use deque block -------
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ 4 4 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ 4 4 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ 4 4 
+_ 4 _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ 1 4 5 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ 4 4 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ 4 _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ 3 4 _ 
 
 ------- Test: use deque iterator -------
+1 2 3 4 5 6 7 8 
 
 ------- Test: use mfwu::deque -------
 constructing
+size: 0
+
+size: 2
+1 2 _ _ 
+
+size: 4
+3 4 5 6 
+
+size: 5
+7 8 9 0 
+1 _ _ _ 
+
+size: 10
+1 2 3 4 5 6 7 8 
+9 10 _ _ _ _ _ _ 
+
+size: 2
+1 2 _ _ 
+
+size: 4
+3 4 5 6 
+
+size: 5
+1 3 5 7 9 _ _ _ 
+
 push/pop/insert/erasing
+size: 4
+7 8 9 0 
+
+size: 5
+7 8 9 0 
+8 _ _ _ 
+
+size: 4
+_ 8 9 0 
+8 _ _ _ 
+
+size: 3
+_ _ 9 0 
+8 _ _ _ 
+
+size: 4
+_ 6 9 0 
+8 _ _ _ 
+
+size: 5
+1 6 9 0 
+8 _ _ _ 
+
+size: 6
+_ _ _ 2 
+1 6 9 0 
+8 _ _ _ 
+
+size: 5
+_ _ _ 2 
+1 6 0 _ 
+8 _ _ _ 
+
+size: 4
+_ _ _ 2 
+_ 6 0 _ 
+8 _ _ _ 
+
+size: 3
+_ _ _ 2 
+_ _ 0 _ 
+8 _ _ _ 
+
+size: 2
+_ _ _ 2 
+8 _ _ _ 
+
+size: 1
+_ _ _ 2 
+
 
 ------- Test: use deque ranged insert/erase -------
+size: 9
+1 2 3 4 
+5 6 7 8 
+9 _ _ _ 
+
+size: 18
+1 2 3 4 
+5 _ _ _ 
+9 8 7 6 
+5 4 3 2 
+1 _ _ _ 
+_ 6 7 8 
+9 _ _ _ 
+
+size: 19
+1 2 3 4 
+5 9 _ _ 
+1 8 7 6 
+5 4 3 2 
+1 _ _ _ 
+_ 6 7 8 
+9 _ _ _ 
+
+size: 14
+1 2 _ _ 
+_ 8 7 6 
+5 4 3 2 
+1 _ _ _ 
+_ 6 7 8 
+9 _ _ _ 
+
+size: 17
+3 5 7 _ 
+1 2 _ _ 
+_ 8 7 6 
+5 4 3 2 
+1 _ _ _ 
+_ 6 7 8 
+9 _ _ _ 
+
+size: 16
+3 5 7 _ 
+1 2 _ _ 
+_ 8 7 6 
+5 4 3 2 
+1 _ _ _ 
+_ 6 7 _ 
+9 _ _ _ 
+
+size: 18
+3 5 7 _ 
+1 2 _ _ 
+_ 8 7 6 
+5 4 3 _ 
+2 0 _ _ 
+2 _ _ _ 
+1 _ _ _ 
+_ 6 7 _ 
+9 _ _ _ 
+
+size: 8
+3 5 7 _ 
+1 2 _ _ 
+_ 8 7 _ 
+9 _ _ _ 
+
 
 ----------- Deque test result -----------
 Pass/Total: 4/4
@@ -280,6 +2074,68 @@ Pass/Total: 4/4
 
 ------- Test: use mfwu::stack -------
 building & copying & moving
+empty : true, size : 0
+
+empty : false, size : 5, top : 
+     
+empty : false, size : 4, top : 5
+2 3 4 5 
+empty : false, size : 6, top : 6
+6 6 6 6 6 6 
+empty : false, size : 6, top : 6
+6 6 6 6 6 6 
+empty : false, size : 6, top : 6
+6 6 6 6 6 6 
+empty : false, size : 6, top : 6
+6 6 6 6 6 6 
+empty : true, size : 0
+
+empty : false, size : 2, top : 8
+7 8 
+empty : false, size : 3, top : 3
+7 8 3 
+empty : false, size : 4, top : 6
+7 8 3 6 
+empty : false, size : 5, top : 7
+7 8 3 6 7 
+empty : false, size : 6, top : 5
+7 8 3 6 7 5 
+empty : false, size : 7, top : 3
+7 8 3 6 7 5 3 
+empty : false, size : 8, top : 5
+7 8 3 6 7 5 3 5 
+empty : false, size : 9, top : 6
+7 8 3 6 7 5 3 5 6 
+empty : false, size : 10, top : 2
+7 8 3 6 7 5 3 5 6 2 
+empty : false, size : 11, top : 9
+7 8 3 6 7 5 3 5 6 2 9 
+empty : false, size : 12, top : 1
+7 8 3 6 7 5 3 5 6 2 9 1 
+empty : false, size : 11, top : 9
+7 8 3 6 7 5 3 5 6 2 9 
+empty : false, size : 12, top : 7
+7 8 3 6 7 5 3 5 6 2 9 7 
+empty : false, size : 11, top : 9
+7 8 3 6 7 5 3 5 6 2 9 
+empty : false, size : 12, top : 9
+7 8 3 6 7 5 3 5 6 2 9 9 
+empty : false, size : 13, top : 3
+7 8 3 6 7 5 3 5 6 2 9 9 3 
+empty : false, size : 12, top : 9
+7 8 3 6 7 5 3 5 6 2 9 9 
+empty : false, size : 11, top : 9
+7 8 3 6 7 5 3 5 6 2 9 
+empty : false, size : 10, top : 2
+7 8 3 6 7 5 3 5 6 2 
+empty : false, size : 9, top : 6
+7 8 3 6 7 5 3 5 6 
+empty : false, size : 8, top : 5
+7 8 3 6 7 5 3 5 
+empty : false, size : 9, top : 1
+7 8 3 6 7 5 3 5 1 
+empty : false, size : 8, top : 5
+7 8 3 6 7 5 3 5 
 
 ----------- Stack test result -----------
 Pass/Total: 1/1
@@ -288,6 +2144,24 @@ Pass/Total: 1/1
 
 ------- Test: use mfwu::queue -------
 building & copying & moving
+empty : true, size : 0
+
+empty : false, size : 5, front : 
+     
+empty : false, size : 4, front : 2
+2 3 4 5 
+empty : false, size : 6, front : 6
+6 6 6 6 6 6 
+empty : false, size : 6, front : 6
+6 6 6 6 6 6 
+empty : false, size : 6, front : 6
+6 6 6 6 6 6 
+empty : false, size : 6, front : 6
+6 6 6 6 6 6 
+empty : true, size : 0
+
+empty : false, size : 2, front : 7
+7 8 
 
 ----------- Queue test result -----------
 Pass/Total: 1/1
@@ -296,13 +2170,214 @@ Pass/Total: 1/1
 
 ------- Test: use mfwu::set -------
 constructing & copying & moving & destroying
+size() : 0  height(): 0
+empty tree
+size() : 10  height(): 4
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 10  height(): 4
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 10  height(): 4
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 10  height(): 4
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+size() : 9  height(): 4
+                [0;32m4[0m               
+        [0;31m2[0m               [0;31m6[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m5[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m3[0m       
+    [0;32m5[0m       [0;32m2[0m   
+  [0;31m6[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 6
+max: 2
+black cnt in each path: 3
 
 ------- Test: use modifiers and lookups -------
 inserting & erasing
+size() : 4  height(): 3
+        [0;32m8[0m       
+    [0;32m1[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 6  height(): 4
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;31m4[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;31m4[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 6  height(): 4
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m7[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;31m6[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
 clearing & ranged_inserting & ranged_erasing & swapping & merging
+size() : 0  height(): 0
+empty tree
+size() : 1  height(): 1
+ [0;32m1[0m
+rbtree validated
+info: 
+min: 1
+max: 1
+black cnt in each path: 2
+size() : 5  height(): 3
+        [0;32m8[0m       
+    [0;31m6[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 2  height(): 2
+    [0;32m1[0m   
+  [0;32m.[0m   [0;31m6[0m 
+rbtree validated
+info: 
+min: 1
+max: 6
+black cnt in each path: 2
+size() : 6  height(): 4
+                [0;32m8[0m               
+        [0;31m6[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m7[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 6  height(): 4
+                [0;32m2[0m               
+        [0;32m1[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+size() : 2  height(): 2
+    [0;32m6[0m   
+  [0;31m1[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 6
+black cnt in each path: 2
+size() : 0  height(): 0
+empty tree
 finding & counting & containing & calcing equal_range
+0
+0
+2
+1
+0, 1, 1, 1
 
 ------- Test: use other interfaces -------
+empty(): 0
+size(): 8
+height(): 4
+root(): 6
+max_size(): 9223372036854775807
 
 ----------- Set test result -----------
 Pass/Total: 3/3
@@ -311,13 +2386,255 @@ Pass/Total: 3/3
 
 ------- Test: use mfwu::map -------
 constructing & copying & moving & destroying
+empty tree
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 3
+                [0;32m5[0m               
+        [0;31m1[0m               [0;31m7[0m       
+    [0;32m0[0m       [0;32m3[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m2[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+                [0;32m4[0m               
+        [0;31m2[0m               [0;31m6[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m5[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 
+max: 	
+black cnt in each path: 3
+                [0;32m4[0m               
+        [0;31m2[0m               [0;31m6[0m       
+    [0;32m1[0m       [0;32m3[0m       [0;32m5[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;31m9[0m 
+        [0;32m3[0m       
+    [0;32m5[0m       [0;32m2[0m   
+  [0;31m6[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 6
+max: 2
+black cnt in each path: 3
+        [0;32m3[0m       
+    [0;32m5[0m       [0;32m2[0m   
+  [0;31m6[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
 
 ------- Test: use modifiers and lookups -------
 inserting & erasing
+        [0;32m8[0m       
+    [0;32m1[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;32m1[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m 
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+        [0;32m8[0m       
+    [0;31m4[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;31m4[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+        [0;32m8[0m       
+    [0;31m4[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;31m4[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m7[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m6[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m7[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m97[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+        [0;32m8[0m       
+    [0;31m6[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;31m97[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
 clearing & ranged_inserting & ranged_erasing & swapping & merging
+empty tree
+ [0;32m1[0m
+rbtree validated
+info: 
+min: 1
+max: 1
+black cnt in each path: 2
+ [0;32m1[0m
+        [0;32m8[0m       
+    [0;31m6[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;31m97[0m       [0;32m9[0m   
+  [0;32m1[0m   [0;32m7[0m   [0;32m.[0m   [0;32m.[0m 
+    [0;32m1[0m   
+  [0;32m.[0m   [0;31m6[0m 
+rbtree validated
+info: 
+min: 1
+max: 6
+black cnt in each path: 2
+    [0;32m1[0m   
+  [0;32m.[0m   [0;31m6[0m 
+                [0;32m8[0m               
+        [0;31m6[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m7[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m97[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m7[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m2[0m               
+        [0;32m1[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m2[0m               
+        [0;32m1[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m97[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m9[0m 
+    [0;32m6[0m   
+  [0;31m1[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 6
+black cnt in each path: 2
+    [0;32m97[0m   
+  [0;31m1[0m   [0;32m.[0m 
+empty tree
 finding & counting & containing & calcing equal_range
+0
+0
+2
+1
+0, 0, 1, 1
 
 ------- Test: use other interfaces -------
+empty(): 0
+size(): 8
+height(): 4
+max_size(): 9223372036854775807
 
 ----------- Map test result -----------
 Pass/Total: 3/3
@@ -356,13 +2673,196 @@ Pass/Total: 1/1
 
 ------- Test: use mfwu::multiset -------
 constructing & copying & moving & destroying
+empty tree
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                                                [0;32m2[0m                                                               
+                                [0;32m1[0m                                                               [0;31m4[0m                               
+                [0;32m0[0m                               [0;32m1[0m                               [0;32m3[0m                               [0;32m6[0m               
+        [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m3[0m               [0;32m4[0m               [0;31m5[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m5[0m       [0;32m5[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+        [0;32m1[0m       
+    [0;32m3[0m       [0;32m1[0m   
+  [0;31m3[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 3
+max: 1
+black cnt in each path: 3
 
 ------- Test: use modifiers and lookups -------
 inserting & erasing
+        [0;32m8[0m       
+    [0;32m1[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
 clearing & ranged_inserting & ranged_erasing & swapping & merging
+empty tree
+ [0;32m1[0m
+rbtree validated
+info: 
+min: 1
+max: 1
+black cnt in each path: 2
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+    [0;32m1[0m   
+  [0;32m.[0m   [0;31m6[0m 
+rbtree validated
+info: 
+min: 1
+max: 6
+black cnt in each path: 2
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m4[0m               
+        [0;31m1[0m               [0;31m6[0m       
+    [0;32m1[0m       [0;32m2[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+empty tree
+empty tree
 finding & counting & containing & calcing equal_range
+0
+0
+0
+0
+0, 0, 0, 0
 
 ------- Test: use other interfaces -------
+empty(): 0
+size(): 8
+height(): 4
+root(): 6
+max_size(): 9223372036854775807
 
 ----------- Multiset test result -----------
 Pass/Total: 3/3
@@ -371,13 +2871,269 @@ Pass/Total: 3/3
 
 ------- Test: use mfwu::multimap -------
 constructing & copying & moving & destroying
+empty tree
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m7[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m7[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m7[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m6[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 0
+max: 9
+black cnt in each path: 4
+                                [0;32m3[0m                               
+                [0;32m0[0m                               [0;32m7[0m               
+        [0;32m0[0m               [0;32m1[0m               [0;31m5[0m               [0;31m8[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;31m1[0m       [0;31m2[0m       [0;32m4[0m       [0;32m5[0m       [0;32m7[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m3[0m   [0;31m4[0m   [0;32m.[0m   [0;31m5[0m   [0;31m6[0m   [0;32m.[0m   [0;31m8[0m   [0;32m.[0m 
+                                                                [0;32m2[0m                                                               
+                                [0;32m1[0m                                                               [0;31m4[0m                               
+                [0;32m0[0m                               [0;32m1[0m                               [0;32m3[0m                               [0;32m6[0m               
+        [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m3[0m               [0;32m4[0m               [0;31m5[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m5[0m       [0;32m5[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min:  
+max: 	
+black cnt in each path: 4
+                                                                [0;32m2[0m                                                               
+                                [0;32m1[0m                                                               [0;31m4[0m                               
+                [0;32m0[0m                               [0;32m1[0m                               [0;32m3[0m                               [0;32m7[0m               
+        [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m.[0m               [0;32m3[0m               [0;32m4[0m               [0;31m5[0m               [0;31m7[0m       
+    [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m.[0m       [0;32m5[0m       [0;32m5[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m8[0m   [0;31m9[0m 
+        [0;32m1[0m       
+    [0;32m3[0m       [0;32m1[0m   
+  [0;31m3[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 3
+max: 1
+black cnt in each path: 3
+        [0;32m1[0m       
+    [0;32m3[0m       [0;32m1[0m   
+  [0;31m3[0m   [0;31m2[0m   [0;32m.[0m   [0;32m.[0m 
 
 ------- Test: use modifiers and lookups -------
 inserting & erasing
+        [0;32m8[0m       
+    [0;32m1[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;32m1[0m       [0;32m9[0m   
+  [0;32m.[0m   [0;31m3[0m   [0;32m.[0m   [0;32m.[0m 
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+        [0;32m8[0m       
+    [0;32m3[0m       [0;32m9[0m   
+  [0;31m1[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m3[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m4[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m97[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;31m4[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m97[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
 clearing & ranged_inserting & ranged_erasing & swapping & merging
+empty tree
+ [0;32m1[0m
+rbtree validated
+info: 
+min: 1
+max: 1
+black cnt in each path: 2
+ [0;32m1[0m
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m97[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+    [0;32m1[0m   
+  [0;32m.[0m   [0;31m6[0m 
+rbtree validated
+info: 
+min: 1
+max: 6
+black cnt in each path: 2
+    [0;32m1[0m   
+  [0;32m.[0m   [0;31m6[0m 
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m6[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m8[0m               
+        [0;31m4[0m               [0;32m9[0m       
+    [0;32m1[0m       [0;32m97[0m       [0;32m.[0m       [0;32m.[0m   
+  [0;32m.[0m   [0;31m2[0m   [0;32m.[0m   [0;31m7[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m 
+                [0;32m4[0m               
+        [0;31m1[0m               [0;31m6[0m       
+    [0;32m1[0m       [0;32m2[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;31m9[0m 
+rbtree validated
+info: 
+min: 1
+max: 9
+black cnt in each path: 3
+                [0;32m4[0m               
+        [0;31m1[0m               [0;31m97[0m       
+    [0;32m1[0m       [0;32m2[0m       [0;32m6[0m       [0;32m8[0m   
+  [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;32m.[0m   [0;31m7[0m   [0;31m9[0m 
+empty tree
+empty tree
 finding & counting & containing & calcing equal_range
+0
+0
+0
+0
+0, 0, 0, 0
 
 ------- Test: use other interfaces -------
+empty(): 0
+size(): 8
+height(): 4
+max_size(): 9223372036854775807
 
 ----------- Multimap test result -----------
 Pass/Total: 3/3
@@ -386,9 +3142,45 @@ Pass/Total: 3/3
 
 ------- Test: use mfwu::hashtable_exp -------
 testing hashtable
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | 1 | - | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| - | 6 | 2 | 3 | - | 6 | 6 | - | - | - | - | 
+| - | 1 | - | - | - | 5 | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| - | 6 | 2 | 3 | - | 6 | 7 | - | - | - | - | 
+| - | 1 | - | - | - | 5 | - | - | - | - | - | 
+
 
 ------- Test: use mfwu::shashtable -------
 testing shashtable
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| 11 | - | - | 3 | - | 5 | - | - | - | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 5
+| 11 | - | 2 | 3 | - | 5 | - | - | - | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 6
+| 22 | - | 2 | 3 | - | 5 | - | - | - | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+| 11 | - | - | - | - | - | - | - | - | - | - | 
+
 
 ----------- Hashtable_exp test result -----------
 Pass/Total: 2/2
@@ -397,16 +3189,144 @@ Pass/Total: 2/2
 
 ------- Test: use mfwu::unordered_multimap -------
 constructing & copying & moving & destroying
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 0
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| - | 2 | 3 | 4 | - | 6 | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 2
+| - | 2 | - | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 2
+| - | 2 | - | 4 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 6 | - | 3 | 4 | - | 
+
 
 ------- Test: use modifiers and lookups -------
+*it = [10, 5]
+is new: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 5
+| 7 | - | 3 | - | - | - | - | - | - | 6 | 5 | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| 7 | 1 | 2 | - | - | - | - | - | - | 6 | 5 | 
+| - | - | 3 | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 53	size: 10
+| - | 1 | 2 | - | - | 8 | - | - | - | - | 3 | - | - | 5 | - | - | - | - | - | - | 6 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 3 | - | - | - | - | - | - | - | 5 | - | - | 7 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+
+*it = [10, 9]
+is new: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 53	size: 11
+| - | 1 | 2 | - | - | 8 | - | - | - | - | 9 | - | - | 5 | - | - | - | - | - | - | 6 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 3 | - | - | - | - | - | - | - | 3 | - | - | 7 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | 5 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+
+*it = [10, 3]
+is successful: true
+is successful: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 8 | - | - | 5 | - | 
+| 3 | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 53	size: 9
+| - | 1 | 2 | - | - | - | - | - | - | - | 5 | - | - | 5 | - | - | - | - | - | - | 6 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 3 | - | - | - | - | - | - | - | - | - | - | 7 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+
+true
+*it = [20, 6]
+6
 
 ------- Test: use other interfaces -------
 allocating & deallocating
 hashing
+18446744073709551610
 testing interfaces
+key: 66, val: 7
+key: 12, val: 4
+key: 2, val: 3
+key: 2, val: 2
+key: 51, val: 4
+key: 20, val: 6
+empty: false
+size: 6
+load_factor: 0.545455
+max_size: 4294967291
+max_load_factor: 0.7
 rehashing capacity = 50...
+key: 2, val: 2
+key: 2, val: 3
+key: 12, val: 4
+key: 66, val: 7
+key: 20, val: 6
+key: 51, val: 4
+empty: false
+size: 6
+load_factor: 0.113208
+max_size: 4294967291
+max_load_factor: 0.7
 reserving size = 50...
+key: 2, val: 3
+key: 2, val: 2
+key: 12, val: 4
+key: 20, val: 6
+key: 51, val: 4
+key: 66, val: 7
+empty: false
+size: 6
+load_factor: 0.0618557
+max_size: 4294967291
+max_load_factor: 0.7
 clearing...
+empty: true
+size: 0
+load_factor: 0
+max_size: 4294967291
+max_load_factor: 0.7
 
 ----------- Unordered_multimap test result -----------
 Pass/Total: 3/3
@@ -415,16 +3335,133 @@ Pass/Total: 3/3
 
 ------- Test: use mfwu::unordered_multiset -------
 constructing & copying & moving & destroying
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 0
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 4
+| - | 1 | 2 | 3 | - | 5 | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 2 | 3 | - | 
+
 
 ------- Test: use modifiers and lookups -------
+*it = 7
+is new: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 5
+| - | - | 2 | - | - | - | 6 | 7 | 8 | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 11	size: 7
+| 11 | - | 2 | - | - | - | 6 | 7 | 8 | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 53	size: 10
+| - | - | 2 | - | - | 5 | 6 | 7 | 8 | - | - | 11 | - | - | - | - | - | - | - | - | - | - | 22 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | 5 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+
+*it = 7
+is new: true
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 53	size: 11
+| - | - | 2 | - | - | 5 | 6 | 7 | 8 | - | - | 11 | - | - | - | - | - | - | - | - | - | - | 22 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | 5 | - | 7 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+
+*it = 7
+is successful: true
+is successful: false
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 5	size: 3
+| 5 | - | 22 | - | - | 
+| 5 | - | - | - | - | 
+
+calling std::fill (or mfwu::fill)
+calling construct in loop
+capacity: 53	size: 10
+| - | - | 2 | - | - | 5 | 6 | 7 | 8 | - | - | 11 | - | - | - | - | - | - | - | - | - | - | 22 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+| - | - | 2 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | 
+
+true
+*it = 6
 
 ------- Test: use other interfaces -------
 allocating & deallocating
 hashing
+18446744073709551610
 testing interfaces
+key: 1
+key: 23
+key: 12
+key: 2
+key: 60
+key: 53
+empty: false
+size: 6
+load_factor: 0.545455
+max_size: 4294967291
+max_load_factor: 0.7
 rehashing capacity = 50...
+key: 53
+key: 1
+key: 2
+key: 60
+key: 12
+key: 23
+empty: false
+size: 6
+load_factor: 0.113208
+max_size: 4294967291
+max_load_factor: 0.7
 reserving size = 50...
+key: 1
+key: 2
+key: 12
+key: 23
+key: 53
+key: 60
+empty: false
+size: 6
+load_factor: 0.0618557
+max_size: 4294967291
+max_load_factor: 0.7
 clearing...
+empty: true
+size: 0
+load_factor: 0
+max_size: 4294967291
+max_load_factor: 0.7
 
 ----------- Unordered_multiset test result -----------
 Pass/Total: 3/3
@@ -438,7 +3475,7 @@ capacity: 0
 empty: true
 
 
-0x60bb3dfa00a0
+0x5b4d5afe29c0
 size: 12
 size: 12
 capacity: 12
@@ -447,7 +3484,7 @@ front: n
 back: o
 niganma-aiyo
 
-0x60bb3dfa1020
+0x5b4d5afe18d0
 size: 12
 size: 12
 capacity: 12
@@ -464,7 +3501,7 @@ back: c
 abc
 
 random pushing/poping/inserting/erasing
-0x60bb3dfa1020
+0x5b4d5afe18d0
 size: 5
 size: 19
 capacity: 24
@@ -487,8 +3524,8 @@ front: i
 back: o
 iyo1qhellog&nm&-&iyo1qhello_____________
 
-0x60bb3df9f3f0
-0x60bb3df9def0
+0x5b4d5afe0ef0
+0x5b4d5afe15e0
 size: 27
 size: 20
 capacity: 20
@@ -526,25 +3563,28 @@ Pass/Total: 2/2
 
 ------- Test: use mfwu::trie -------
 constructing & inserting & erasing
-0x60bb3dfa00a0
+0x5b4d5afe29c0
 size: 3
-0x60bb3dfa04e0
+0x5b4d5afd9a50
 size: 3
-0x60bb3dfa0f00
+0x5b4d5afe2ae0
 size: 4
-0x60bb3dfa1020
+0x5b4d5afe18d0
 size: 3
-0x60bb3dfa0400
+0x5b4d5afd9a70
 size: 3
-0x60bb3df9fc60
+0x5b4d5afe2d00
 size: 1
-0x60bb3dfa0b20
+0x5b4d5afe2ca0
 size: 3
-0x60bb3df9ff40
+0x5b4d5afe1f50
 size: 3
-0x60bb3dfa0140
+0x5b4d5afe1e90
 size: 3
 here
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -------------------------------------------------
 |  e  ||                a                ||  b  |
        |      a     ||  b  ||      c     ||  c  |
@@ -557,12 +3597,18 @@ here
        |      a     ||  b  ||      c     ||  c  |
 |  e  ||                a                ||  b  |
 -------------------------------------------------
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -------
        
        
 -------
-0x60bb3dfa08c0
+0x5b4d5afe1790
 size: 7
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -------
 |  n  |
 |  i  |
@@ -581,14 +3627,17 @@ size: 7
 |  i  |
 |  n  |
 -------
-0x60bb3dfa1950
+0x5b4d5afe3d90
 size: 6
-0x60bb3dfa1950
+0x5b4d5afe3d90
 size: 4
-0x60bb3dfa1950
+0x5b4d5afe3d90
 size: 4
-0x60bb3dfa1950
+0x5b4d5afe3d90
 size: 11
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -----------------------------------
 |         n         ||  y  ||  a  |
 |         i         ||  o  ||  i  |
@@ -615,6 +3664,9 @@ size: 11
 |         i         ||  o  ||  i  |
 |         n         ||  y  ||  a  |
 -----------------------------------
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -------------------------------------------------
 |  e  ||                a                ||  b  |
        |      a     ||  b  ||      c     ||  c  |
@@ -627,8 +3679,11 @@ size: 11
        |      a     ||  b  ||      c     ||  c  |
 |  e  ||                a                ||  b  |
 -------------------------------------------------
-0x60bb3dfa5340
+0x5b4d5afe7780
 size: 3
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -------------------------------------------------
 |  e  ||                a                ||  b  |
        |      a     ||  b  ||      c     ||  c  |
@@ -641,12 +3696,15 @@ size: 3
        |      a     ||  b  ||      c     ||  c  |
 |  e  ||                a                ||  b  |
 -------------------------------------------------
-0x60bb3dfa5340
+0x5b4d5afe7780
 size: 3
-0x60bb3dfa5340
+0x5b4d5afe7780
 size: 3
-0x60bb3dfa5340
+0x5b4d5afe7780
 size: 4
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 --------------------------------------------------------
 |  e  ||                    a                   ||  b  |
        |      a     ||      b     ||      c     ||  c  |
@@ -660,14 +3718,17 @@ size: 4
 |  e  ||                    a                   ||  b  |
 --------------------------------------------------------
 counting & getting res with prefix
-count 'abd': 0x60bb3dfa5340
+count 'abd': 0x5b4d5afe7780
 size: 3
 2
-count 'a' as prefix: 0x60bb3dfa5340
+count 'a' as prefix: 0x5b4d5afe7780
 size: 1
 9
-0x60bb3dfa5340
+0x5b4d5afe7780
 size: 1
+calling construct in loop
+calling std::fill (or mfwu::fill)
+calling construct in loop
 -----------------------------------
 |                a                |
 |  a  ||      b     ||      c     |
