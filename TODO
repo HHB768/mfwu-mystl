@@ -25,24 +25,35 @@
     5. tiny_string                          -
     6. ringbuffer                           -
     7. sort                                 -
-    8. webserver & logger & postman         30+ days
+    8. webserver & logger                   30+ days
 
     24.12.03 X-H
 */
 
 /*
-1. tiny_string                          2 days
-2. ringbuffer                           3 days
-3. sort                                 -
-4. tuple                                -
-5. TODOs                                -
-6. webserver & logger & postman         30+ days
+    1. tiny_string                          2 days
+    2. ringbuffer                           3 days
+    3. sort                                 -
+    4. tuple                                -
+    5. TODOs                                -
+    6. webserver & logger                   30+ days
 
-24.12.08 X-H
+    24.12.08 X-H
 
 */
 
-1. tiny_string & trie ut                2 days
-2. same as last update
+/*
+    1. tiny_string & trie ut                2 days  √
+    2. same as last update
 
-25.01.01 X-H
+    25.01.01 X-H
+*/
+
+
+1. tuple                                    1 days
+2. webserver                                3 days
+3. ringbuffer                               5 days
+4. logger                                   2 days
+5. others                                   -
+
+25.01.22 X-Q3
