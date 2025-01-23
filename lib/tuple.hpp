@@ -8,9 +8,8 @@ template <typename ThisArg, typename... RestArgs>
 class tuple : private tuple<RestArgs...> {
 public:
     using this_type = ThisArg;
-    using base_type = tuple<RestArgs>;
+    using base_type = tuple<RestArgs...>;
 
-    template <typename ThisArg, typename... RestArgs>
     tuple(ThisArg&& this_arg, RestArgs&&... rest_args)
         : base_type(mfwu::forward<RestArgs>(rest_args)...),
           first_(mfwu::forward<ThisArg>(this_arg)) {}
@@ -50,6 +49,22 @@ public:
     // _Tuple_val<this_type>
 
 };  // endof class tuple
+
+template <int idx, typename _Tuple>
+struct tuple_element {
+    using type = typename tuple_element<idx - 1, typename _Tuple::base_type>::type;
+};  // endof struct tuple_element
+
+template <typename _Tuple>
+struct tuple_element<0, _Tuple> {
+    using type = _Tuple;
+};  // endof struct tuple_element<0, ...>
+
+template <int idx, typename _Tuple>
+constexpr auto& get(_Tuple& t) {
+    using type = typename tuple_element<idx, _Tuple>::type;
+    return static_cast<type&>(t).first_;
+} 
 
 
 }  // endof namespace mfwu
