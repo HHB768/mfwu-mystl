@@ -1,21 +1,19 @@
-#include "common.hpp"
+#include "tuple.hpp"
+#include "iostream"
 
-template <typename Compare>
-class A {
-public:
-    static Compare cmp;
-};
-template <typename Compare>
-Compare A<Compare>::cmp = {};
-
-template <typename Compare>
-void test_func(A<Compare> a) {
-    std::cout << a.cmp(0, 1) << "\n";
-}
+using namespace mfwu;
 
 int main() {
-    A<mfwu::less<int>> a1;
-    A<mfwu::greater<int>> a2;
-    test_func(a1);
-    test_func(a2);
+    mfwu::tuple<int> a = 1;
+    mfwu::tuple<int, char> b = {1, 'c'};
+    mfwu::tuple<int, int, mfwu::tuple<char>> c = {1, 2, 97};
+    mfwu::tuple<int, char> b1 = b;
+    mfwu::tuple<int, char> b2 = {1, 'd'};
+
+    std::cout << mfwu::get<0>(a) << "\n";
+    std::cout << mfwu::get<1>(c) << " " << mfwu::get<0>(mfwu::get<2>(c)) << "\n";
+    std::cout << "b == b1 ? " << (b == b1) << "\n";
+    std::cout << "b == b2 ? " << (b == b2) << "\n";
+
+    return 0;
 }
