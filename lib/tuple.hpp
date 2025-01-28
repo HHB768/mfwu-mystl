@@ -71,3 +71,17 @@ constexpr auto& get(_Tuple& t) {
 
 
 #endif  // __TUPLE_HPP__
+
+/*
+LOL GIT PUSH FAILURE:
+
+gpt ans:
+Why It Worked with HTTPS Before
+Your setup likely relied on an implicit fallback where:
+
+Git used SSH keys for authentication despite an HTTPS URL, possibly with some VS Code logic or configuration bridging the two.
+git.terminalAuthentication forced HTTPS prompts, which became problematic if no valid credentials were available.
+Once you disabled the setting, this interference ceased, and Git's native behavior (possibly SSH authentication) took over.
+
+25.01.24
+*/
