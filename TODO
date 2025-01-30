@@ -50,10 +50,10 @@
 */
 
 
-1. tuple                                    1 days
+1. tuple                                    1 days  √
 2. webserver                                3 days
 3. ringbuffer                               5 days
-4. logger                                   2 days
+4. logger                                   5 days (2 + 3)
 5. others                                   -
 
 25.01.22 X-Q3
