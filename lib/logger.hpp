@@ -6,10 +6,29 @@
 
 namespace mfwu {
 
+std::chrono::high_resolution_clock::time_point start_time = {};
+
 struct LogEvent {
 public:
     using ptr = std::shared_ptr<LogEvent>;
-    LogEvent() {}
+    LogEvent() = default;
+    LogEvent(const mfwu::string<char>& str)
+        : file_(__FILE__), line_(rand() % 10), 
+          elapse_(std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - start_time).count()),
+          threadId_(rand() % 10), fiberId_(rand() % 10), time_(time(nullptr)) {
+        content_ = str.copy();
+    }
+    void refresh(const mfwu::string<char>& str) {
+        file_ = __FILE__;
+        line_ = rand() % 10;
+        elapse_ = std::chrono::duration_cast<std::chrono::microseconds>(
+            std::chrono::high_resolution_clock::now() - start_time).count();
+        threadId_ = rand() % 10;
+        fiberId_ = rand() % 10;
+        time_ = time(nullptr);
+        content_ = str.copy();
+    }
 
 // private:
     mfwu::string<char> file_ = {};
@@ -19,6 +38,7 @@ public:
     uint32_t fiberId_ = 0;
     time_t time_ = 0;  // time stamp
     mfwu::string<char> content_;
+
 };  // endof struct LogEvent
 
 enum class LogLevel {
@@ -35,12 +55,12 @@ public:
     LogFormatter() {}
     mfwu::string<char> format(LogEvent::ptr event) {
         std::stringstream ss;
-        ss << "in file: " << event->file_ << ",";
+        ss << "in file: " << event->file_ << ", ";
         ss << "line " << event->line_ << ":\n";
         ss << event->content_ << "\n";
         ss << "[ threadId: " << event->threadId_ << ", ";
         ss << "fiberId: " << event->fiberId_ << " ]\n";
-        ss << ctime(&event->time_) << ", ";
+        ss << ctime(&event->time_);
         ss << "elapse: " << event->elapse_ << "\n";
         return ss.str().c_str();  
         // std::string.c_str() differs from mfwu::string<char>
@@ -72,7 +92,7 @@ public:
     StdoutLogAppender(LogLevel level=LogLevel::DEBUG)
         : LogAppender(level) {}
     void append(LogLevel level, LogEvent::ptr event) {
-        if (level > get_level()) {
+        if (level >= get_level()) {
             std::cout << format(event) << "\n";
         }
     }
@@ -85,9 +105,9 @@ public:
                     const mfwu::string<char> output_dir="./log.out")
         : LogAppender(level), output_dir_(output_dir) {}
     void append(LogLevel level, LogEvent::ptr event) {
-        if (level > get_level()) {
+        if (level >= get_level()) {
             std::fstream fs;
-            fs.open(output_dir_.c_str(), std::ios_base::out);
+            fs.open(output_dir_.c_str(), std::ios_base::app);
             fs << format(event) << "\n";
         }
     }
@@ -98,7 +118,8 @@ private:
 class Logger {
 public:
     using ptr = std::shared_ptr<Logger>;
-    Logger(const mfwu::string<char>& name="root");
+    Logger(const mfwu::string<char>& name="root")
+        : name_(), level_(LogLevel::DEBUG), appenders_() {}
     void log(LogLevel level, LogEvent::ptr event) {
         for (auto appender : appenders_) {
             appender->append(level, event);
@@ -125,16 +146,16 @@ public:
                      LogLevel level=LogLevel::DEBUG, 
                      const mfwu::string<char>& filename="") {
         if (mode) {
-            appenders_.push_front(std::make_shared<LogAppender>(level, filename));  // TODO
+            appenders_.push_front(std::shared_ptr<LogAppender>(new FileLogAppender(level, filename)));  // TODO
         } else {
-            appenders_.push_front(std::make_shared<LogAppender>(new StdoutLogAppender(level)));
+            appenders_.push_front(std::shared_ptr<LogAppender>(new StdoutLogAppender(level)));
         }
     }
     void delAppender() {
         appenders_.pop_front();
     }
 private:
-    mfwu::string<char> name_;
+    mfwu::string<char> name_;  // ?
     LogLevel level_;  // ?
     mfwu::list<LogAppender::ptr> appenders_;
 };  // endof class Logger

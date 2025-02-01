@@ -60,6 +60,7 @@
 #include "ut_unordered_multiset.hpp"
 #include "ut_string.hpp"
 #include "ut_trie.hpp"
+#include "ut_logger.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -115,6 +116,7 @@ int main() {
     mfwu::unit_test_unordered_multiset ut_uod_mset;
     mfwu::unit_test_string ut_string;
     mfwu::unit_test_trie ut_trie;
+    mfwu::unit_test_logger ut_logger;
 
     size_t score = 0;
     size_t total = 0;
@@ -301,6 +303,11 @@ int main() {
     unit_test(
         "Trie",
         ut_func(mfwu::unit_test_trie::use_mfwu_trie, ut_trie)
+    );
+
+    unit_test(
+        "Logger",
+        ut_func(mfwu::unit_test_logger::use_mfwu_logger, ut_logger)
     );
     
     std::cout << "\n---------- test result -----------\n";

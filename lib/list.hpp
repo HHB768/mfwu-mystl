@@ -389,11 +389,11 @@ public:
     using size_type = size_t;
 
     // TODO: what is the diff between new and alloc & construct
-    DoubleLinkedList() : head_(new node(42)), tail_(new node(6)) /*allocator_()*/ {
+    DoubleLinkedList() : head_(new node(/*42*/)), tail_(new node(/*6*/)) /*allocator_()*/ {
         connect(head_, tail_);
     }
     DoubleLinkedList(size_type n, const value_type& val=value_type()) 
-        : head_(new node(42)), tail_(new node(6)) {
+        : head_(new node(/*42*/)), tail_(new node(/*6*/)) {
         node* prev = head_;
         for (int i = 0; i < n; i++) {
             node* newnode = new node(val, prev, nullptr);
@@ -407,7 +407,7 @@ public:
                     mfwu::iterator, InputIterator>::value>
              >
     DoubleLinkedList(InputIterator first, InputIterator last) 
-        : head_(new node(42)), tail_(new node(6)) {
+        : head_(new node(/*42*/)), tail_(new node(/*6*/)) {
         node* prev = head_;
         for ( ; first != last; first++) {
             node* newnode = new node(*first, prev, nullptr);
@@ -417,7 +417,7 @@ public:
         connect(prev, tail_);
     }
     DoubleLinkedList(const std::initializer_list<value_type>& values)
-        : head_(new node(42)), tail_(new node(6)) {
+        : head_(new node(/*42*/)), tail_(new node(/*6*/)) {
         node* prev = head_;
         for (const value_type& val : values) {
             node* newnode = new node(val, prev, nullptr);
