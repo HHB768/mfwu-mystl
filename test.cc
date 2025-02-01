@@ -17,5 +17,7 @@ int main() {
     auto [x, y, z] = c;  // failed
     std::cout << x << " " << y << " " << z.first_ << "\n";
 
+    // TODO: make pair be compatible with structural binding
+
     return 0;
 }
