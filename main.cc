@@ -307,7 +307,8 @@ int main() {
 
     unit_test(
         "Logger",
-        ut_func(mfwu::unit_test_logger::use_mfwu_logger, ut_logger)
+        ut_func(mfwu::unit_test_logger::use_mfwu_logger, ut_logger),
+        ut_func(mfwu::unit_test_logger::use_webserver_logger, ut_logger)
     );
     
     std::cout << "\n---------- test result -----------\n";

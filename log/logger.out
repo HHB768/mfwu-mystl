@@ -1,0 +1,12 @@
+in file: ./lib/logger.hpp, line 7:
+--- WARN MSG ---
+[ threadId: 4, fiberId: 9 ]
+Wed Feb  5 17:59:46 2025
+elapse: 1980
+
+in file: ./lib/logger.hpp, line 1:
+--- ERROR MSG ---
+[ threadId: 1, fiberId: 7 ]
+Wed Feb  5 17:59:46 2025
+elapse: 3524
+
