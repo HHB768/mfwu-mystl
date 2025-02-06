@@ -26,6 +26,7 @@
 #   define __UNIT_TEST_UNORDERED_MULTISET_BRIEF__
 #   define __UNIT_TEST_STRING_BRIEF__
 #   define __UNIT_TEST_TRIE_BRIEF__
+#   define __UNIT_TEST_LOGGER_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__

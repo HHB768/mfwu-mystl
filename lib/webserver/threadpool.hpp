@@ -6,7 +6,7 @@
 #include <queue>
 #include <thread>
 #include <functional>
-#include<assert.h>
+#include <assert.h>
 
 // 当 std::condition_variable 对象的某个 wait 函数被调用的时候，
 // 它使用 std::unique_lock(通过 std::mutex) 来锁住当前线程。

@@ -93,7 +93,13 @@ public:
         : LogAppender(level) {}
     void append(LogLevel level, LogEvent::ptr event) {
         if (level >= get_level()) {
+#ifdef __UNIT_TEST_LOGGER__
+#ifndef __UNIT_TEST_LOGGER_BRIEF__
             std::cout << format(event) << "\n";
+#else  // !UNIT_TEST_LOGGER_BRIEF__
+            format(event);
+#endif  // UNIT_TEST_LOGGER_BRIEF__
+#endif  // UNIT_TEST_LOGGER__
         }
     }
 private:
@@ -107,8 +113,16 @@ public:
     void append(LogLevel level, LogEvent::ptr event) {
         if (level >= get_level()) {
             std::fstream fs;
+#ifdef __UNIT_TEST_LOGGER__
+#ifndef __UNIT_TEST_LOGGER_BRIEF__
             fs.open(output_dir_.c_str(), std::ios_base::app);
             fs << format(event) << "\n";
+#else  // !UNIT_TEST_LOGGER_BRIEF__
+            format(event);
+#endif  // UNIT_TEST_LOGGER_BRIEF__
+#endif  // UNIT_TEST_LOGGER__
+            // fs.close();  // dont need this
+                            // included in ~fstream
         }
     }
 private:
