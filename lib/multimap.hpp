@@ -15,7 +15,7 @@ public:
     
     using key_type = Key;
     using mapped_type = Value;
-    using value_type = mfwu::pair<Key, Value>;
+    using value_type = mfwu::pair<const Key, Value>;
     using size_type = size_t;
 
     using rbtr = mfwu::drbtree_exp<key_type, mapped_type, Compare>;
@@ -24,7 +24,7 @@ public:
     class map_iterator {
     public:
         using iterator_category = mfwu::forward_iterator_tag;
-        using value_type = mfwu::pair<Key, Value>;
+        using value_type = mfwu::pair<const Key, Value>;
         using pointer = value_type*;
         using reference = value_type&;
         using difference_type = mfwu::ptrdiff_t;
@@ -136,7 +136,7 @@ public:
 
     mfwu::pair<iterator, bool> insert(const key_type& key, 
                                       const mapped_type& val) {
-        return insert(mfwu::make_pair<key_type, mapped_type>(key, val));
+        return insert(mfwu::make_pair<const key_type, mapped_type>(key, val));
     }
     mfwu::pair<iterator, bool> insert(const value_type& val) {
         // node* ret = rbt_.search(val);

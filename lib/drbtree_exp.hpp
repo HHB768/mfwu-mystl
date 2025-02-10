@@ -29,7 +29,7 @@ public:
 
     using key_type = Key;
     using mapped_type = Value;
-    using value_type = mfwu::pair<Key, Value>;
+    using value_type = mfwu::pair<const Key, Value>;
     using size_type = size_t;
 
     using rbtree = mfwu::rbtree_exp<Key, CmpFunctor>;
