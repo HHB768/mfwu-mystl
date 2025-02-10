@@ -55,6 +55,7 @@ public:
         clear();
         head_ = bkt.head_;
         bkt.head_ = nullptr;
+        return *this;
     }
     
     bool empty() { return head_->next == nullptr; }
@@ -511,6 +512,7 @@ public:
         clear();
         head_ = bkt.head_;
         bkt.head_ = nullptr;
+        return *this;
     }
 
     bool empty() { return head_->next == nullptr; }
