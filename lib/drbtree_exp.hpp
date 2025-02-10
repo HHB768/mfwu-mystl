@@ -38,7 +38,18 @@ public:
     constexpr static bool black = rbtree::black;
 
     struct rb_node {
-        const value_type val;  // can i? 12.3/24
+        // const value_type val;  // can i? 12.3/24
+        value_type val;  // the problem is, map[key] must be mutable
+                         // so we discard this 'const'
+                         // which is used to detect any unexpected
+                         // changes of val in the course of rebalancing
+                         // we cannot find this problem bcz
+                         // ut_multimap has no operator[] test
+                         // and dbtree_exp is designed for it 
+                         // specially at that moment 
+                         // but bug occurs when we use drbtree_exp as
+                         // the base of hashtable_with_rbtree
+                         // XQX 25.02.10
         bool color;
         rb_node* left;
         rb_node* right;

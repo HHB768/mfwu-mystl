@@ -316,7 +316,7 @@ int main() {
 
     unit_test(
         "Hashtable_wtot",
-        ut_func(mfwu::unit_test_hashtable_wtot::use_mfwu_hashtable_wtot, ut_htblw)
+        ut_func(mfwu::unit_test_hashtable_wtot::use_mfwu_hashtable_with_tree, ut_htblw)
     );
 
 
