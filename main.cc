@@ -62,6 +62,7 @@
 #include "ut_string.hpp"
 #include "ut_trie.hpp"
 #include "ut_logger.hpp"
+#include "ut_hashtable_wtot.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -118,6 +119,7 @@ int main() {
     mfwu::unit_test_string ut_string;
     mfwu::unit_test_trie ut_trie;
     mfwu::unit_test_logger ut_logger;
+    mfwu::unit_test_hashtable_wtot ut_htblw;
 
     size_t score = 0;
     size_t total = 0;
@@ -311,6 +313,13 @@ int main() {
         ut_func(mfwu::unit_test_logger::use_mfwu_logger, ut_logger),
         ut_func(mfwu::unit_test_logger::use_webserver_logger, ut_logger)
     );
+
+    unit_test(
+        "Hashtable_wtot",
+        ut_func(mfwu::unit_test_hashtable_wtot::use_mfwu_hashtable_wtot, ut_htblw)
+    );
+
+
     
     std::cout << "\n---------- test result -----------\n";
     std::cout << "\nTotal number of unit tests: " << ttotal;

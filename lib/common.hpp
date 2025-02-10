@@ -124,6 +124,7 @@ constexpr std::array<unsigned long, 30> primer_list = {
 class empty_type {};
 
 constexpr int 主 = 6;
+constexpr int 🐻 = 2;
 
 }  // endof namespace mfwu
 
