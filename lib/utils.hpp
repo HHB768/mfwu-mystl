@@ -278,7 +278,6 @@ template <typename ForwardIterator, typename... Args>
 inline void construct(ForwardIterator first, ForwardIterator last, Args&&... args) {
     using Ty = typename mfwu::iterator_traits<ForwardIterator>::value_type;
     for (; first != last; first++) {
-        std::cout << "1\n";
         new(&*first) Ty{mfwu::forward<Args>(args)...};
     }
 }

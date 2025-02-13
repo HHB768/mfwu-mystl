@@ -793,7 +793,7 @@ public:
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
-        mfwu::pair<node*, bool> ret = this->buckets_[hash(key)].push(key, val);
+        mfwu::pair<node*, bool> ret = get_buckets_()[hash(key)].push(key, val);
         add_cnt(ret.second);
         return {find(key), ret.second};
         // note: you must search again bcz add_cnt may
@@ -804,7 +804,7 @@ public:
     } 
     bool erase(const key_type& key) {
         size_type hashed_key = hash(key);
-        bool ret = this->buckets_[hashed_key].pop(key);
+        bool ret = get_buckets_()[hashed_key].pop(key);
         size_ -= ret;
         return ret;
     }
@@ -818,16 +818,16 @@ public:
     // TODO: erase by iterator !
     value_type& operator[](const key_type& key) {
         // assert
-        add_cnt(this->buckets_[hash(key)].get(key).second);
+        add_cnt(get_buckets_()[hash(key)].get(key).second);
         // note: you must search again bcz add_cnt may
         //       rehash the buckets 24.10.11 
-        return this->buckets_[hash(key)].get(key).first;
+        return get_buckets_()[hash(key)].get(key).first;
     }
-    bool count(const key_type& key) const {
-        return this->buckets_[hash(key)].count(key);
+    bool count(const key_type& key) {
+        return get_buckets_()[hash(key)].count(key);
     }
-    iterator find(const key_type& key) const {
-        bucket* bkt = this->buckets_ + hash(key);
+    iterator find(const key_type& key) {
+        bucket* bkt = get_buckets_() + hash(key);
         node* cur = bkt->find(key);
         if (cur == nullptr) {
             return end();
@@ -851,8 +851,9 @@ public:
     size_type size() const { return size_; }
     size_type capacity() const { return this->capacity_; }
     iterator begin() const { return iterator(get_first_node(), &get_first_bucket()); }
-    iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
+    iterator end() { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
+    // can only be used in constructor
     void construct() {
         bucket bkt{};  // avoid move construct   // ? 250211
         std::cout << "???\n";
@@ -866,10 +867,12 @@ private:
     }
     void validate_buckets_() {
         if (!buckets_validation_flag_) {
+            std::cout << "from\n";
             for (size_type i = 0; i <= capacity_; i++) {
                 this->buckets_[i].htbl_ = new hashtable_with_htbl();
             }
-            buckets_validation_flag = true;
+            buckets_validation_flag_ = true;
+            std::cout << "to\n";
         }
     }
     bucket* get_buckets_() {
@@ -880,7 +883,7 @@ private:
         mfwu::destroy(this->buckets_, this->buckets_ + capacity_ + 1);
         // delete htbl_ has already been ~bucket(); 
     }
-    void deallocate() { Alloc::deallocate(this->buckets_, capacity_ + 1); }
+    void deallocate() { Alloc::deallocate(get_buckets_(), capacity_ + 1); }
     void reset() { destroy(); deallocate(); }
     void init_dummy_node() {
         this->buckets_[capacity_].push(key_type{}, value_type{});
@@ -891,7 +894,7 @@ private:
     void rehash_hard(size_type capacity) {
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            bucket cur = this->buckets_[idx];
+            bucket cur = get_buckets_()[idx];
             while (!cur.empty()) {
                 node* nd = cur.front();
                 newtable.insert(*nd->val_);
@@ -912,19 +915,19 @@ private:
         }
     }
 
-    bucket& get_first_bucket() const {
+    bucket& get_first_bucket() {
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            if (!this->buckets_[idx].empty()) return this->buckets_[idx];
+            if (!get_buckets_()[idx].empty()) return get_buckets_()[idx];
         }
         return get_dummy_bucket();
     }
-    node* get_first_node() const {
+    node* get_first_node() {
         return get_first_bucket().front();
     }
-    bucket& get_dummy_bucket() const {
-        return this->buckets_[capacity_];
+    bucket& get_dummy_bucket() {
+        return get_buckets_()[capacity_];
     }
-    node* get_dummy_node() const {
+    node* get_dummy_node() {
         return get_dummy_bucket().front();
     }
 

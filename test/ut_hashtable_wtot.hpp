@@ -135,8 +135,8 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl() {
     mfwu::hashtable_with_htbl<data, int, data_hash> htbl1(5);
     std::cout << "a\n";
     print_hashtable(htbl1);
-    // htbl1[data{1}] = 1;
-    // print_hashtable(htbl1);
+    htbl1[data{1}] = 1;
+    print_hashtable(htbl1);
     // htbl1[data{5}] = 5;
     // print_hashtable(htbl1);
     // htbl1.insert(mfwu::make_pair<const data, int>(data{3}, 3));
