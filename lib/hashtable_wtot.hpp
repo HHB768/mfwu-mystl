@@ -368,187 +368,30 @@ private:
 template <typename Key, typename Value, typename Hash, typename Compare, typename Alloc>
 Hash hashtable_with_tree<Key, Value, Hash, Compare, Alloc>::hashfunc_ = {};
 
+
+/* 
+    i want to implement a hashtable with hashtable-like buckets
+    but i fail to do so bcz you can not guarantee that
+    multiple hash ops will eventually divide them into different buckets
+    so we will finally have a different underlying hashtable (with
+    different hasher or using list / tree), it is not graceful enough.
+    therefore, i may implement a usable hashtable_with_htbl with 
+    limited depth later... just maybe...           XQX 250212  
+*/
 template <typename Key, typename Value, typename Hash, typename Alloc>
-hashtable_with_htbl<Key, Value, Hash, Alloc>;
+class hashtable_with_htbl;
 
-template <typename key_type, typename value_type, typename Hash, typename Alloc>
-class bucket_with_htbl {
+template <typename key_type, typename value_type>
+class bucket_with_htbl;
+
+template <typename Key, typename Value>
+class htbl_base {
 public:
-    struct bucket_node {
-        mfwu::pair<const key_type, value_type> value;
-        // not a good idea 24.12.08
-        bucket_node* next;
+    friend class mfwu::unit_test_hashtable_wtot;
 
-        // TODO: i found many class lacks one or more
-        // rvalue constructor
-        bucket_node() : value(), next(nullptr) {}
-        bucket_node(const key_type& k, const value_type& v)
-            : value(k, v), next(nullptr) {}
-        bucket_node(const key_type& k, const value_type& v, bucket_node* n)
-            : value(k, v), next(n) {}
-        bucket_node(const bucket_node& nd)
-            : value(nd.value), next(nd.next) {}
-        bucket_node(bucket_node&& nd) 
-            : value(mfwu::move(nd.value)), next(nd.next) {
-            nd.next = nullptr;
-        }
-    };  // endof struct bucket_node
-    using node = bucket_node;
-
-    bucket_with_htbl() :  {}
-    bucket_with_htbl(const bucket_with_htbl& bkt) {
-        bucket_copy(bkt);
-    }
-    bucket_with_htbl(bucket_with_htbl&& bkt) : head_(bkt.head_) {
-        bkt.head_ = nullptr;
-    }
-    ~bucket_with_htbl() {
-        bucket_destroy();
-    }
-
-    bucket_with_htbl& operator=(const bucket_with_htbl& bkt) {
-        clear();
-        bucket_copy(bkt);
-        return *this;
-    }
-    bucket_with_htbl& operator=(bucket_with_htbl&& bkt) {
-        clear();
-        head_ = bkt.head_;
-        bkt.head_ = nullptr;
-    }
-    
-    bool empty() { return head_->next == nullptr; }
-    size_t size() {
-        node* cur = head_->next;
-        size_t cnt = 0;
-        while (cur) {
-            cnt++;
-            cur = cur->next;
-        }
-        return cnt;
-    }
-    node* front() { return head_->next; }
-    mfwu::pair<node*, bool> push(const key_type& key, 
-                                 const value_type& value) {
-        // node* ret = search(key);
-        // if (ret != nullptr) {
-        //     ret->value.second = value;
-        //     return {ret, false};
-        // }
-        node* next = head_->next;
-        node* cur = new node(key, value, next);
-        head_->next = cur;
-        return {cur, true};
-    }
-    void pop() {
-        node* next = head_->next;
-        head_->next = next->next;
-        delete next;
-    }
-    bool pop(const mfwu::pair<const key_type, value_type>& val) {
-        node* prev = head_;
-        while (prev->next) {
-            if (prev->next->value == val) {
-                node* next = prev->next;
-                prev->next = next->next;
-                delete next;
-                return true;
-            }
-            prev = prev->next;
-        }
-        return false;
-    }
-    bool pop(const key_type& key) {
-        node* prev = head_;
-        while (prev->next) {
-            if (prev->next->value.first == key) {
-                node* next = prev->next;
-                prev->next = next->next;
-                delete next;
-                return true;
-            }
-            prev = prev->next;
-        }
-        return false;
-    }  // TODO: remove all elements with .key == key
-    bool pop(node* cur) {
-        node* prev = head_;
-        while (prev->next) {
-            if (prev->next == cur) {
-                prev->next = cur->next;
-                delete cur;
-                return true;
-            }
-            prev = prev->next;
-        }
-        return false;
-    }
-    mfwu::pair<value_type&, bool> get(const key_type& key) {
-        node* ret = search(key);
-        bool is_new_node = false;
-        if (ret == nullptr) {
-            ret = push(key, value_type{}).first;
-            is_new_node = true;
-        }
-        return {ret->value.second, is_new_node};
-    }
-    bool count(const key_type& key) const {
-        return search(key) != nullptr;
-    }
-    node* find(const key_type& key) const {
-        return search(key);
-    }
-private:
-    void bucket_copy(const bucket_with_htbl& bkt) {
-        head_ = new node(*bkt.head_);
-        node* src = bkt.head_;
-        node* dst = head_;
-        while (src->next != nullptr) {
-            dst->next = new node(*src->next);
-            src = src->next;
-            dst = dst->next;
-        }  // CHECK: dst->next === nullptr
-    }
-    void bucket_destroy() {
-        clear();
-        delete head_;
-    }
-    void clear() { while (head_->next) { pop(); } }
-    node* search(const key_type& key) const {
-        node* cur = head_->next;
-        while (cur) {
-            if (cur->value.first == key) {
-                return cur;
-            }
-            cur = cur->next;
-        }
-        return nullptr;
-    }
-
-    mfwu::pair<const key_type, value_type> val_;
-    hashtable_with_htbl<key_type, value_type, Hash, Alloc>* htbl_;
-
-};  // endof class bucket_with_htbl
-
-class unit_test_hashtable_wtot;
-
-template <typename Key,
-          typename Value,
-          typename Hash=mfwu::hash_functor<Key>,
-          typename Alloc=mfwu::DefaultAllocator<
-                         mfwu::bucket_with_htbl<Key, Value, Hash, Alloc>, mfwu::malloc_alloc>>
-class hashtable_with_htbl {
-public:
-    friend class mfwu::unit_test_hashtable_exp;
-    friend class mfwu::unordered_map<Key, Value, Hash, Alloc>;
-    // using key_type = Key;
-    // using value_type = Value;
-    using size_type = size_t;
-    // actual size should be within max_primer
-
-    
     using bucket = mfwu::bucket_with_htbl<Key, Value>;
     using node = typename bucket::node;
+    using size_type = size_t;
 
     class hashtable_iterator {
     public:
@@ -580,15 +423,30 @@ public:
             return !(*this == it);
         }
         value_type& operator*() const {
-            return cur_->value;
+            return *cur_->val_;
         }
         value_type* operator->() const {
             return & this->operator*();
         }
 
         hashtable_iterator& operator++() {
-            cur_ = cur_->next;
+            // inside the bucket to which cur belongs
+            bucket* bkt = buckets_;
+            if (bkt->get_status() == 0) { std::cerr << "error!\n"; }
+            else if (bkt->get_status() == 1) { /* no next node in this bucket */ }
+            else {  // == 2
+                iterator lower_it = iterator(
+                    cur_, bkt->htbl_->buckets_ + bkt->htbl_->hash(cur_->val_->first));
+                ++lower_it;
+                if (lower_it.get_cur() != bkt->htbl_->get_dummy_node()) {
+                    cur_ = lower_it.cur_;
+                    return *this;
+                }  /* otherwise, no next node in this bucket */
+            }
+
             while (cur_ == nullptr) {
+                // the dummy node val should always be valid
+                // it is compatible with it == end()?
                 ++buckets_;
                 cur_ = buckets_->front();
             }
@@ -611,17 +469,239 @@ public:
     };  // endof class hashtable_iterator
     using iterator = hashtable_iterator;
 
+    htbl_base() : buckets_(nullptr) {}
+    htbl_base(bucket* bkt) : buckets_(bkt) {}
+    // should we delete copy constructor here? 25.02.13
+    virtual ~htbl_base() {}
+
     using key_type = Key;
     using value_type = Value;
 
+    virtual bool empty() const { return false; }
+    virtual iterator find(const key_type& key) const { return iterator(); }
+    virtual iterator end() const { return {}; }
+    virtual mfwu::pair<iterator, bool> 
+    insert(const key_type& key, const value_type& val) { return {}; }
+    virtual mfwu::pair<iterator, bool> 
+    insert(const mfwu::pair<const key_type, value_type>& key_val) { return {}; } 
+    virtual bool erase(const key_type& key) { return 0; }
+    virtual iterator erase(iterator it) { return {}; }
+    virtual node* get_first_node() const { return nullptr; }
+    virtual node* get_dummy_node() const { return nullptr; }
+    virtual size_type hash(const key_type& key) const { return 0; }
+
+    bucket* buckets_ = nullptr;
+    // dont alloc or dealloc in this class
+};  // endof class htbl_base
+
+template <typename key_type, typename value_type>
+class bucket_with_htbl {
+public:
+    friend class mfwu::unit_test_hashtable_wtot;
+    friend class mfwu::htbl_base<key_type, value_type>;
+    // template <typename Hash, typename Alloc>
+    // friend class mfwu::hashtable_with_htbl<key_type, value_type, Hash, Alloc>;
+    // error: specialization of ‘template<class Key, class Value, class Hash, 
+    // class Alloc> class mfwu::hashtable_with_htbl’ must appear at namespace scope
+    // specialization should appear at namespace instead of class scope XQX 25.02.13
+    template <typename Key, typename Value, typename Hash, typename Alloc>
+    friend class mfwu::hashtable_with_htbl;
+
+    // using node = mfwu::pair<const key_type, value_type>;  // discarded
+    struct node {
+    public:
+        // we dont need the thisBucket_
+        // the iterator records the highlevel buckets_
+        // if we record lowlevel thisBuckets_ like this
+        // we will need thisHashtable in the bucket members
+        // X-Q3 25.02.13
+        using val_t = mfwu::pair<const key_type, value_type>;
+        node() = delete;
+        node(val_t* val, bucket_with_htbl* bucket) 
+            : val_(val), thisBucket_(bucket) {}
+        node(const node& nd) : val_(new val_t(*nd.val_)),
+            thisBucket_(new bucket_with_htbl(*nd.thisBucket_)) {}
+        node(node&& nd) : val_(nd.val_), thisBucket_(nd.thisBucket_) {
+            nd.val_ = nullptr; nd.thisBucket_ = nullptr;
+        } 
+        ~node() {
+            if (val_) { delete val_; }
+            if (thisBucket_) { delete thisBucket_; }
+        }
+        val_t* val_ = nullptr;
+        bucket_with_htbl* thisBucket_ = nullptr;
+    };  // endof class node
+
+    bucket_with_htbl()
+        : cur_(new node(nullptr, this)), htbl_(nullptr), status_(0) {}
+    bucket_with_htbl(const bucket_with_htbl& bkt)
+        : cur_(new node(*bkt.cur_)), htbl_(new htbl_base(*bkt.htbl_)) , status_(bkt.status_) {}
+    bucket_with_htbl(bucket_with_htbl&& bkt) 
+        : cur_(bkt.cur_), htbl_(bkt.htbl_), status_(bkt.status_) {
+        bkt.cur_ = nullptr;
+        bkt.htbl_ = nullptr;
+    }
+    ~bucket_with_htbl() {
+        bucket_destroy();
+    }
+
+    bucket_with_htbl& operator=(const bucket_with_htbl& bkt) {
+        clear();
+        bucket_copy(bkt);
+        return *this;
+    }
+    bucket_with_htbl& operator=(bucket_with_htbl&& bkt) {
+        clear();
+        bucket_copy(mfwu::move(bkt));
+        return *this;
+    }
+    
+    bool empty() { 
+        return status_ == 0 
+               || (status_ == 2 && htbl_->empty()); 
+    }
+    size_t size() {
+        if (status_ == 2) {
+            return htbl_.size();
+        } 
+        return status_;
+    }
+    node* front() {
+        if (status_ == 1) return cur_;
+        return htbl_->get_first_node(); 
+    }
+    mfwu::pair<node*, bool> push(const key_type& key, 
+                                 const value_type& value) {
+        if (status_ == 0) {
+            cur_->val_ = new mfwu::pair<const key_type, value_type>(key, value);
+            status_ = 1;
+            return {cur_, true};
+        } else if (status_ == 1) {
+            if (cur_->val_->first == key) {
+                cur_->val_->second = value;
+                return {cur_, false};
+            } else {
+                // htbl_ = new hashtable_with_htbl  // you cannot do this bcz you have no Hash and Alloc
+                assert(htbl_ != nullptr);
+                htbl_->insert(*cur_->val_);
+                cur_->val_ = nullptr;
+                status_ = 2;
+            }
+        } 
+        auto ret = htbl_->insert(key, value);
+        return {ret.first.get_cur(), ret.second};
+    }
+    // DONT USE THIS FUNC  
+    void pop() {}
+
+    bool pop(const mfwu::pair<const key_type, value_type>& val) {
+        return pop(val.first);
+    }
+    bool pop(const key_type& key) {
+        if (status_ == 0) {
+            return false;
+        } else if (status_ == 1) {
+            if (key == cur_->val_->first) {
+                cur_->val_ = nullptr;
+                status_ = 0;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return htbl_->erase(key);
+        // if status_ == 2, it will not come back to 1 / 0
+        // even after elements are erased, except clear() being called
+        // what you have to concern is how to dealloc its mem
+        // X-Qx 25.02.11
+    }
+    mfwu::pair<value_type&, bool> get(const key_type& key) {
+        node* ret = search(key);
+        bool is_new_node = false;
+        if (ret == nullptr) {
+            ret = push(key, value_type{}).first;
+            is_new_node = true;
+        }
+        return {ret->val_->second, is_new_node};
+    }
+    bool count(const key_type& key) const {
+        return search(key) != nullptr;
+    }
+    node* find(const key_type& key) const {
+        return search(key);
+    }
+    int get_status() const {
+        return status_;
+    }
+private:
+    void bucket_copy(const bucket_with_htbl& bkt) {
+        cur_ = new node(*bkt.cur_);
+        htbl_ = new htbl_base(*bkt.htbl_);
+    }
+    void bucket_destroy() {
+        clear();
+    }
+    void clear() { 
+        if (cur_) {
+            delete cur_;
+            cur_ = nullptr;
+        } 
+        if (htbl_) {
+            delete htbl_; 
+            htbl_ = nullptr;
+        }
+        status_ = 0;
+    }
+    node* search(const key_type& key) const {
+        if (status_ == 0) { return nullptr; }
+        if (status_ == 1) {
+            if (cur_->val_->first == key) { return cur_; }
+            return nullptr;
+        }
+        return htbl_->find(key).get_cur();
+    }
+
+    node* cur_;
+    htbl_base<key_type, value_type>* htbl_;
+    int status_ = 0;
+    // htbl_base<key_type, value_type>* thisHtbl_;  // it seems we dont need this
+};  // endof class bucket_with_htbl
+
+class unit_test_hashtable_wtot;
+
+/*
+    c++ 两阶段名字查找，对于非依赖模板名称的都是现场决议的，编译器不查找基类 scope，没找到就报错，
+    编译器不查找基类，因为此时基类还是个类模板，到底是什么东西还不定呢。
+    然后实例化的时候进行第二阶段名字查找，这时候所有类型都是确定的，才能够查找基类 scope。
+    增加 this 或 Base:: 就是把对 function 的查找延迟到第二阶段，这是 c++ 标准规定的                  
+    https://blog.csdn.net/sb985/article/details/79670881
+*/
+template <typename Key,
+          typename Value,
+          typename Hash=mfwu::hash_functor<Key>,
+          typename Alloc=mfwu::DefaultAllocator<
+                         mfwu::bucket_with_htbl<Key, Value>, mfwu::malloc_alloc>>
+class hashtable_with_htbl : public htbl_base<Key, Value> {
+public:
+    friend class mfwu::unit_test_hashtable_wtot;
+    using key_type = Key;
+    using value_type = Value;
+    using size_type = size_t;
+
+    using bucket = mfwu::bucket_with_htbl<Key, Value>;
+    using node = typename bucket::node;
+    using base_type = htbl_base<Key, Value>;
+    using iterator = typename base_type::hashtable_iterator;
+
+    
     hashtable_with_htbl(): capacity_(mfwu::get_next_primer(0)), size_(0),
-        buckets_(Alloc::allocate(capacity_ + 1)) {
+        base_type(Alloc::allocate(capacity_ + 1)) {
         construct();
         init_dummy_node();
     }
     hashtable_with_htbl(size_type capacity) 
         : capacity_(mfwu::get_next_primer(capacity)),
-          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+          size_(0), base_type(Alloc::allocate(capacity_ + 1)) {
         construct();
         // GPT DEBUG HISTORY 24.10.11
         /*
@@ -643,7 +723,7 @@ public:
     */
         : capacity_(mfwu::get_next_primer(
                     std::ceil((float)vals.size() / alpha))),
-          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+          size_(0), base_type(Alloc::allocate(capacity_ + 1)) {
         construct();
         for (auto&& [k, v] : vals) {
             this->insert(k, v);
@@ -657,7 +737,7 @@ public:
     hashtable_with_htbl(InputIterator first, InputIterator last)
         : capacity_(mfwu::get_next_primer(std::ceil(
                     (float)(mfwu::distance(first, last)) / alpha))),
-          size_(0), buckets_(Alloc::allocate(capacity_ + 1)) {
+          size_(0), base_type(Alloc::allocate(capacity_ + 1)) {
         construct();
         for (; first != last; ++first) {
             this->insert(*first);
@@ -666,12 +746,12 @@ public:
     }
     hashtable_with_htbl(const hashtable_with_htbl& tbl) 
         : capacity_(tbl.capacity_), size_(tbl.size_),
-          buckets_(Alloc::allocate(capacity_ + 1)) {
+          base_type(Alloc::allocate(capacity_ + 1)) {
         mfwu::uninitialized_copy(tbl.buckets_,
-            tbl.buckets_ + capacity_ + 1, buckets_);
+            tbl.buckets_ + capacity_ + 1, this->buckets_);
     }
     hashtable_with_htbl(hashtable_with_htbl&& tbl) : capacity_(tbl.capacity_),
-        size_(tbl.size_), buckets_(tbl.buckets_) {
+        size_(tbl.size_), base_type(tbl.buckets_) {
         tbl.buckets_ = nullptr;
         tbl.capacity_ = -1;  
         // found it ! 
@@ -684,16 +764,16 @@ public:
         reset();
         capacity_ = tbl.capacity_;
         size_ = tbl.size_;
-        buckets_ = Alloc::allocate(capacity_ + 1);
+        this->buckets_ = Alloc::allocate(capacity_ + 1);
         mfwu::uninitialized_copy(tbl.buckets_, 
-            tbl.buckets_ + capacity_ + 1, buckets_);
+            tbl.buckets_ + capacity_ + 1, this->buckets_);
         return *this;
     }
     hashtable_with_htbl& operator=(hashtable_with_htbl&& tbl) {
         reset();
         capacity_ = tbl.capacity_;
         size_ = tbl.size_;
-        buckets_ = tbl.buckets_;
+        this->buckets_ = tbl.buckets_;
         tbl.buckets_ = nullptr;
         tbl.capacity_ = -1;  // nt!
         // let deallocate() deallocate nothing
@@ -701,7 +781,7 @@ public:
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
-        mfwu::pair<node*, bool> ret = buckets_[hash(key)].push(key, val);
+        mfwu::pair<node*, bool> ret = this->buckets_[hash(key)].push(key, val);
         add_cnt(ret.second);
         return {find(key), ret.second};
         // note: you must search again bcz add_cnt may
@@ -712,7 +792,7 @@ public:
     } 
     bool erase(const key_type& key) {
         size_type hashed_key = hash(key);
-        bool ret = buckets_[hashed_key].pop(key);
+        bool ret = this->buckets_[hashed_key].pop(key);
         size_ -= ret;
         return ret;
     }
@@ -720,22 +800,22 @@ public:
         node* cur = it.get_cur();
         bucket* bkt = it.get_bucket();
         ++it;
-        bkt->pop(cur);
+        bkt->pop(cur->val_->first);
         return it;
     }
     // TODO: erase by iterator !
     value_type& operator[](const key_type& key) {
         // assert
-        add_cnt(buckets_[hash(key)].get(key).second);
+        add_cnt(this->buckets_[hash(key)].get(key).second);
         // note: you must search again bcz add_cnt may
         //       rehash the buckets 24.10.11 
-        return buckets_[hash(key)].get(key).first;
+        return this->buckets_[hash(key)].get(key).first;
     }
     bool count(const key_type& key) const {
-        return buckets_[hash(key)].count(key);
+        return this->buckets_[hash(key)].count(key);
     }
     iterator find(const key_type& key) const {
-        bucket* bkt = buckets_ + hash(key);
+        bucket* bkt = this->buckets_ + hash(key);
         node* cur = bkt->find(key);
         if (cur == nullptr) {
             return end();
@@ -762,17 +842,20 @@ public:
     iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
     void construct() {
-        bucket bkt{};  // avoid move construct
-        mfwu::construct(buckets_, buckets_ + capacity_ + 1, bkt);
+        bucket bkt{};  // avoid move construct   // ? 250211
+        mfwu::construct(this->buckets_, this->buckets_ + capacity_ + 1, bkt);
+        for (size_type i = 0; i <= capacity_; i++) {
+            this->buckets_[i].htbl_ = new hashtable_with_htbl();
+        }
     }
-    // TODO: let me think, construct dummy bucket first, then construct others with
-    //       enable = dummy.enable (which is new bool(f) swhere)
-    //       when req_mem, keep the same bool*
-    void destroy() { mfwu::destroy(buckets_, buckets_ + capacity_ + 1); }
-    void deallocate() { Alloc::deallocate(buckets_, capacity_ + 1); }
+    void destroy() {
+        mfwu::destroy(this->buckets_, this->buckets_ + capacity_ + 1);
+        // delete htbl_ has already been ~bucket(); 
+    }
+    void deallocate() { Alloc::deallocate(this->buckets_, capacity_ + 1); }
     void reset() { destroy(); deallocate(); }
     void init_dummy_node() {
-        buckets_[capacity_].push(key_type{}, value_type{});
+        this->buckets_[capacity_].push(key_type{}, value_type{});
     }
     size_type hash(const key_type& key) const {
         return hashfunc_(key) % capacity_;
@@ -780,10 +863,10 @@ private:
     void rehash_hard(size_type capacity) {
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            bucket cur = buckets_[idx];
+            bucket cur = this->buckets_[idx];
             while (!cur.empty()) {
                 node* nd = cur.front();
-                newtable.insert(nd->value);
+                newtable.insert(*nd->val_);
                 cur.pop();
             }
         }
@@ -803,7 +886,7 @@ private:
 
     bucket& get_first_bucket() const {
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            if (!buckets_[idx].empty()) return buckets_[idx];
+            if (!this->buckets_[idx].empty()) return this->buckets_[idx];
         }
         return get_dummy_bucket();
     }
@@ -811,7 +894,7 @@ private:
         return get_first_bucket().front();
     }
     bucket& get_dummy_bucket() const {
-        return buckets_[capacity_];
+        return this->buckets_[capacity_];
     }
     node* get_dummy_node() const {
         return get_dummy_bucket().front();
@@ -819,7 +902,6 @@ private:
 
     size_type capacity_;
     size_type size_;
-    bucket* buckets_;
     static Hash hashfunc_;
     constexpr static float alpha = 0.7F;
 

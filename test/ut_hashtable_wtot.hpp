@@ -69,11 +69,12 @@ public:
             if (!htbl.buckets_[idx].empty()) {
                 size_t depth = 0;
                 auto cur = htbl.buckets_[idx].front();
-                while (cur) {
+                auto it = typename htbl_base<Key, Value>::iterator(cur, &htbl.buckets_[idx]);
+                while (it != htbl.buckets_[idx].htbl_->end()) {
                     // std::cout << idx << ", " << depth << "\n";
-                    cache[depth][idx] = cur->val.second;
+                    cache[depth][idx] = it.get_cur()->val_->second;
                     // std::cout << cur->next << "\n";
-                    ++depth; cur = cur->next();
+                    ++depth; ++it;
                 }
             }
         }
