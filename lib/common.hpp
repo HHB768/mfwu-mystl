@@ -83,6 +83,10 @@ inline int roundup22(int n) {
     return n < 0 ? 1 : n + 1; 
 }
 
+inline float rand01(int N=99) {
+    return (N + 1 + rand() % (N + 1)) / (float)(N + 1) / 2;
+}
+
 template <typename T>
 struct less {
     bool operator()(const T& a, const T& b) const {

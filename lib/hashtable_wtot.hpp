@@ -470,8 +470,9 @@ public:
     using iterator = hashtable_iterator;
 
     htbl_base() : buckets_(nullptr) {}
-    htbl_base(bucket* bkt) : buckets_(bkt) {}
-    // should we delete copy constructor here? 25.02.13
+    htbl_base(bucket* bkt) : buckets_(bkt) { std::cout << buckets_ << "\n";}
+    // should we delete copy constructor here? 25.02.13   ANS: no. XQX 0213
+    htbl_base(const htbl_base& tbl) : buckets_(tbl.buckets_ ? new bucket(*tbl.buckets_) : nullptr) {}
     virtual ~htbl_base() {}
 
     using key_type = Key;
@@ -517,27 +518,29 @@ public:
         // X-Q3 25.02.13
         using val_t = mfwu::pair<const key_type, value_type>;
         node() = delete;
-        node(val_t* val, bucket_with_htbl* bucket) 
-            : val_(val), thisBucket_(bucket) {}
-        node(const node& nd) : val_(new val_t(*nd.val_)),
-            thisBucket_(new bucket_with_htbl(*nd.thisBucket_)) {}
-        node(node&& nd) : val_(nd.val_), thisBucket_(nd.thisBucket_) {
-            nd.val_ = nullptr; nd.thisBucket_ = nullptr;
+        node(val_t* val) 
+            : val_(val) {}
+        node(const node& nd) 
+            : val_(nd.val_ ? new val_t(*nd.val_) : nullptr) {}
+        node(node&& nd) : val_(nd.val_) {
+            nd.val_ = nullptr;
         } 
         ~node() {
             if (val_) { delete val_; }
-            if (thisBucket_) { delete thisBucket_; }
         }
         val_t* val_ = nullptr;
-        bucket_with_htbl* thisBucket_ = nullptr;
+        // bucket_with_htbl* thisBucket_ = nullptr;
     };  // endof class node
 
     bucket_with_htbl()
-        : cur_(new node(nullptr, this)), htbl_(nullptr), status_(0) {}
+        : cur_(new node(nullptr)), htbl_(nullptr), status_(0) {std::cout << "b\n";}
     bucket_with_htbl(const bucket_with_htbl& bkt)
-        : cur_(new node(*bkt.cur_)), htbl_(new htbl_base(*bkt.htbl_)) , status_(bkt.status_) {}
+        : cur_(bkt.cur_ ? new node(*bkt.cur_) : nullptr),
+          htbl_(bkt.htbl_ ? new htbl_base(*bkt.htbl_) : nullptr) , status_(bkt.status_) { std::cout << " ?-- \n"; }
+    // i found in many places we dont have nullptr detection before deref
     bucket_with_htbl(bucket_with_htbl&& bkt) 
         : cur_(bkt.cur_), htbl_(bkt.htbl_), status_(bkt.status_) {
+        std::cout << "a\n";
         bkt.cur_ = nullptr;
         bkt.htbl_ = nullptr;
     }
@@ -695,13 +698,18 @@ public:
 
     
     hashtable_with_htbl(): capacity_(mfwu::get_next_primer(0)), size_(0),
-        base_type(Alloc::allocate(capacity_ + 1)) {
+        /*base_type(Alloc::allocate(capacity_ + 1)),*/ k_(rand01()) {
+        // you cannot do this in initlist, bcz base_type is the first member
+        // and capacity_ is the second (maybe), you can just use the code
+        // from hashtable_with_tree orz  xqx 25.02.13
+        this->buckets_ = Alloc::allocate(capacity_ + 1);
         construct();
         init_dummy_node();
     }
     hashtable_with_htbl(size_type capacity) 
         : capacity_(mfwu::get_next_primer(capacity)),
-          size_(0), base_type(Alloc::allocate(capacity_ + 1)) {
+          size_(0), k_(rand01()) {
+        this->buckets_ = Alloc::allocate(capacity_ + 1);
         construct();
         // GPT DEBUG HISTORY 24.10.11
         /*
@@ -723,7 +731,8 @@ public:
     */
         : capacity_(mfwu::get_next_primer(
                     std::ceil((float)vals.size() / alpha))),
-          size_(0), base_type(Alloc::allocate(capacity_ + 1)) {
+          size_(0), k_(rand01()) {
+        this->buckets_ = Alloc::allocate(capacity_ + 1);
         construct();
         for (auto&& [k, v] : vals) {
             this->insert(k, v);
@@ -737,7 +746,8 @@ public:
     hashtable_with_htbl(InputIterator first, InputIterator last)
         : capacity_(mfwu::get_next_primer(std::ceil(
                     (float)(mfwu::distance(first, last)) / alpha))),
-          size_(0), base_type(Alloc::allocate(capacity_ + 1)) {
+          size_(0), k_(rand01()) {
+        this->buckets_ = Alloc::allocate(capacity_ + 1);
         construct();
         for (; first != last; ++first) {
             this->insert(*first);
@@ -745,13 +755,13 @@ public:
         init_dummy_node();
     }
     hashtable_with_htbl(const hashtable_with_htbl& tbl) 
-        : capacity_(tbl.capacity_), size_(tbl.size_),
-          base_type(Alloc::allocate(capacity_ + 1)) {
+        : capacity_(tbl.capacity_), size_(tbl.size_), k_(rand01()) {
+        this->buckets_ = Alloc::allocate(capacity_ + 1);
         mfwu::uninitialized_copy(tbl.buckets_,
             tbl.buckets_ + capacity_ + 1, this->buckets_);
     }
     hashtable_with_htbl(hashtable_with_htbl&& tbl) : capacity_(tbl.capacity_),
-        size_(tbl.size_), base_type(tbl.buckets_) {
+        size_(tbl.size_), base_type(tbl.buckets_), k_(rand01()) {
         tbl.buckets_ = nullptr;
         tbl.capacity_ = -1;  
         // found it ! 
@@ -767,6 +777,7 @@ public:
         this->buckets_ = Alloc::allocate(capacity_ + 1);
         mfwu::uninitialized_copy(tbl.buckets_, 
             tbl.buckets_ + capacity_ + 1, this->buckets_);
+        k_ = tbl.k_;
         return *this;
     }
     hashtable_with_htbl& operator=(hashtable_with_htbl&& tbl) {
@@ -778,6 +789,7 @@ public:
         tbl.capacity_ = -1;  // nt!
         // let deallocate() deallocate nothing
         // 24.10.11
+        k_ = tbl.k_;
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
@@ -837,16 +849,32 @@ public:
     }
     bool empty() const { return size_ == 0; }
     size_type size() const { return size_; }
-    size_type capacity() const { return capacity_; }
+    size_type capacity() const { return this->capacity_; }
     iterator begin() const { return iterator(get_first_node(), &get_first_bucket()); }
     iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
     void construct() {
         bucket bkt{};  // avoid move construct   // ? 250211
+        std::cout << "???\n";
+        std::cout << this->buckets_ << "\n";
         mfwu::construct(this->buckets_, this->buckets_ + capacity_ + 1, bkt);
-        for (size_type i = 0; i <= capacity_; i++) {
-            this->buckets_[i].htbl_ = new hashtable_with_htbl();
+        std::cout << "??\n";
+        // for (size_type i = 0; i <= capacity_; i++) {
+            // this->buckets_[i].htbl_ = new hashtable_with_htbl();
+        // }
+        // cannot new hashtable_with_htbl here: recursively constructing
+    }
+    void validate_buckets_() {
+        if (!buckets_validation_flag_) {
+            for (size_type i = 0; i <= capacity_; i++) {
+                this->buckets_[i].htbl_ = new hashtable_with_htbl();
+            }
+            buckets_validation_flag = true;
         }
+    }
+    bucket* get_buckets_() {
+        validate_buckets_();
+        return this->buckets_;
     }
     void destroy() {
         mfwu::destroy(this->buckets_, this->buckets_ + capacity_ + 1);
@@ -858,7 +886,7 @@ private:
         this->buckets_[capacity_].push(key_type{}, value_type{});
     }
     size_type hash(const key_type& key) const {
-        return hashfunc_(key) % capacity_;
+        return hashfunc_(key) % size_type(capacity_ * k_);
     }
     void rehash_hard(size_type capacity) {
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
@@ -904,6 +932,8 @@ private:
     size_type size_;
     static Hash hashfunc_;
     constexpr static float alpha = 0.7F;
+    float k_ = 1;
+    bool buckets_validation_flag_ = false;
 
 };  // endof class hashtable_with_htbl
 
