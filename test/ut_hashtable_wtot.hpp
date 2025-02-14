@@ -66,12 +66,13 @@ public:
 #endif  // __UNIT_TEST_HASHTABLE_WTOT_BRIEF__
 #endif  // __UNIT_TEST_HASHTABLE_WTOT__
         for (size_t idx = 0; idx < htbl.capacity_; ++idx) {
-            if (!htbl.buckets_[idx].empty()) {
+            auto bkt = htbl.buckets_ + idx;
+            if (!bkt->empty()) {
                 size_t depth = 0;
-                auto cur = htbl.buckets_[idx].front();
-                size_t sz = htbl.buckets_[idx].size();
+                auto cur = bkt->front();
+                size_t sz = bkt->size();
                 if (cur == nullptr) continue;
-                auto it = typename htbl_base<Key, Value>::iterator(cur, &htbl.buckets_[idx]);
+                auto it = typename htbl_base<Key, Value>::iterator(cur, bkt);
                 for (size_t i = 0; i < sz; i++) {
                     cache[depth][idx] = it.get_cur()->val_->second;
                     ++depth; ++it;

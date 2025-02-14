@@ -478,7 +478,7 @@ public:
     using key_type = Key;
     using value_type = Value;
 
-    virtual bool empty() const { return false; }
+    virtual bool empty() const { std::cout << "no way\n"; return false; }
     virtual size_type size() const { return 0; }
     virtual iterator find(const key_type& key) const { return iterator(); }
     virtual iterator end() const { return {}; }
@@ -588,10 +588,12 @@ public:
                 // htbl_ = new hashtable_with_htbl  // you cannot do this bcz you have no Hash and Alloc
                 assert(htbl_ != nullptr);
                 htbl_->insert(*cur_->val_);
+                std::cout << "ori_key_val: " << cur_->val_->first << " " << cur_->val_->second << "\n";
                 cur_->val_ = nullptr;
                 status_ = 2;
             }
         } 
+        std::cout << "new_key_val: " << key << " " << value << "\n";
         auto ret = htbl_->insert(key, value);
         return {ret.first.get_cur(), ret.second};
     }
@@ -793,23 +795,23 @@ public:
         k_ = tbl.k_;
         return *this;
     }
-    mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) {
+    mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) override {
         mfwu::pair<node*, bool> ret = get_buckets_()[hash(key)].push(key, val);
         add_cnt(ret.second);
         return {find(key), ret.second};
         // note: you must search again bcz add_cnt may
         //       rehash the buckets, but found on 24.10.23 T^T
     }
-    mfwu::pair<iterator, bool> insert(const mfwu::pair<const key_type, value_type>& key_val) {
+    mfwu::pair<iterator, bool> insert(const mfwu::pair<const key_type, value_type>& key_val) override {
         return insert(key_val.first, key_val.second);
     } 
-    bool erase(const key_type& key) {
+    bool erase(const key_type& key) override {
         size_type hashed_key = hash(key);
         bool ret = get_buckets_()[hashed_key].pop(key);
         size_ -= ret;
         return ret;
     }
-    iterator erase(iterator it) {
+    iterator erase(iterator it) override {
         node* cur = it.get_cur();
         bucket* bkt = it.get_bucket();
         ++it;
@@ -827,7 +829,7 @@ public:
     bool count(const key_type& key) const {
         return this->buckets_()[hash(key)].count(key);
     }
-    iterator find(const key_type& key) const {
+    iterator find(const key_type& key) const override {
         bucket* bkt = this->buckets_ + hash(key);
         node* cur = bkt->find(key);
         if (cur == nullptr) {
@@ -849,11 +851,11 @@ public:
         }
         rehash_hard(capacity);  // TODO: check
     }
-    bool empty() const { return size_ == 0; }
-    size_type size() const { return size_; }
+    bool empty() const override { return size_ == 0; }
+    size_type size() const override { return size_; }
     size_type capacity() const { return this->capacity_; }
     iterator begin() const { return iterator(get_first_node(), &get_first_bucket()); }
-    iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
+    iterator end() const override { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
     // can only be used in constructor
     void construct() {
@@ -866,6 +868,7 @@ private:
     }
     void validate_buckets_() {
         if (!buckets_validation_flag_) {
+            std::cout << "validate here\n";
             for (size_type i = 0; i <= capacity_; i++) {
                 this->buckets_[i].htbl_ = new hashtable_with_htbl();
             }
@@ -885,20 +888,19 @@ private:
     void init_dummy_node() {
         this->buckets_[capacity_].push(key_type{}, value_type{});
     }
-    size_type hash(const key_type& key) const {
+    size_type hash(const key_type& key) const override {
         return hashfunc_(key) % size_type(capacity_ * k_);
     }
     void rehash_hard(size_type capacity) {
-        std::cout << "from\n";
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
-        std::cout << "to\n";
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            bucket cur = get_buckets_()[idx];
-            while (!cur.empty()) {
-                node* nd = cur.front();
+            bucket bkt = this->buckets_[idx];
+            while (!bkt.empty()) {
+                node* nd = bkt.front();
+                if (nd == nullptr) std::cout << "nm\n";
                 std::cout << nd->val_->first << " : " << nd->val_->second << "\n";
                 newtable.insert(*nd->val_);
-                cur.pop(nd->val_->first);
+                bkt.pop(nd->val_->first);
             }
         }
         newtable.size_ = this->size_;
@@ -921,13 +923,13 @@ private:
         }
         return get_dummy_bucket();
     }
-    node* get_first_node() const {
+    node* get_first_node() const override {
         return get_first_bucket().front();
     }
     bucket& get_dummy_bucket() const {
         return this->buckets_[capacity_];
     }
-    node* get_dummy_node() const {
+    node* get_dummy_node() const override {
         return get_dummy_bucket().front();
     }
 
