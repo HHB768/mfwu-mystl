@@ -479,6 +479,7 @@ public:
     using value_type = Value;
 
     virtual bool empty() const { return false; }
+    virtual size_type size() const { return 0; }
     virtual iterator find(const key_type& key) const { return iterator(); }
     virtual iterator end() const { return {}; }
     virtual mfwu::pair<iterator, bool> 
@@ -533,14 +534,13 @@ public:
     };  // endof class node
 
     bucket_with_htbl()
-        : cur_(new node(nullptr)), htbl_(nullptr), status_(0) {std::cout << "b\n";}
+        : cur_(new node(nullptr)), htbl_(nullptr), status_(0) {}
     bucket_with_htbl(const bucket_with_htbl& bkt)
         : cur_(bkt.cur_ ? new node(*bkt.cur_) : nullptr),
-          htbl_(bkt.htbl_ ? new htbl_base(*bkt.htbl_) : nullptr) , status_(bkt.status_) { std::cout << " ?-- \n"; }
+          htbl_(bkt.htbl_ ? new htbl_base(*bkt.htbl_) : nullptr) , status_(bkt.status_) {}
     // i found in many places we dont have nullptr detection before deref
     bucket_with_htbl(bucket_with_htbl&& bkt) 
         : cur_(bkt.cur_), htbl_(bkt.htbl_), status_(bkt.status_) {
-        std::cout << "a\n";
         bkt.cur_ = nullptr;
         bkt.htbl_ = nullptr;
     }
@@ -565,11 +565,12 @@ public:
     }
     size_t size() {
         if (status_ == 2) {
-            return htbl_.size();
+            return htbl_->size();
         } 
         return status_;
     }
     node* front() {
+        if (status_ == 0) return nullptr;
         if (status_ == 1) return cur_;
         return htbl_->get_first_node(); 
     }
@@ -821,13 +822,13 @@ public:
         add_cnt(get_buckets_()[hash(key)].get(key).second);
         // note: you must search again bcz add_cnt may
         //       rehash the buckets 24.10.11 
-        return get_buckets_()[hash(key)].get(key).first;
+        return this->buckets_[hash(key)].get(key).first;
     }
-    bool count(const key_type& key) {
-        return get_buckets_()[hash(key)].count(key);
+    bool count(const key_type& key) const {
+        return this->buckets_()[hash(key)].count(key);
     }
-    iterator find(const key_type& key) {
-        bucket* bkt = get_buckets_() + hash(key);
+    iterator find(const key_type& key) const {
+        bucket* bkt = this->buckets_ + hash(key);
         node* cur = bkt->find(key);
         if (cur == nullptr) {
             return end();
@@ -842,6 +843,7 @@ public:
     }
     void rehash(size_type capacity) {
         capacity = mfwu::get_next_primer(capacity);
+        std::cout << capacity_ << "\n";
         while ((float)size_ / capacity >= max_load_factor()) {
             capacity = mfwu::get_next_primer(capacity + 1);
         }
@@ -851,15 +853,12 @@ public:
     size_type size() const { return size_; }
     size_type capacity() const { return this->capacity_; }
     iterator begin() const { return iterator(get_first_node(), &get_first_bucket()); }
-    iterator end() { return iterator(get_dummy_node(), &get_dummy_bucket()); }
+    iterator end() const { return iterator(get_dummy_node(), &get_dummy_bucket()); }
 private:
     // can only be used in constructor
     void construct() {
-        bucket bkt{};  // avoid move construct   // ? 250211
-        std::cout << "???\n";
-        std::cout << this->buckets_ << "\n";
+        bucket bkt{};  // avoid move construct   // ? 250211, ! 250213
         mfwu::construct(this->buckets_, this->buckets_ + capacity_ + 1, bkt);
-        std::cout << "??\n";
         // for (size_type i = 0; i <= capacity_; i++) {
             // this->buckets_[i].htbl_ = new hashtable_with_htbl();
         // }
@@ -867,12 +866,10 @@ private:
     }
     void validate_buckets_() {
         if (!buckets_validation_flag_) {
-            std::cout << "from\n";
             for (size_type i = 0; i <= capacity_; i++) {
                 this->buckets_[i].htbl_ = new hashtable_with_htbl();
             }
             buckets_validation_flag_ = true;
-            std::cout << "to\n";
         }
     }
     bucket* get_buckets_() {
@@ -883,7 +880,7 @@ private:
         mfwu::destroy(this->buckets_, this->buckets_ + capacity_ + 1);
         // delete htbl_ has already been ~bucket(); 
     }
-    void deallocate() { Alloc::deallocate(get_buckets_(), capacity_ + 1); }
+    void deallocate() { Alloc::deallocate(this->buckets_, capacity_ + 1); }
     void reset() { destroy(); deallocate(); }
     void init_dummy_node() {
         this->buckets_[capacity_].push(key_type{}, value_type{});
@@ -892,13 +889,16 @@ private:
         return hashfunc_(key) % size_type(capacity_ * k_);
     }
     void rehash_hard(size_type capacity) {
+        std::cout << "from\n";
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
+        std::cout << "to\n";
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket cur = get_buckets_()[idx];
             while (!cur.empty()) {
                 node* nd = cur.front();
+                std::cout << nd->val_->first << " : " << nd->val_->second << "\n";
                 newtable.insert(*nd->val_);
-                cur.pop();
+                cur.pop(nd->val_->first);
             }
         }
         newtable.size_ = this->size_;
@@ -915,19 +915,19 @@ private:
         }
     }
 
-    bucket& get_first_bucket() {
+    bucket& get_first_bucket() const {
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            if (!get_buckets_()[idx].empty()) return get_buckets_()[idx];
+            if (!this->buckets_[idx].empty()) return this->buckets_[idx];
         }
         return get_dummy_bucket();
     }
-    node* get_first_node() {
+    node* get_first_node() const {
         return get_first_bucket().front();
     }
-    bucket& get_dummy_bucket() {
-        return get_buckets_()[capacity_];
+    bucket& get_dummy_bucket() const {
+        return this->buckets_[capacity_];
     }
-    node* get_dummy_node() {
+    node* get_dummy_node() const {
         return get_dummy_bucket().front();
     }
 

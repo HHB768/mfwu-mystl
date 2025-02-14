@@ -69,11 +69,11 @@ public:
             if (!htbl.buckets_[idx].empty()) {
                 size_t depth = 0;
                 auto cur = htbl.buckets_[idx].front();
+                size_t sz = htbl.buckets_[idx].size();
+                if (cur == nullptr) continue;
                 auto it = typename htbl_base<Key, Value>::iterator(cur, &htbl.buckets_[idx]);
-                while (it != htbl.buckets_[idx].htbl_->end()) {
-                    // std::cout << idx << ", " << depth << "\n";
+                for (size_t i = 0; i < sz; i++) {
                     cache[depth][idx] = it.get_cur()->val_->second;
-                    // std::cout << cur->next << "\n";
                     ++depth; ++it;
                 }
             }
@@ -107,8 +107,8 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_tree() {
     std::cout << "\n------- Test: use mfwu::hashtable_with_tree -------\n";
     std::cout << "testing hashtable_with_tree\n";
     mfwu::hashtable_with_tree<data, int, data_hash, data_compare> htbl1(5);
-    htbl1[data{1}] = 1;
     htbl1[data{5}] = 5;
+    htbl1[data{1}] = 1;
     htbl1.insert(mfwu::make_pair<const data, int>(data{3}, 3));
     print_hashtable(htbl1);
     htbl1[data{6}] = 主;
@@ -133,19 +133,21 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl() {
     std::cout << "\n------- Test: use mfwu::hashtable_with_htbl -------\n";
     std::cout << "testing hashtable_with_htbl\n";
     mfwu::hashtable_with_htbl<data, int, data_hash> htbl1(5);
-    std::cout << "a\n";
+    print_hashtable(htbl1);
+    htbl1[data{5}] = 5;
     print_hashtable(htbl1);
     htbl1[data{1}] = 1;
     print_hashtable(htbl1);
-    // htbl1[data{5}] = 5;
-    // print_hashtable(htbl1);
-    // htbl1.insert(mfwu::make_pair<const data, int>(data{3}, 3));
-    // print_hashtable(htbl1);
-    // htbl1[data{6}] = 主;
-    // htbl1.insert(data{2}, 2);
-    // htbl1.insert(data{5}, 主);
-    // htbl1[data{12}] = 主;
-    // print_hashtable(htbl1);
+    htbl1.insert(mfwu::make_pair<const data, int>(data{3}, 3));
+    print_hashtable(htbl1);
+    htbl1[data{6}] = 主;
+    print_hashtable(htbl1);
+    htbl1.insert(data{2}, 2);
+    print_hashtable(htbl1);
+    htbl1.insert(data{5}, 主);
+    print_hashtable(htbl1);
+    htbl1[data{12}] = 主;
+    print_hashtable(htbl1);
     // ++htbl1[data{主}];
     // print_hashtable(htbl1);
     // htbl1.erase(data{5});
