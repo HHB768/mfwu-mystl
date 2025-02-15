@@ -324,7 +324,7 @@ private:
             while (!cur.empty()) {
                 node* nd = cur.front();
                 newtable.insert(nd->val.first, nd->val.second);
-                cur.pop();
+                cur.pop();  // TODO: DEPRECATED METHODS
             }
         }
         newtable.size_ = this->size_;
@@ -437,12 +437,15 @@ public:
             else {  // == 2
                 iterator lower_it = iterator(
                     cur_, bkt->htbl_->buckets_ + bkt->htbl_->hash(cur_->val_->first));
-                ++lower_it;
+                ++lower_it;  // CHECK: is it right?
                 if (lower_it.get_cur() != bkt->htbl_->get_dummy_node()) {
                     cur_ = lower_it.cur_;
                     return *this;
                 }  /* otherwise, no next node in this bucket */
             }
+
+            // std::cout << "no next node in this bucket\n";
+            cur_ = nullptr;  // ! 250215
 
             while (cur_ == nullptr) {
                 // the dummy node val should always be valid
@@ -450,6 +453,8 @@ public:
                 ++buckets_;
                 cur_ = buckets_->front();
             }
+            // i really thick we should have a bucket_iterator with nullptr
+            // as its end_iterator, is it possible to implement? xqx 0215/25
             return *this;
         }
         hashtable_iterator operator++(int) {
@@ -470,7 +475,7 @@ public:
     using iterator = hashtable_iterator;
 
     htbl_base() : buckets_(nullptr) {}
-    htbl_base(bucket* bkt) : buckets_(bkt) { std::cout << buckets_ << "\n";}
+    htbl_base(bucket* bkt) : buckets_(bkt) { /*std::cout << buckets_ << "\n";*/ }
     // should we delete copy constructor here? 25.02.13   ANS: no. XQX 0213
     htbl_base(const htbl_base& tbl) : buckets_(tbl.buckets_ ? new bucket(*tbl.buckets_) : nullptr) {}
     virtual ~htbl_base() {}
@@ -478,7 +483,7 @@ public:
     using key_type = Key;
     using value_type = Value;
 
-    virtual bool empty() const { std::cout << "no way\n"; return false; }
+    virtual bool empty() const { return false; }
     virtual size_type size() const { return 0; }
     virtual iterator find(const key_type& key) const { return iterator(); }
     virtual iterator end() const { return {}; }
@@ -591,10 +596,14 @@ public:
                 std::cout << "ori_key_val: " << cur_->val_->first << " " << cur_->val_->second << "\n";
                 cur_->val_ = nullptr;
                 status_ = 2;
+                // std::cout << "pos of ori_val: " << htbl_->get_first_node()->val_ << "\n";
+                // std::cout << htbl_->get_first_node()->val_->first << "\n";
             }
         } 
         std::cout << "new_key_val: " << key << " " << value << "\n";
         auto ret = htbl_->insert(key, value);
+        std::cout << "3\n";
+        // std::cout << "pos of new_val: " << ret.first.get_cur()->val_ << "\n";
         return {ret.first.get_cur(), ret.second};
     }
     // DONT USE THIS FUNC  
@@ -626,8 +635,10 @@ public:
         bool is_new_node = false;
         if (ret == nullptr) {
             ret = push(key, value_type{}).first;
+            std::cout << "2\n";
             is_new_node = true;
         }
+        // std::cout << "get: " << ret->val_ << "\n";
         return {ret->val_->second, is_new_node};
     }
     bool count(const key_type& key) const {
@@ -796,7 +807,9 @@ public:
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) override {
-        mfwu::pair<node*, bool> ret = get_buckets_()[hash(key)].push(key, val);
+        std::cout << "-1\n";
+        mfwu::pair<node*, bool> ret = get_buckets_()[this->hash(key)].push(key, val);
+        std::cout << "5\n";
         add_cnt(ret.second);
         return {find(key), ret.second};
         // note: you must search again bcz add_cnt may
@@ -806,9 +819,8 @@ public:
         return insert(key_val.first, key_val.second);
     } 
     bool erase(const key_type& key) override {
-        size_type hashed_key = hash(key);
+        size_type hashed_key = this->hash(key);
         bool ret = get_buckets_()[hashed_key].pop(key);
-        size_ -= ret;
         return ret;
     }
     iterator erase(iterator it) override {
@@ -818,19 +830,19 @@ public:
         bkt->pop(cur->val_->first);
         return it;
     }
-    // TODO: erase by iterator !
     value_type& operator[](const key_type& key) {
         // assert
-        add_cnt(get_buckets_()[hash(key)].get(key).second);
+        add_cnt(get_buckets_()[this->hash(key)].get(key).second);
+        std::cout << "1\n";
         // note: you must search again bcz add_cnt may
         //       rehash the buckets 24.10.11 
-        return this->buckets_[hash(key)].get(key).first;
+        return this->buckets_[this->hash(key)].get(key).first;
     }
     bool count(const key_type& key) const {
-        return this->buckets_()[hash(key)].count(key);
+        return this->buckets_()[this->hash(key)].count(key);
     }
     iterator find(const key_type& key) const override {
-        bucket* bkt = this->buckets_ + hash(key);
+        bucket* bkt = this->buckets_ + this->hash(key);
         node* cur = bkt->find(key);
         if (cur == nullptr) {
             return end();
@@ -845,7 +857,6 @@ public:
     }
     void rehash(size_type capacity) {
         capacity = mfwu::get_next_primer(capacity);
-        std::cout << capacity_ << "\n";
         while ((float)size_ / capacity >= max_load_factor()) {
             capacity = mfwu::get_next_primer(capacity + 1);
         }
@@ -868,9 +879,9 @@ private:
     }
     void validate_buckets_() {
         if (!buckets_validation_flag_) {
-            std::cout << "validate here\n";
             for (size_type i = 0; i <= capacity_; i++) {
                 this->buckets_[i].htbl_ = new hashtable_with_htbl();
+                std::cout << "6\n";
             }
             buckets_validation_flag_ = true;
         }
@@ -889,18 +900,17 @@ private:
         this->buckets_[capacity_].push(key_type{}, value_type{});
     }
     size_type hash(const key_type& key) const override {
-        return hashfunc_(key) % size_type(capacity_ * k_);
+        return hashfunc_(key) % size_type(capacity_ * this->k_);
     }
     void rehash_hard(size_type capacity) {
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
-            bucket bkt = this->buckets_[idx];
-            while (!bkt.empty()) {
-                node* nd = bkt.front();
-                if (nd == nullptr) std::cout << "nm\n";
-                std::cout << nd->val_->first << " : " << nd->val_->second << "\n";
+            bucket* bkt = this->buckets_ + idx;
+            while (!bkt->empty()) {
+                node* nd = bkt->front();
+                if (nd == nullptr) { /*impossible*/}
                 newtable.insert(*nd->val_);
-                bkt.pop(nd->val_->first);
+                bkt->pop(nd->val_->first);
             }
         }
         newtable.size_ = this->size_;

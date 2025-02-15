@@ -70,10 +70,12 @@ public:
             if (!bkt->empty()) {
                 size_t depth = 0;
                 auto cur = bkt->front();
+                // std::cout << "front pos: " << cur->val_ << "\n";
                 size_t sz = bkt->size();
                 if (cur == nullptr) continue;
                 auto it = typename htbl_base<Key, Value>::iterator(cur, bkt);
                 for (size_t i = 0; i < sz; i++) {
+                    // std::cout << "iterator_cur pos: " << it.get_cur()->val_ << "\n";
                     cache[depth][idx] = it.get_cur()->val_->second;
                     ++depth; ++it;
                 }
@@ -114,7 +116,7 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_tree() {
     print_hashtable(htbl1);
     htbl1[data{6}] = 主;
     htbl1.insert(data{2}, 2);
-    htbl1.insert(data{5}, 主);
+    htbl1.insert(data{5}, 主);  // with underlying multimap
     htbl1[data{12}] = 主;
     print_hashtable(htbl1);
     ++htbl1[data{主}];
@@ -134,31 +136,33 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl() {
     std::cout << "\n------- Test: use mfwu::hashtable_with_htbl -------\n";
     std::cout << "testing hashtable_with_htbl\n";
     mfwu::hashtable_with_htbl<data, int, data_hash> htbl1(5);
-    print_hashtable(htbl1);
     htbl1[data{5}] = 5;
-    print_hashtable(htbl1);
     htbl1[data{1}] = 1;
-    print_hashtable(htbl1);
     htbl1.insert(mfwu::make_pair<const data, int>(data{3}, 3));
     print_hashtable(htbl1);
     htbl1[data{6}] = 主;
-    print_hashtable(htbl1);
     htbl1.insert(data{2}, 2);
+    htbl1.insert(data{5}, 主);  // change the val:5 of key:data{5}
+    htbl1[data{12}] = 主 + 1;
     print_hashtable(htbl1);
-    htbl1.insert(data{5}, 主);
+    ++htbl1[data{主}];
     print_hashtable(htbl1);
-    htbl1[data{12}] = 主;
+    htbl1.erase(data{5});
+    htbl1.erase(data{4});
+    htbl1.erase(data{3});
+    htbl1.insert(data{34}, 🐻);
+    htbl1.insert(data{23}, 🐻 + 主);
     print_hashtable(htbl1);
-    // ++htbl1[data{主}];
-    // print_hashtable(htbl1);
-    // htbl1.erase(data{5});
-    // htbl1.erase(data{4});
-    // htbl1.erase(data{3});
-    // htbl1.insert(data{34}, 🐻);
-    // htbl1.insert(data{23}, 🐻 + 主);
-    // print_hashtable(htbl1);
-    // mfwu::hashtable_with_htbl<data, int, data_hash> htbl2(++htbl1.begin(), htbl1.end());
-    // print_hashtable(htbl2);
+    mfwu::hashtable_with_htbl<data, int, data_hash> htbl2(++htbl1.begin(), htbl1.end());
+    print_hashtable(htbl2);
+    for (int i = 0; i < 100; i++) {
+        int key = rand() % 30;
+        int val = rand() % 10;
+        std::cout << "key_val: " << key << " : " << val << "\n";
+        htbl2[data{key}] = val;
+        print_hashtable(htbl2);
+    }
+    print_hashtable(htbl2);
     return 0;
 }
 
