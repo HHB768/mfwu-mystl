@@ -260,7 +260,8 @@ public:
         node* cur = it.get_cur();
         bucket* bkt = it.get_bucket();
         ++it;
-        bkt->pop(cur);
+        bool ret = bkt->pop(cur);
+        size_ -= ret;  // bug fixed on 25.02.16
         return it;
     }
     // TODO: erase by iterator !
@@ -577,7 +578,9 @@ public:
     node* front() {
         if (status_ == 0) return nullptr;
         if (status_ == 1) return cur_;
-        return htbl_->get_first_node(); 
+        node* ret = htbl_->get_first_node(); 
+        if (ret == htbl_->get_dummy_node()) { return nullptr; }  // hhh, it cost me 1 day to find this
+        return ret;
     }
     mfwu::pair<node*, bool> push(const key_type& key, 
                                  const value_type& value) {
@@ -811,7 +814,8 @@ public:
         mfwu::pair<node*, bool> ret = get_buckets_()[this->hash(key)].push(key, val);
         std::cout << "5\n";
         add_cnt(ret.second);
-        return {find(key), ret.second};
+        std::cout << "-2\n";
+        return {this->find(key), ret.second};
         // note: you must search again bcz add_cnt may
         //       rehash the buckets, but found on 24.10.23 T^T
     }
@@ -821,13 +825,15 @@ public:
     bool erase(const key_type& key) override {
         size_type hashed_key = this->hash(key);
         bool ret = get_buckets_()[hashed_key].pop(key);
+        size_ -= ret;
         return ret;
     }
     iterator erase(iterator it) override {
         node* cur = it.get_cur();
         bucket* bkt = it.get_bucket();
         ++it;
-        bkt->pop(cur->val_->first);
+        bool ret = bkt->pop(cur->val_->first);
+        size_ -= ret; 
         return it;
     }
     value_type& operator[](const key_type& key) {
@@ -844,6 +850,7 @@ public:
     iterator find(const key_type& key) const override {
         bucket* bkt = this->buckets_ + this->hash(key);
         node* cur = bkt->find(key);
+        std::cout << "found: " << cur << "\n";
         if (cur == nullptr) {
             return end();
         }
@@ -903,12 +910,19 @@ private:
         return hashfunc_(key) % size_type(capacity_ * this->k_);
     }
     void rehash_hard(size_type capacity) {
+        std::cout << "new cap: " << capacity << "\n";
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket* bkt = this->buckets_ + idx;
             while (!bkt->empty()) {
                 node* nd = bkt->front();
-                if (nd == nullptr) { /*impossible*/}
+                if (nd == nullptr) { /*impossible*/
+                                     /*no, it is possible 25.02.16*/
+                                     /*oh, it seems impossible 0216*/
+                    continue;  // actually empty
+                    // related to size_ maintenance bug in erase(...)
+                }
+                std::cout << nd << " ere\n";
                 newtable.insert(*nd->val_);
                 bkt->pop(nd->val_->first);
             }

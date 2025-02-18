@@ -362,7 +362,8 @@ public:
         node* cur = it.get_cur();
         bucket* bkt = it.get_bucket();
         ++it;
-        bkt->pop(cur);
+        bool ret = bkt->pop(cur);
+        size_ -= ret;  // bug fixed on 25.02.16
         return it;
     }
     // TODO: erase by iterator !
@@ -756,7 +757,8 @@ public:
         node* cur = it.get_cur();
         bucket* bkt = it.get_bucket();
         ++it;
-        bkt->pop(cur);
+        bool ret = bkt->pop(cur);
+        size_ -= ret;  // bug fixed on 25.02.16
         return it;
     }
     bool count(const key_type& key) const {
