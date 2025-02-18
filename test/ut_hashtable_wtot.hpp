@@ -155,13 +155,18 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl() {
     print_hashtable(htbl1);
     mfwu::hashtable_with_htbl<data, int, data_hash> htbl2(++htbl1.begin(), htbl1.end());
     print_hashtable(htbl2);
-    for (int i = 0; i < 100; i++) {
-        int key = rand() % 30;
+    for (int i = 0; i < 1000; i++) {
+        int key = rand() % 60;
         int val = rand() % 10;
-        std::cout << "key_val: " << key << " : " << val << "\n";
+        // std::cout << "key_val: " << key << " : " << val << "\n";
         htbl2[data{key}] = val;
         print_hashtable(htbl2);
     }
+    print_hashtable(htbl2);
+    std::cout << "-----------------------------------------\n";
+    mfwu::hashtable_with_htbl<data, int, data_hash> htbl3;
+    htbl3[data{0}] = 1;
+    htbl3[data{60}] = 1;  // 炸了
     print_hashtable(htbl2);
     return 0;
 }

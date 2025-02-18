@@ -596,16 +596,15 @@ public:
                 // htbl_ = new hashtable_with_htbl  // you cannot do this bcz you have no Hash and Alloc
                 assert(htbl_ != nullptr);
                 htbl_->insert(*cur_->val_);
-                std::cout << "ori_key_val: " << cur_->val_->first << " " << cur_->val_->second << "\n";
+                // std::cout << "ori_key_val: " << cur_->val_->first << " " << cur_->val_->second << "\n";
                 cur_->val_ = nullptr;
                 status_ = 2;
                 // std::cout << "pos of ori_val: " << htbl_->get_first_node()->val_ << "\n";
                 // std::cout << htbl_->get_first_node()->val_->first << "\n";
             }
         } 
-        std::cout << "new_key_val: " << key << " " << value << "\n";
+        // std::cout << "new_key_val: " << key << " " << value << "\n";
         auto ret = htbl_->insert(key, value);
-        std::cout << "3\n";
         // std::cout << "pos of new_val: " << ret.first.get_cur()->val_ << "\n";
         return {ret.first.get_cur(), ret.second};
     }
@@ -638,7 +637,6 @@ public:
         bool is_new_node = false;
         if (ret == nullptr) {
             ret = push(key, value_type{}).first;
-            std::cout << "2\n";
             is_new_node = true;
         }
         // std::cout << "get: " << ret->val_ << "\n";
@@ -810,11 +808,8 @@ public:
         return *this;
     }
     mfwu::pair<iterator, bool> insert(const key_type& key, const value_type& val) override {
-        std::cout << "-1\n";
         mfwu::pair<node*, bool> ret = get_buckets_()[this->hash(key)].push(key, val);
-        std::cout << "5\n";
         add_cnt(ret.second);
-        std::cout << "-2\n";
         return {this->find(key), ret.second};
         // note: you must search again bcz add_cnt may
         //       rehash the buckets, but found on 24.10.23 T^T
@@ -839,7 +834,6 @@ public:
     value_type& operator[](const key_type& key) {
         // assert
         add_cnt(get_buckets_()[this->hash(key)].get(key).second);
-        std::cout << "1\n";
         // note: you must search again bcz add_cnt may
         //       rehash the buckets 24.10.11 
         return this->buckets_[this->hash(key)].get(key).first;
@@ -850,7 +844,7 @@ public:
     iterator find(const key_type& key) const override {
         bucket* bkt = this->buckets_ + this->hash(key);
         node* cur = bkt->find(key);
-        std::cout << "found: " << cur << "\n";
+        // std::cout << "found: " << cur << "\n";
         if (cur == nullptr) {
             return end();
         }
@@ -888,7 +882,6 @@ private:
         if (!buckets_validation_flag_) {
             for (size_type i = 0; i <= capacity_; i++) {
                 this->buckets_[i].htbl_ = new hashtable_with_htbl();
-                std::cout << "6\n";
             }
             buckets_validation_flag_ = true;
         }
@@ -910,7 +903,7 @@ private:
         return hashfunc_(key) % size_type(capacity_ * this->k_);
     }
     void rehash_hard(size_type capacity) {
-        std::cout << "new cap: " << capacity << "\n";
+        // std::cout << "new cap: " << capacity << "\n";
         hashtable_with_htbl newtable = hashtable_with_htbl(capacity);
         for (size_type idx = 0; idx < capacity_; ++idx) {
             bucket* bkt = this->buckets_ + idx;
@@ -922,7 +915,6 @@ private:
                     continue;  // actually empty
                     // related to size_ maintenance bug in erase(...)
                 }
-                std::cout << nd << " ere\n";
                 newtable.insert(*nd->val_);
                 bkt->pop(nd->val_->first);
             }

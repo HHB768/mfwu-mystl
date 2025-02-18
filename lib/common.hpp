@@ -83,8 +83,22 @@ inline int roundup22(int n) {
     return n < 0 ? 1 : n + 1; 
 }
 
-inline float rand01(int N=99) {
-    return (N + 1 + rand() % (N + 1)) / (float)(N + 1) / 2;
+// inline float rand01(int N=99) {
+//     return (N + 1 + rand() % (N + 1)) / (float)(N + 1) / 2;
+//     // not good, for example, 2 % 3 == 26 % 3 and 2 % 4 == 26 % 4
+//     // (5 * 1/2 = 3, 5 * 0.99 = 4)
+//     // actually what we need is finding a hashfunctor that
+//     // make sure there is no number can have unlimited collisions
+//     // XQX 25.02.18
+// }
+
+inline float rand01() {
+    return (1 + rand() % 5 + 0.01) / 5.0F;
+    // not good, for example, 2 % 3 == 26 % 3 and 2 % 4 == 26 % 4
+    // (5 * 1/2 = 3, 5 * 0.99 = 4)
+    // actually what we need is finding a hashfunctor that
+    // make sure there is no number can have unlimited collisions
+    // XQX 25.02.18
 }
 
 template <typename T>
