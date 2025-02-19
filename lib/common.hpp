@@ -92,15 +92,6 @@ inline int roundup22(int n) {
 //     // XQX 25.02.18
 // }
 
-inline float rand01() {
-    return (1 + rand() % 5 + 0.01) / 5.0F;
-    // not good, for example, 2 % 3 == 26 % 3 and 2 % 4 == 26 % 4
-    // (5 * 1/2 = 3, 5 * 0.99 = 4)
-    // actually what we need is finding a hashfunctor that
-    // make sure there is no number can have unlimited collisions
-    // XQX 25.02.18
-}
-
 template <typename T>
 struct less {
     bool operator()(const T& a, const T& b) const {
@@ -138,6 +129,21 @@ constexpr std::array<unsigned long, 30> primer_list = {
 // that is 'shayisia', and he left when we found we will not
 // use git at work, it is useless it we will not use it, he said
 // 24.08.08 [0809]
+
+inline float rand01() {
+    return (1 + rand() % primer_list[0] + 0.01) / (float)primer_list[0];
+    // not good, for example, 2 % 3 == 26 % 3 and 2 % 4 == 26 % 4
+    // (5 * 1/2 = 3, 5 * 0.99 = 4)
+    // actually what we need is finding a hashfunctor that
+    // make sure there is no number can have unlimited collisions
+    // XQX 25.02.18
+    // the solution is, making the lcm(1, ..., p[0]) > numeric limit
+    // of max_of_size_type, or explicitly assigning a valid range
+    // of this kind of hashtable (maybe) X 25.02.19
+    // when p[0] = 47, lcm(1, ..., p[0]) > numeric_limits<size_t>
+    // and we need 29 - 47 to achieve the maximum lcm and 29 > 47 / 2
+    // so there is a solution, huh?  X 25.02.19
+}
 
 class empty_type {};
 

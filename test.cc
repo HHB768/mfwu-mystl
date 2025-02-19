@@ -1,31 +1,24 @@
-template <typename T>
-class SomeAlloc; // Forward declaration of SomeAlloc
-
-// Forward declaration of ABase (a base class for A)
-template <typename T>
-class ABase {
-public:
-    virtual ~ABase() = default;
-};
-
-// B now uses `ABase<T>` instead of `A<T, Hasher, Alloc>` directly
-template <typename T>
-class B {
-    T t_;
-    ABase<T>* a_;  // Pointer to a base class instead of full A
-};
-
-// Define A, which inherits from ABase
-template <typename T, typename Hasher, typename Alloc = SomeAlloc<B<T>>>
-class A : public ABase<T> {
-public:
-    using BType = B<T>;  // Now B does not need to reference A directly
-private:
-    BType* elements_;
-};
+#include "common.hpp"
 
 int main() {
-    using MyHasher = int; // Replace with an actual hasher type
-    A<int, MyHasher> aInstance; // Instantiate A
+    // std::cout << "size_t limit: " << std::numeric_limits<size_t>::max() << "\n";
+    // for (int i = 0; i < 10; i++) {
+    //     unsigned long long n = mfwu::primer_list[i];
+    //     size_t res = 1;
+    //     for (int i = 2; i <= n; i++) {
+    //         res = std::lcm(res, i);
+    //     }
+    //     std::cout << "n = " << n << ", "
+    //               << "res = " << res << "\n";
+    // }
+
+    std::cout << "size_t limit: " << std::numeric_limits<size_t>::max() << "\n";
+    size_t res = 1;
+    for (int n = 2; n < 53; n++) {
+        res = std::lcm(res, n);
+        std::cout << "n = " << n << ", "
+                  << "res = " << res << "\n";
+    }
+
     return 0;
 }
