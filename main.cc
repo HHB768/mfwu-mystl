@@ -27,6 +27,7 @@
 #   define __UNIT_TEST_STRING_BRIEF__
 #   define __UNIT_TEST_TRIE_BRIEF__
 #   define __UNIT_TEST_LOGGER_BRIEF__
+#   define __UNIT_TEST_HASHTABLE_WTOT_BRIEF__
 #endif  // __ALL_BRIEF__
 
 // #define __USE_MALLOC__
@@ -78,11 +79,18 @@ size_t unit_test(UtFunc ut_func, ResUtFunc... other_func) {
 
 template <typename... UtFunc>
 void unit_test(const char* title, UtFunc... ut_func) {
+    auto start_time = std::chrono::high_resolution_clock::now();
     size_t total = sizeof...(ut_func);
     size_t score = unit_test(ut_func...);
     std::cout << "\n----------- " << title << " test result -----------\n";
-    std::cout << "Pass/Total: " << score << "/" << total << "\n\n\n";
+    std::cout << "Pass/Total: " << score << "/" << total << "\n";
     ttotal += total; sscore += score;
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::cout << "Time cost: " 
+        << std::chrono::duration_cast<std::chrono::microseconds>(
+               end_time - start_time
+           ).count() << "us\n";
+    std::cout << "\n\n";
 }
 
 // void update_score(const mfwu::pair<size_t, size_t>& p) {

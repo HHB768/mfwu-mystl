@@ -49,11 +49,17 @@
     25.01.01 X-H
 */
 
+/*
+    1. tuple                                    1 days  √
+    2. webserver                                3 days  √
+    3. ringbuffer                               5 days  
+    4. logger                                   5 days (2 + 3) √
+    5. others                                   stl_with_locker
 
-1. tuple                                    1 days  √
-2. webserver                                3 days  √
-3. ringbuffer                               5 days  
-4. logger                                   5 days (2 + 3) √
-5. others                                   (sort iostream stl_with_locker)
+    25.02.07 X-Q3
+*/
 
-25.02.07 X-Q3
+1. buffer with and without locker
+2. new proj
+
+25.02.19 X-Qx

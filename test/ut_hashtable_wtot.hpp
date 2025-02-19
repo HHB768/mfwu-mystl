@@ -50,8 +50,8 @@ public:
 #ifdef __UNIT_TEST_HASHTABLE_WTOT__
 #ifndef __UNIT_TEST_HASHTABLE_WTOT_BRIEF__
         mfwu::print_rect(cache);
-#endif  // __UNIT_TEST_HASHTABLE_BRIEF__
-#endif  // __UNIT_TEST_HASHTABLE__
+#endif  // __UNIT_TEST_HASHTABLE_WTOTBRIEF__
+#endif  // __UNIT_TEST_HASHTABLE_WTOT__
     }
 
 
@@ -84,8 +84,8 @@ public:
 #ifdef __UNIT_TEST_HASHTABLE_WTOT__
 #ifndef __UNIT_TEST_HASHTABLE_WTOT_BRIEF__
         mfwu::print_rect(cache);
-#endif  // __UNIT_TEST_HASHTABLE_BRIEF__
-#endif  // __UNIT_TEST_HASHTABLE__
+#endif  // __UNIT_TEST_HASHTABLE_WTOT_BRIEF__
+#endif  // __UNIT_TEST_HASHTABLE_WTOT__
     }
 
 private:
@@ -160,14 +160,14 @@ bool unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl() {
         int val = rand() % 10;
         // std::cout << "key_val: " << key << " : " << val << "\n";
         htbl2[data{key}] = val;
-        print_hashtable(htbl2);
+        // print_hashtable(htbl2);
     }
     print_hashtable(htbl2);
-    std::cout << "-----------------------------------------\n";
+    // std::cout << "-----------------------------------------\n";
     mfwu::hashtable_with_htbl<data, int, data_hash> htbl3;
     htbl3[data{0}] = 1;
-    htbl3[data{60}] = 1;  // 炸了
-    print_hashtable(htbl2);
+    // htbl3[data{60}] = 1;  // 炸了
+    print_hashtable(htbl3);
     return 0;
 }
 
