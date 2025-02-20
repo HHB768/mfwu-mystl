@@ -12,6 +12,7 @@ template <typename value_type,
 struct rbf_block {
     static constexpr size_t get_padding(size_t vtsz) {
         return blksz * ((vtsz - 1) / blksz + 1) - vtsz;
+        //  != vtsz - 1 + blksz - vtsz == blksz - 1  -_|||
     }  // check: will it work? or we should deal with vtsz == 0? 24.10.5
     value_type val;
     char padding[get_padding(sizeof(value_type))];
@@ -93,7 +94,8 @@ public:
         }
         iterator operator+(int n) {
             iterator temp = *this;
-            temp.ptr_ += n;
+            temp.ptr_ += n;  // no such operator+= lol 25.02.20
+                             // ops, it says 'temp.ptr' lol
             return temp;
         }
         iterator operator-(int n) {

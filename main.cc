@@ -64,6 +64,7 @@
 #include "ut_trie.hpp"
 #include "ut_logger.hpp"
 #include "ut_hashtable_wtot.hpp"
+#include "ut_safe_rbf.hpp"
 
 static size_t ttotal = 0;
 static size_t sscore = 0;
@@ -128,6 +129,7 @@ int main() {
     mfwu::unit_test_trie ut_trie;
     mfwu::unit_test_logger ut_logger;
     mfwu::unit_test_hashtable_wtot ut_htblw;
+    mfwu::unit_test_safe_rbf ut_srbf;
 
     size_t score = 0;
     size_t total = 0;
@@ -326,6 +328,12 @@ int main() {
         "Hashtable_wtot",
         ut_func(mfwu::unit_test_hashtable_wtot::use_mfwu_hashtable_with_tree, ut_htblw),
         ut_func(mfwu::unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl, ut_htblw)
+    );
+
+    unit_test(
+        "Safe Ringbuffer",
+        ut_func(mfwu::unit_test_safe_rbf::use_rbf_with_mtx, ut_srbf)
+        // ut_func(mfwu::unit_test_hashtable_wtot::use_mfwu_hashtable_with_htbl, ut_htblw)
     );
 
 
