@@ -64,7 +64,7 @@ bool unit_test_rbtree_exp::use_rbtree_exp() {
             // unit_test_rbtree::print_colored_struct(rbt2.get_tree());
         }
         if (equal_(rbt1, rbt2)) {
-            std::cout << "validated, test num: " << test_num + 1 << "\n";
+            // std::cout << "validated, test num: " << test_num + 1 << "\n";
             // unit_test_rbtree::print_colored_struct(rbt1.get_tree());
             // unit_test_rbtree::print_colored_struct(rbt2.get_tree());
         } else {

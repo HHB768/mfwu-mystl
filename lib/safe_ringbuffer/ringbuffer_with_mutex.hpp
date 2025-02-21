@@ -137,6 +137,7 @@ public:
           read_pos_(start_ + rbf.get_read_pos_idx(), start_, last_),
           mtx_(),size_(rbf.size_) {
         mfwu::uninitialized_copy(rbf.start_, rbf.last_, start_);
+        // TODO: open after copy?
     }
     ringbuffer_with_mutex(ringbuffer_with_mutex&& rbf)
         : start_(rbf.start_), last_(rbf.last_),
@@ -171,28 +172,84 @@ public:
 
     iterator begin() const { return read_pos_; }
     iterator end() const { return write_pos_; }
+    bool empty() {  // we cannot add const here?
+        std::lock_guard<std::mutex> locker(mtx_);
+        return write_pos_ == read_pos_;
+    }
+    bool full() {
+        std::lock_guard<std::mutex> locker(mtx_);
+        return write_pos_ + 1 = read_pos_;
+    }
     size_type size() const {
         assert(last_ - start_ == size_);
         return size_;
     }
+    void clear() {
+        std::lock_guard<std::mutex> locker(mtx_);
+        write_pos_ = read_pos_ = iterator(start_, start_, last_);
+    }
     iterator read(value_type* res) {
-        std::lock_guard<std::mutex>(mtx_);
-        iterator ret = read_pos_;
+        std::unique_lock<std::mutex> locker(mtx_);
+        while (read_pos_ == write_pos_) {
+            std::cout << "waiting\n";
+            consumer_.wait(locker);
+            std::cout << "go\n";
+            if (is_close_ && read_pos_ == write_pos_) {
+                *res = "no data left\0";
+                return read_pos_;
+            }
+        }
         *res = *read_pos_;
         ++read_pos_;
-        return ret;
+        producer_.notify_one();
+
+        return read_pos_;
     }
     iterator write(const value_type& val) {
-        std::lock_guard<std::mutex>(mtx_);
+        std::unique_lock<std::mutex> locker(mtx_);
+        while (write_pos_ + 1 == read_pos_) {
+            producer_.wait(locker);
+            if (is_close_) {
+                return write_pos_;
+            }
+        }
         *write_pos_ = val;
         ++write_pos_;
+        consumer_.notify_one();
+
         return write_pos_;
     }
     iterator write(value_type&& val) {
-        std::lock_guard<std::mutex>(mtx_);
+        std::unique_lock<std::mutex> locker(mtx_);
+        while (write_pos_ + 1 == read_pos_) {
+            producer_.wait(locker);
+            if (is_close_) {
+                return write_pos_;
+            }
+        }
         *write_pos_ = mfwu::move(val);
         ++write_pos_;
+        consumer_.notify_one();
+
         return write_pos_;
+    }
+
+    void _close() {
+        {
+            std::unique_lock<std::mutex> locker(mtx_);
+            if (is_close_) return ;
+            is_close_ = true;
+        }
+        producer_.notify_all();
+        consumer_.notify_all();
+    }
+    bool is_close() {
+        std::unique_lock<std::mutex> locker(mtx_);
+        return is_close_;
+    }
+    void flush() {
+        std::cout << "to flush one\n";
+        consumer_.notify_one();
     }
 private:
     void _destroy() {
@@ -213,6 +270,10 @@ private:
     iterator read_pos_;
     const size_type size_;
     std::mutex mtx_;
+
+    std::condition_variable consumer_;
+    std::condition_variable producer_;
+    bool is_close_ = false;
 };  // endof class ringbuffer_with_mutex
 
 }  // endof namespace mfwu_rbf
