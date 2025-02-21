@@ -23,7 +23,7 @@ struct rbf_block {
         return ss.str();
     }
     static constexpr size_t get_padding(size_t vtsz) {
-        return mfwu::ringbuffer<T, BlockSize>::get_padding(vtsz);
+        return mfwu::rbf_block<T, BlockSize>::get_padding(vtsz);
     }
     value_type val;
     char padding[get_padding(sizeof(value_type))];
@@ -126,14 +126,16 @@ public:
     ringbuffer_with_mutex() = delete;
     ringbuffer_with_mutex(size_type n)
         : start_(Alloc::allocate(n)), last_(start_ + n),
-          write_pos_(start_), read_pos_(start_), size_(n), mtx_() {
+          write_pos_(start_, start_, last_), 
+          read_pos_(start_, start_, last_), size_(n), mtx_() {
         // for non-pod data, init them
         mfwu::construct(start_, last_, value_type{});
     }
     ringbuffer_with_mutex(const ringbuffer_with_mutex& rbf)
         : start_(Alloc::allocate(rbf.size_)), last_(start_ + rbf.size_),
-          write_pos_(start_ + rbf.get_write_pos_idx()), mtx_(),
-          read_pos_(start_ + rbf.get_read_pos_idx()), size_(rbf.size_) {
+          write_pos_(start_ + rbf.get_write_pos_idx(), start_, last_), 
+          read_pos_(start_ + rbf.get_read_pos_idx(), start_, last_),
+          mtx_(),size_(rbf.size_) {
         mfwu::uninitialized_copy(rbf.start_, rbf.last_, start_);
     }
     ringbuffer_with_mutex(ringbuffer_with_mutex&& rbf)
@@ -195,7 +197,7 @@ public:
 private:
     void _destroy() {
         mfwu::destroy(start_, last_);
-        Alloc::deallocate(start_.get_ptr(), size_);
+        Alloc::deallocate(start_, size_);
     }
     size_type get_write_pos_idx() const {
         return write_pos_ - start_;
@@ -204,8 +206,9 @@ private:
         return read_pos_ - start_;
     }
 
-    iterator start_;
-    iterator last_;
+    block* start_;
+    block* last_;
+    
     iterator write_pos_;
     iterator read_pos_;
     const size_type size_;
