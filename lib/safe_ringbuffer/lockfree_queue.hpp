@@ -1,7 +1,7 @@
 #ifndef __LOCK_FREE_QUEUE_HPP__
 #define __LOCK_FREE_QUEUE_HPP__
 
-// source: TODO: WRBSITE HERE
+// source: https://github.com/craflin/LockFreeQueue
 
 #include <atomic>
 #include <cstddef>

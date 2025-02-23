@@ -88,7 +88,7 @@ public:
         }
         iterator operator++(int) {
             iterator temp = *this;
-            ++ptr_;
+            ++(*this);
             return temp;
         }
         iterator operator+(int n) {
@@ -178,7 +178,7 @@ public:
     }
     bool full() {
         std::lock_guard<std::mutex> locker(mtx_);
-        return write_pos_ + 1 = read_pos_;
+        return write_pos_ + 1 == read_pos_;
     }
     size_type size() const {
         assert(last_ - start_ == size_);
@@ -195,7 +195,6 @@ public:
             consumer_.wait(locker);
             std::cout << "go\n";
             if (is_close_ && read_pos_ == write_pos_) {
-                *res = "no data left\0";
                 return read_pos_;
             }
         }
@@ -207,7 +206,7 @@ public:
     }
     iterator write(const value_type& val) {
         std::unique_lock<std::mutex> locker(mtx_);
-        while (write_pos_ + 1 == read_pos_) {
+        while ((write_pos_ + 1) == read_pos_) {
             producer_.wait(locker);
             if (is_close_) {
                 return write_pos_;
@@ -221,7 +220,7 @@ public:
     }
     iterator write(value_type&& val) {
         std::unique_lock<std::mutex> locker(mtx_);
-        while (write_pos_ + 1 == read_pos_) {
+        while ((write_pos_ + 1) == read_pos_) {
             producer_.wait(locker);
             if (is_close_) {
                 return write_pos_;
