@@ -21,7 +21,7 @@ end of random tests
 
 ----------- Alloc test result -----------
 Pass/Total: 2/2
-Time cost: 213us
+Time cost: 17509us
 
 
 
@@ -48,7 +48,7 @@ testing random_access_iterator moving and writing
 
 ----------- Iterator test result -----------
 Pass/Total: 6/6
-Time cost: 5us
+Time cost: 68us
 
 
 
@@ -76,7 +76,7 @@ testing advance of iterator
 
 ----------- Utils test result -----------
 Pass/Total: 3/3
-Time cost: 6us
+Time cost: 66us
 
 
 
@@ -111,7 +111,7 @@ comparing
 
 ----------- Vector test result -----------
 Pass/Total: 3/3
-Time cost: 29us
+Time cost: 109us
 
 
 
@@ -151,7 +151,7 @@ erasing
 
 ----------- List test result -----------
 Pass/Total: 4/4
-Time cost: 10us
+Time cost: 79us
 
 
 
@@ -169,7 +169,7 @@ sorting
 
 ----------- Heap test result -----------
 Pass/Total: 2/2
-Time cost: 16us
+Time cost: 100us
 
 
 
@@ -182,7 +182,7 @@ traversing
 
 ----------- BST test result -----------
 Pass/Total: 2/2
-Time cost: 5us
+Time cost: 136us
 
 
 
@@ -194,7 +194,7 @@ traversing
 
 ----------- AVL_tree test result -----------
 Pass/Total: 2/2
-Time cost: 27us
+Time cost: 129us
 
 
 
@@ -209,7 +209,7 @@ random inserting/eraseing test: part 2
 
 ----------- Rbtree test result -----------
 Pass/Total: 3/3
-Time cost: 31us
+Time cost: 766us
 
 
 
@@ -222,7 +222,7 @@ read/write ptr pos ctrl
 
 ----------- Rbf test result -----------
 Pass/Total: 1/1
-Time cost: 13us
+Time cost: 101us
 
 
 
@@ -234,7 +234,7 @@ testing shashtable
 
 ----------- Hashtable test result -----------
 Pass/Total: 2/2
-Time cost: 21us
+Time cost: 124us
 
 
 
@@ -253,7 +253,7 @@ clearing...
 
 ----------- Unordered_map test result -----------
 Pass/Total: 3/3
-Time cost: 43us
+Time cost: 304us
 
 
 
@@ -272,7 +272,7 @@ clearing...
 
 ----------- Unordered_set test result -----------
 Pass/Total: 3/3
-Time cost: 27us
+Time cost: 137us
 
 
 
@@ -288,7 +288,7 @@ push/pop/insert/erasing
 
 ----------- Deque test result -----------
 Pass/Total: 4/4
-Time cost: 18us
+Time cost: 114us
 
 
 
@@ -297,7 +297,7 @@ building & copying & moving
 
 ----------- Stack test result -----------
 Pass/Total: 1/1
-Time cost: 21us
+Time cost: 174us
 
 
 
@@ -306,7 +306,7 @@ building & copying & moving
 
 ----------- Queue test result -----------
 Pass/Total: 1/1
-Time cost: 6us
+Time cost: 1024us
 
 
 
@@ -322,7 +322,7 @@ finding & counting & containing & calcing equal_range
 
 ----------- Set test result -----------
 Pass/Total: 3/3
-Time cost: 16us
+Time cost: 105us
 
 
 
@@ -338,38 +338,18 @@ finding & counting & containing & calcing equal_range
 
 ----------- Map test result -----------
 Pass/Total: 3/3
-Time cost: 26us
+Time cost: 137us
 
 
 
 ------- Test: use mfwu::rbtree_exp -------
 testing random push/pop
-validated, test num: 1
-validated, test num: 2
-validated, test num: 3
-validated, test num: 4
-validated, test num: 5
-validated, test num: 6
-validated, test num: 7
-validated, test num: 8
-validated, test num: 9
-validated, test num: 10
-validated, test num: 11
-validated, test num: 12
-validated, test num: 13
-validated, test num: 14
-validated, test num: 15
-validated, test num: 16
-validated, test num: 17
-validated, test num: 18
-validated, test num: 19
-validated, test num: 20
 insane random push/pop test!
 validated, iter_num: 1000
 
 ----------- Rbtree_exp test result -----------
 Pass/Total: 1/1
-Time cost: 1812us
+Time cost: 10910us
 
 
 
@@ -385,7 +365,7 @@ finding & counting & containing & calcing equal_range
 
 ----------- Multiset test result -----------
 Pass/Total: 3/3
-Time cost: 33us
+Time cost: 113us
 
 
 
@@ -401,7 +381,7 @@ finding & counting & containing & calcing equal_range
 
 ----------- Multimap test result -----------
 Pass/Total: 3/3
-Time cost: 50us
+Time cost: 739us
 
 
 
@@ -413,7 +393,7 @@ testing shashtable
 
 ----------- Hashtable_exp test result -----------
 Pass/Total: 2/2
-Time cost: 25us
+Time cost: 126us
 
 
 
@@ -432,7 +412,7 @@ clearing...
 
 ----------- Unordered_multimap test result -----------
 Pass/Total: 3/3
-Time cost: 92us
+Time cost: 661us
 
 
 
@@ -451,7 +431,7 @@ clearing...
 
 ----------- Unordered_multiset test result -----------
 Pass/Total: 3/3
-Time cost: 30us
+Time cost: 496us
 
 
 
@@ -465,7 +445,7 @@ random pushing/poping/inserting/erasing
 
 ----------- String test result -----------
 Pass/Total: 2/2
-Time cost: 10us
+Time cost: 85us
 
 
 
@@ -477,7 +457,7 @@ count 'a' as prefix: 9
 
 ----------- Trie test result -----------
 Pass/Total: 1/1
-Time cost: 206us
+Time cost: 1463us
 
 
 
@@ -487,7 +467,7 @@ Time cost: 206us
 
 ----------- Logger test result -----------
 Pass/Total: 2/2
-Time cost: 132us
+Time cost: 3001us
 
 
 
@@ -499,12 +479,218 @@ testing hashtable_with_htbl
 
 ----------- Hashtable_wtot test result -----------
 Pass/Total: 2/2
-Time cost: 556us
+Time cost: 7430us
+
+
+writing the #1 record
+writing the #2 record
+writing the #3 record
+writing the #4 record
+writing the #5 record
+writing the #6 record
+writing the #7 record
+writing the #8 record
+writing the #9 record
+writing the #10 record
+writing the #11 record
+writing the #12 record
+found record: 100000
+found record: 100001
+found record: 100002
+found record: 100003
+found record: 100004
+found record: 100005
+found record: 100006
+found record: 100007
+found record: 100008
+found record: 100009
+found record: 100010
+writing the #13 record
+writing the #14 record
+found record: 100012
+found record: 100013
+writing the #15 record
+writing the #16 record
+writing the #17 record
+writing the #18 record
+writing the #19 record
+writing the #20 record
+writing the #21 record
+writing the #22 record
+writing the #23 record
+writing the #24 record
+writing the #25 record
+writing the #26 record
+found record: 100014
+found record: 100015
+found record: 100016
+found record: 100017
+found record: 100018
+found record: 100019
+found record: 100020
+found record: 100021
+found record: 100022
+found record: 100023
+found record: 100024
+writing the #27 record
+writing the #28 record
+writing the #29 record
+writing the #30 record
+writing the #31 record
+writing the #32 record
+writing the #33 record
+writing the #34 record
+writing the #35 record
+writing the #36 record
+writing the #37 record
+found record: 100011
+found record: 100026
+found record: 100027
+found record: 100028
+found record: 100029
+found record: 100030
+found record: 100031
+found record: 100032
+found record: 100033
+found record: 100034
+found record: 100035
+writing the #38 record
+writing the #39 record
+writing the #40 record
+writing the #41 record
+writing the #42 record
+writing the #43 record
+writing the #44 record
+writing the #45 record
+writing the #46 record
+writing the #47 record
+writing the #48 record
+found record: 100036
+found record: 100037
+found record: 100038
+found record: 100039
+found record: 100040
+found record: 100041
+found record: 100042
+found record: 100043
+found record: 100044
+found record: 100045
+found record: 100046
+found record: 100047
+writing the #49 record
+writing the #50 record
+writing the #51 record
+writing the #52 record
+writing the #53 record
+writing the #54 record
+writing the #55 record
+writing the #56 record
+writing the #57 record
+writing the #58 record
+writing the #59 record
+writing the #60 record
+found record: 100048
+found record: 100049
+found record: 100050
+found record: 100051
+found record: 100052
+found record: 100053
+found record: 100054
+found record: 100055
+found record: 100056
+found record: 100057
+found record: 100058
+writing the #61 record
+writing the #62 record
+writing the #63 record
+writing the #64 record
+writing the #65 record
+writing the #66 record
+writing the #67 record
+writing the #68 record
+writing the #69 record
+writing the #70 record
+writing the #71 record
+found record: 100059
+found record: 100060
+found record: 100061
+found record: 100062
+found record: 100063
+found record: 100064
+found record: 100065
+found record: 100066
+found record: 100067
+found record: 100068
+found record: 100069
+writing the #72 record
+writing the #73 record
+writing the #74 record
+writing the #75 record
+writing the #76 record
+writing the #77 record
+writing the #78 record
+writing the #79 record
+writing the #80 record
+writing the #81 record
+writing the #82 record
+writing the #83 record
+found record: 100071
+found record: 100072
+found record: 100073
+found record: 100074
+found record: 100075
+found record: 100076
+found record: 100077
+found record: 100078
+found record: 100079
+found record: 100080
+found record: 100081
+writing the #84 record
+writing the #85 record
+writing the #86 record
+writing the #87 record
+writing the #88 record
+writing the #89 record
+writing the #90 record
+writing the #91 record
+writing the #92 record
+writing the #93 record
+writing the #94 record
+found record: 100082
+found record: 100083
+found record: 100084
+found record: 100085
+found record: 100086
+found record: 100087
+found record: 100088
+found record: 100089
+found record: 100090
+found record: 100091
+found record: 100092
+writing the #95 record
+writing the #96 record
+writing the #97 record
+writing the #98 record
+writing the #99 record
+writing the #100 record
+found record: 100025
+found record: 100093
+found record: 100094
+found record: 100095
+found record: 100096
+found record: 100097
+found record: 100098
+found record: 100099
+found record: 100070
+
+----------- Safe Ringbuffer test result -----------
+Pass/Total: 1/1
+Time cost: 33982us
 
 
 
 ---------- test result -----------
 
-Total number of unit tests: 70
+Total number of unit tests: 71
 Endof unit tests
 +++++++++++++++++++++++++++++++++++++++++++++

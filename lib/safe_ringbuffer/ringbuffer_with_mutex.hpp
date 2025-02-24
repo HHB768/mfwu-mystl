@@ -188,55 +188,53 @@ public:
         std::lock_guard<std::mutex> locker(mtx_);
         write_pos_ = read_pos_ = iterator(start_, start_, last_);
     }
-    iterator read(value_type* res) {
+    bool /*iterator*/ read(value_type* res) {
         std::unique_lock<std::mutex> locker(mtx_);
         while (read_pos_ == write_pos_) {
-            std::cout << "waiting\n";
             consumer_.wait(locker);
-            std::cout << "go\n";
-            if (is_close_ && read_pos_ == write_pos_) {
-                return read_pos_;
+            if (is_close_) {
+                return false;
             }
         }
         *res = *read_pos_;
         ++read_pos_;
         producer_.notify_one();
 
-        return read_pos_;
+        return true;
     }
-    iterator write(const value_type& val) {
+    bool write(const value_type& val) {
         std::unique_lock<std::mutex> locker(mtx_);
         while ((write_pos_ + 1) == read_pos_) {
             producer_.wait(locker);
             if (is_close_) {
-                return write_pos_;
+                return false;
             }
         }
         *write_pos_ = val;
         ++write_pos_;
         consumer_.notify_one();
 
-        return write_pos_;
+        return true;
     }
-    iterator write(value_type&& val) {
+    bool write(value_type&& val) {
         std::unique_lock<std::mutex> locker(mtx_);
         while ((write_pos_ + 1) == read_pos_) {
             producer_.wait(locker);
             if (is_close_) {
-                return write_pos_;
+                return false;
             }
         }
         *write_pos_ = mfwu::move(val);
         ++write_pos_;
         consumer_.notify_one();
 
-        return write_pos_;
+        return true;
     }
 
     void _close() {
         {
+            // std::cout << "close\n";
             std::unique_lock<std::mutex> locker(mtx_);
-            if (is_close_) return ;
             is_close_ = true;
         }
         producer_.notify_all();
@@ -247,8 +245,9 @@ public:
         return is_close_;
     }
     void flush() {
-        std::cout << "to flush one\n";
+        // std::cout << "to flush one\n";
         consumer_.notify_one();
+        // sleep(1);
     }
 private:
     void _destroy() {
